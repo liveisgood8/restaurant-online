@@ -1,9 +1,13 @@
 version: '3.7'
 
 services: 
+  # nginx:
+  #   build: ./docker/nginx
+  #   ports:
+  #     - 80:80
   db:
     build: ./docker/postgres
-    ports: 
+    ports: # Just for dev
       - 5432:5432
     environment: 
       POSTGRES_USER: root
@@ -23,7 +27,7 @@ services:
       DB_SCHEMA: public
     depends_on:
       - db
-  adminer:
+  adminer: # Just for dev
     image: adminer
     restart: always
     ports:
