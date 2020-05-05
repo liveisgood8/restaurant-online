@@ -1,10 +1,10 @@
-package com.nexus.restaurantonline;
+package com.restaurantonline.authservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RestaurantOnlineApplicationTests {
+class AuthServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
