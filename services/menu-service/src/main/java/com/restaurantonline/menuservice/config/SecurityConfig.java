@@ -42,7 +42,12 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     super.configure(http);
     http
         .csrf().disable();
+
     configureDishesSecurity(http);
+
+    http
+        .authorizeRequests()
+        .anyRequest().permitAll();
   }
 
   private void configureDishesSecurity(HttpSecurity http) throws Exception {
