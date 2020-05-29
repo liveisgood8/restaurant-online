@@ -27,14 +27,14 @@ public class Dish implements Serializable {
   @Size(max = 255)
   private String description;
 
-  @Column
-  private double protein;
+  @Column(nullable = true)
+  private Double protein;
 
-  @Column
-  private double fat;
+  @Column(nullable = true)
+  private Double fat;
 
-  @Column
-  private double carbohydrates;
+  @Column(nullable = true)
+  private Double carbohydrates;
 
   @Column
   @URL(message = "Некорректная ссылка на изображение блюда")
@@ -69,27 +69,27 @@ public class Dish implements Serializable {
     this.description = description;
   }
 
-  public double getProtein() {
+  public Double getProtein() {
     return protein;
   }
 
-  public void setProtein(double protein) {
+  public void setProtein(Double protein) {
     this.protein = protein;
   }
 
-  public double getFat() {
+  public Double getFat() {
     return fat;
   }
 
-  public void setFat(double fat) {
+  public void setFat(Double fat) {
     this.fat = fat;
   }
 
-  public double getCarbohydrates() {
+  public Double getCarbohydrates() {
     return carbohydrates;
   }
 
-  public void setCarbohydrates(double carbohydrates) {
+  public void setCarbohydrates(Double carbohydrates) {
     this.carbohydrates = carbohydrates;
   }
 
