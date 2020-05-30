@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.groups.Default;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,14 +21,23 @@ public class DishController {
   private DishService dishService;
 
   @GetMapping
-  public List<Dish> getAll() {
-    return dishService.getAll();
+  public List<Dish> getAll(@RequestParam Long categoryId) {
+    if (categoryId == null) {
+      return dishService.getAll();
+    } else {
+      return dishService.getByCategoryId(categoryId);
+    }
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public void create(@Validated({Default.class, InsertGroup.class}) @RequestBody Dish dish) {
-    dishService.create(dish);
+  public Dish create(@Validated({Default.class, InsertGroup.class}) @RequestBody Dish dish) {
+    return dishService.create(dish);
+  }
+
+  @PostMapping("/upload-image")
+  public String uploadDishImage(@RequestParam("file") MultipartFile file) throws IOException {
+    return dishService.saveImageInPublicDirectoryAndGetUrl(file);
   }
 
   @PutMapping("{id}")
