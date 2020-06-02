@@ -42,7 +42,6 @@ public class Dish implements Serializable {
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
-  @NotNull
   private Category category;
 
   public Long getId() {

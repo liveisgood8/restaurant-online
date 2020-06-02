@@ -19,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
+// TODO enable
 @KeycloakConfiguration
 public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
   /**
@@ -69,7 +70,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         .csrf().disable()
         .cors();
 
-    configureDishesSecurity(http);
+//    configureDishesSecurity(http);
 
     http
         .authorizeRequests()
