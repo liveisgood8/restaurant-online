@@ -6,7 +6,6 @@ import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -17,14 +16,14 @@ public class Dish implements Serializable {
   @GeneratedValue
   private Long id;
 
-  @Column
   @NotEmpty(groups = InsertGroup.class)
   @Size(max = 255)
+  @Column(nullable = false)
   private String name;
 
-  @Column
   @NotEmpty(groups = InsertGroup.class)
   @Size(max = 255)
+  @Column(nullable = false)
   private String description;
 
   @Column(nullable = true)
@@ -36,8 +35,8 @@ public class Dish implements Serializable {
   @Column(nullable = true)
   private Double carbohydrates;
 
-  @Column
   @URL(message = "Некорректная ссылка на изображение блюда")
+  @Column
   private String imageUrl;
 
   @JsonBackReference

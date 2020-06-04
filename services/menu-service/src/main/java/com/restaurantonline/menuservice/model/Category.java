@@ -2,6 +2,7 @@ package com.restaurantonline.menuservice.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -16,10 +17,14 @@ public class Category {
   @GeneratedValue
   private Long id;
 
-  @Column(length = 128)
   @NotEmpty
   @Length(max = 128)
+  @Column(length = 128, nullable = false)
   private String name;
+
+  @URL(message = "Некорректная ссылка на изображение категории")
+  @Column
+  private String imageUrl;
 
   @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
