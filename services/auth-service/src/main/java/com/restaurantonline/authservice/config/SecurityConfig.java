@@ -32,7 +32,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
    */
   @Bean
   public Keycloak keycloak(KeycloakSpringBootProperties props) {
-    Keycloak keycloak = KeycloakBuilder.builder() //
+    return KeycloakBuilder.builder() //
         .serverUrl(props.getAuthServerUrl()) //
         .grantType(OAuth2Constants.PASSWORD)
         .realm(props.getRealm()) //
@@ -40,8 +40,6 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         .password("admin")
         .clientId("admin-cli") //
         .build();
-
-    return keycloak;
   }
 
   /**
