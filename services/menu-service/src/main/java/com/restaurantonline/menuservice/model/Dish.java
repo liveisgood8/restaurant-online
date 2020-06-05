@@ -1,8 +1,8 @@
 package com.restaurantonline.menuservice.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.restaurantonline.menuservice.validation.InsertGroup;
-import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -35,9 +35,10 @@ public class Dish implements Serializable {
   @Column(nullable = true)
   private Double carbohydrates;
 
-  @URL(message = "Некорректная ссылка на изображение блюда")
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   @Column
-  private String imageUrl;
+  @Basic(fetch = FetchType.LAZY)
+  private String imagePath;
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
@@ -91,12 +92,12 @@ public class Dish implements Serializable {
     this.carbohydrates = carbohydrates;
   }
 
-  public String getImageUrl() {
-    return imageUrl;
+  public String getImagePath() {
+    return imagePath;
   }
 
-  public void setImageUrl(String imageUrl) {
-    this.imageUrl = imageUrl;
+  public void setImagePath(String imagePath) {
+    this.imagePath = imagePath;
   }
 
   public Category getCategory() {

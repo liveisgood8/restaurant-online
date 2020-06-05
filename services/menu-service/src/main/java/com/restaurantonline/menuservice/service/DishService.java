@@ -1,42 +1,55 @@
 package com.restaurantonline.menuservice.service;
 
 import com.restaurantonline.menuservice.model.Dish;
+import com.restaurantonline.menuservice.model.DishWithImageUrl;
 import com.restaurantonline.menuservice.repository.DishRepository;
 import com.restaurantonline.menuservice.utils.NullAwareBeanUtilsBean;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class DishService {
+  private final Path UPLOAD_IMAGES_DIR;
+
   @Autowired
   private DishRepository dishRepository;
 
-  private final Path UPLOAD_IMAGES_DIR =
-      Paths.get("/media/ExtPartition/ro/menu-service/dish-images");
-
-  @PostConstruct
-  private void createUploadsDirectory() throws IOException {
+  @Autowired
+  public DishService(@Value("${uploads.directory:uploads}") String uploadsDirectory) throws IOException {
+    UPLOAD_IMAGES_DIR = Paths.get(uploadsDirectory, "dish-images");
     Files.createDirectories(UPLOAD_IMAGES_DIR);
   }
 
-  public List<Dish> getAll() {
-    return dishRepository.findAll();
+  public List<DishWithImageUrl> getAll() {
+    List<Dish> dishes = dishRepository.findAll();
+    return getDishesWithImageUrl(dishes);
   }
 
-  public List<Dish> getByCategoryId(Long categoryId) {
-    return dishRepository.findByCategoryId(categoryId);
+  public List<DishWithImageUrl> getByCategoryId(Long categoryId) {
+    List<Dish> dishes = dishRepository.findByCategoryId(categoryId);
+    return getDishesWithImageUrl(dishes);
+  }
+
+  private List<DishWithImageUrl> getDishesWithImageUrl(List<Dish> dishes) {
+    return dishes.stream()
+        .map(x -> new DishWithImageUrl(x,
+            String.format("/menu/dishes/%s/image", x.getId())))
+        .collect(Collectors.toList());
   }
 
   public Dish create(Dish dish) {
@@ -54,13 +67,30 @@ public class DishService {
     dishRepository.deleteById(id);
   }
 
-  public String saveImageInPublicDirectoryAndGetUrl(MultipartFile file) throws IOException {
-    String fileName = UUID.randomUUID().toString() +
-        "." + FilenameUtils.getExtension(file.getOriginalFilename());
+  public byte[] getImageBytes(Long dishId) throws IOException, EntityNotFoundException {
+    String imagePath = dishRepository.findImagePathById(dishId);
+    if (imagePath == null || !Files.exists(Paths.get(imagePath))) {
+      throw new EntityNotFoundException();
+    }
 
-    Path destination = UPLOAD_IMAGES_DIR.resolve(fileName);
-    file.transferTo(destination);
+    return Files.readAllBytes(Paths.get(imagePath));
+  }
 
-    return "/dish-images/" + fileName;
+  public void saveImage(Long dishId, MultipartFile file) throws IOException {
+    String filePath = UPLOAD_IMAGES_DIR.resolve(UUID.randomUUID().toString() + ".png")
+        .toString();
+
+    BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
+    ImageIO.write(bufferedImage, "png", new File(filePath));
+
+    String imagePathString = dishRepository.findImagePathById(dishId);
+    if (imagePathString != null) {
+      Path imagePath = Paths.get(imagePathString);
+      if (Files.exists(imagePath)) {
+        Files.delete(imagePath);
+      }
+    }
+
+    dishRepository.updateImagePath(dishId, filePath);
   }
 }

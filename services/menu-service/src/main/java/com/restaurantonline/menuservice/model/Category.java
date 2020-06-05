@@ -1,8 +1,8 @@
 package com.restaurantonline.menuservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -22,9 +22,10 @@ public class Category {
   @Column(length = 128, nullable = false)
   private String name;
 
-  @URL(message = "Некорректная ссылка на изображение категории")
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   @Column
-  private String imageUrl;
+  @Basic(fetch = FetchType.LAZY)
+  private String imagePath;
 
   @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
@@ -52,5 +53,13 @@ public class Category {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public String getImagePath() {
+    return imagePath;
+  }
+
+  public void setImagePath(String imagePath) {
+    this.imagePath = imagePath;
   }
 }

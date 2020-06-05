@@ -1,14 +1,18 @@
 package com.restaurantonline.menuservice.controller;
 
 import com.restaurantonline.menuservice.model.Dish;
+import com.restaurantonline.menuservice.model.DishWithImageUrl;
 import com.restaurantonline.menuservice.service.DishService;
 import com.restaurantonline.menuservice.validation.InsertGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.groups.Default;
 import java.io.IOException;
 import java.util.List;
@@ -20,11 +24,24 @@ public class DishController {
   private DishService dishService;
 
   @GetMapping
-  public List<Dish> getAll(@RequestParam Long categoryId) {
+  public List<DishWithImageUrl> getAll(@RequestParam Long categoryId) {
     if (categoryId == null) {
       return dishService.getAll();
     } else {
       return dishService.getByCategoryId(categoryId);
+    }
+  }
+
+  @GetMapping(value = "{id}/image", produces = MediaType.IMAGE_PNG_VALUE)
+  public ResponseEntity<byte[]> getImage(@PathVariable Long id) throws IOException {
+    try {
+      byte[] imageBytes = dishService.getImageBytes(id);
+      return ResponseEntity
+          .ok(imageBytes);
+    } catch (EntityNotFoundException ignored) {
+      return ResponseEntity
+          .notFound()
+          .build();
     }
   }
 
@@ -34,9 +51,10 @@ public class DishController {
     return dishService.create(dish);
   }
 
-  @PostMapping("/upload-image")
-  public String uploadDishImage(@RequestParam("file") MultipartFile file) throws IOException {
-    return dishService.saveImageInPublicDirectoryAndGetUrl(file);
+  @PostMapping("{id}/image")
+  public void uploadImage(@PathVariable Long id,
+                          @RequestParam("file") MultipartFile file) throws IOException {
+    dishService.saveImage(id, file);
   }
 
   @PatchMapping("{id}")
