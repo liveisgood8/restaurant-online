@@ -15,6 +15,6 @@ public class NullAwareBeanUtilsBean extends BeanUtilsBean {
 
   public static void copyNonNullProperties(Object source, Object destination) throws Exception {
     var nullAwareBean = new NullAwareBeanUtilsBean();
-    nullAwareBean.copyProperties(source, destination);
+    nullAwareBean.copyProperties(destination, source);
   }
 }

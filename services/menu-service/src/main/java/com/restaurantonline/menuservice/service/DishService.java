@@ -48,7 +48,7 @@ public class DishService {
   private List<DishWithImageUrl> getDishesWithImageUrl(List<Dish> dishes) {
     return dishes.stream()
         .map(x -> new DishWithImageUrl(x,
-            String.format("/menu/dishes/%s/image", x.getId())))
+            x.getImagePath() != null ? String.format("/menu/dishes/%s/image", x.getId()) : null))
         .collect(Collectors.toList());
   }
 

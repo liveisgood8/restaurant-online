@@ -26,6 +26,11 @@ public class CategoryController {
     return categoryService.create(category);
   }
 
+  @PatchMapping("{id}")
+  public void update(@PathVariable Long id, @RequestBody Category category) throws Exception {
+    categoryService.update(id, category);
+  }
+
   @DeleteMapping("{id}")
   public void delete(@PathVariable Long id) {
     categoryService.delete(id);

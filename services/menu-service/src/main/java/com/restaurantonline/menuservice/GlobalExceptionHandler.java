@@ -1,10 +1,11 @@
 package com.restaurantonline.menuservice;
 
 import com.restaurantonline.menuservice.validation.ApiError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,9 +18,13 @@ import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+  private static final Logger logger =
+      LoggerFactory.getLogger(ResponseEntityExceptionHandler.class);
+
   @ExceptionHandler({ RuntimeException.class })
   public ResponseEntity<Object> handleRuntimeException(RuntimeException ex, WebRequest request) {
-    return new ResponseEntity<>(new ApiError(ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    logger.error("Runtime exception in controller:", ex);
+    return new ResponseEntity<>(new ApiError("Внутренняя ошибка сервера"), HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @Override
@@ -53,14 +58,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @Override
-  protected ResponseEntity<Object> handleExceptionInternal(Exception ex, @Nullable Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
-    if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status)) {
-      request.setAttribute("javax.servlet.error.exception", ex, 0);
-    }
-
-    System.out.println("REST exception:");
-    System.out.println(ex.toString());
-
+  protected ResponseEntity<Object> handleExceptionInternal(Exception ex,
+                                                           Object body,
+                                                           HttpHeaders headers,
+                                                           HttpStatus status,
+                                                           WebRequest request) {
+    logger.error("Unhandled error in controller:", ex);
     return new ResponseEntity<>(new ApiError("Необработанное исключения сервера"), headers, status);
   }
 }
