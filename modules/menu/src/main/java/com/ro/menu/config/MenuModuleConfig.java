@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @ComponentScan(basePackages = "com.ro.menu")
 @EnableJpaRepositories(basePackages = "com.ro.menu.repository")
-@EntityScan(basePackages = "com.ro.menu.models")
+@EntityScan(basePackages = "com.ro.menu.model")
 public class MenuModuleConfig {
 }

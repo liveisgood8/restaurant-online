@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @ComponentScan(basePackages = "com.ro.orders")
 @EnableJpaRepositories(basePackages = "com.ro.orders.repository")
-@EntityScan(basePackages = "com.ro.orders.models")
+@EntityScan(basePackages = "com.ro.orders.model")
 public class OrdersServiceConfig {
 }

@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/dishes")
+@RequestMapping("/menu/dishes")
 public class DishController {
   @Autowired
   private DishService dishService;

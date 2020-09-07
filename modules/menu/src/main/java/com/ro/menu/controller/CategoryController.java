@@ -10,7 +10,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/menu/categories")
 public class CategoryController {
   @Autowired
   private CategoryService categoryService;
