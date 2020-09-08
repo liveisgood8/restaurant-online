@@ -25,6 +25,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.ro</groupId>
+			<artifactId>auth</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ro</groupId>
 			<artifactId>menu</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -33,6 +38,7 @@
 			<artifactId>orders</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

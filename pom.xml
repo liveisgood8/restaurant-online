@@ -10,6 +10,7 @@
   <modules>
     <module>modules/app</module>
     <module>modules/core</module>
+    <module>modules/auth</module>
     <module>modules/menu</module>
     <module>modules/orders</module>
   </modules>
