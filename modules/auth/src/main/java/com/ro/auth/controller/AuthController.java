@@ -8,7 +8,6 @@ import com.ro.auth.service.JwtUserDetailsService;
 import com.ro.auth.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,9 +37,9 @@ public class AuthController {
 
   @PostMapping
   public AuthResponse authenticate(@RequestBody AuthRequest authRequest) {
-    authService.authenticateUser(authRequest.getUsername(), authRequest.getPassword());
+    authService.authenticateUser(authRequest.getLogin(), authRequest.getPassword());
 
-    UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authRequest.getUsername());
+    UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authRequest.getLogin());
     String accessToken = jwtTokenUtil.generateToken(userDetails);
 
     AuthResponse authResponse = new AuthResponse();
@@ -49,7 +48,7 @@ public class AuthController {
     return authResponse;
   }
 
-  @PostMapping("/register")
+  @PostMapping("/registration")
   public void register(@RequestBody User user) {
     authService.register(user);
   }

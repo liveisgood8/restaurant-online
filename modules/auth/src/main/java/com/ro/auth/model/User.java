@@ -13,10 +13,10 @@ public class User implements UserDetails {
   @GeneratedValue
   private Long id;
 
-  @Column(unique = true)
-  private String username;
+  @Column(unique = true, nullable = false)
+  private String login;
 
-  @Column
+  @Column(nullable = false)
   private String password;
 
   @Column
@@ -25,16 +25,16 @@ public class User implements UserDetails {
   @Column
   private String surname;
 
-  @Column(columnDefinition = "boolean default true")
+  @Column(columnDefinition = "boolean default true", nullable = false)
   private Boolean isEnabled = true;
 
-  @Column(columnDefinition = "boolean default false")
+  @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isExpired = false;
 
-  @Column(columnDefinition = "boolean default false")
+  @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isCredentialsExpired = false;
 
-  @Column(columnDefinition = "boolean default false")
+  @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isBanned = false;
 
   @Override
@@ -53,6 +53,11 @@ public class User implements UserDetails {
   }
 
   @Override
+  public String getUsername() {
+    return login;
+  }
+
+  @Override
   public boolean isCredentialsNonExpired() {
     return !isCredentialsExpired;
   }
@@ -62,12 +67,12 @@ public class User implements UserDetails {
     return isEnabled;
   }
 
-  public String getUsername() {
-    return username;
+  public String getLogin() {
+    return login;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setLogin(String login) {
+    this.login = login;
   }
 
   public String getPassword() {
