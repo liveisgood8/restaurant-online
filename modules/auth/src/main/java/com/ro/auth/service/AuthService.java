@@ -1,5 +1,7 @@
 package com.ro.auth.service;
 
+import com.ro.auth.controller.body.RegistrationRequest;
+import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.User;
 import com.ro.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +35,16 @@ public class AuthService {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
   }
 
-  public void register(User user) {
-    // TODO Validate for duplicates
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
-    userRepository.save(user);
+  public User register(RegistrationRequest registrationRequest) {
+    if (userRepository.findByEmail(registrationRequest.getEmail()).isPresent()) {
+      throw new UserAlreadyExistException(registrationRequest.getEmail());
+    }
+
+    User user = new User();
+    user.setEmail(registrationRequest.getEmail());
+    user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+    user.setName(registrationRequest.getName());
+    user.setSurname(registrationRequest.getSurname());
+    return userRepository.save(user);
   }
 }

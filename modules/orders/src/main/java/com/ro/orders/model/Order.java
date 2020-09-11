@@ -1,7 +1,9 @@
 package com.ro.orders.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.ro.auth.model.User;
 import com.ro.orders.validation.InsertGroup;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -18,9 +20,10 @@ public class Order {
   @GeneratedValue
   private Long id;
 
-  @Column
-  @NotNull(groups = {InsertGroup.class})
-  private Long clientId;
+  @JsonIgnore
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @NotNull(groups = {InsertGroup.class})
@@ -39,12 +42,12 @@ public class Order {
     this.id = id;
   }
 
-  public Long getClientId() {
-    return clientId;
+  public User getUser() {
+    return user;
   }
 
-  public void setClientId(Long clientId) {
-    this.clientId = clientId;
+  public void setUser(User user) {
+    this.user = user;
   }
 
   public Set<OrderInfo> getOrderInfos() {

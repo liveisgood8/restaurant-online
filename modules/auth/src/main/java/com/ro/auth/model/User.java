@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.util.Collection;
 
 @Entity
@@ -13,8 +14,9 @@ public class User implements UserDetails {
   @GeneratedValue
   private Long id;
 
+  @Email
   @Column(unique = true, nullable = false)
-  private String login;
+  private String email;
 
   @Column(nullable = false)
   private String password;
@@ -54,7 +56,7 @@ public class User implements UserDetails {
 
   @Override
   public String getUsername() {
-    return login;
+    return email;
   }
 
   @Override
@@ -67,12 +69,20 @@ public class User implements UserDetails {
     return isEnabled;
   }
 
-  public String getLogin() {
-    return login;
+  public Long getId() {
+    return id;
   }
 
-  public void setLogin(String login) {
-    this.login = login;
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public String getPassword() {

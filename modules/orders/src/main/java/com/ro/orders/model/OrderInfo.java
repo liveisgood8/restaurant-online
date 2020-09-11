@@ -2,6 +2,7 @@ package com.ro.orders.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.ro.menu.model.Dish;
 
 import javax.persistence.*;
 
@@ -13,12 +14,16 @@ public class OrderInfo {
   @GeneratedValue
   private Long id;
 
+  @Column(name = "count", nullable = false)
+  private Long count;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)
   private Order order;
 
-  @Column
-  private Long dishId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "dish_id", nullable = false)
+  private Dish dish;
 
   public Long getId() {
     return id;
@@ -26,6 +31,14 @@ public class OrderInfo {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public Long getCount() {
+    return count;
+  }
+
+  public void setCount(Long count) {
+    this.count = count;
   }
 
   public Order getOrder() {
@@ -36,11 +49,11 @@ public class OrderInfo {
     this.order = order;
   }
 
-  public Long getDishId() {
-    return dishId;
+  public Dish getDish() {
+    return dish;
   }
 
-  public void setDishId(Long dishId) {
-    this.dishId = dishId;
+  public void setDish(Dish dish) {
+    this.dish = dish;
   }
 }

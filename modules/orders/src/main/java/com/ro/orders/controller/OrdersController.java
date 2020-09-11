@@ -1,10 +1,11 @@
 package com.ro.orders.controller;
 
-import com.ro.orders.validation.InsertGroup;
+import com.ro.auth.model.User;
+import com.ro.orders.controller.payloads.MakeOrderRequest;
 import com.ro.orders.model.Order;
 import com.ro.orders.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +18,7 @@ public class OrdersController {
   private OrdersService ordersService;
 
   @PostMapping
-  public void makeOrder(@RequestBody @Validated({InsertGroup.class}) Order order) {
-    ordersService.makeOrder(order);
+  public Order makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
+    return ordersService.makeOrder(makeOrderRequest, ((User) authentication.getPrincipal()));
   }
 }
