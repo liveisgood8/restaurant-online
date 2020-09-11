@@ -11,12 +11,14 @@ public class AuthResponse {
     private final String email;
     private final String name;
     private final String surname;
+    private final Integer bonuses;
 
     public UserInfo(User user) {
       this.id = user.getId();
       this.email = user.getEmail();
       this.name = user.getName();
       this.surname = user.getSurname();
+      this.bonuses = user.getBonuses();
     }
 
     public Long getId() {
@@ -33,6 +35,10 @@ public class AuthResponse {
 
     public String getSurname() {
       return surname;
+    }
+
+    public Integer getBonuses() {
+      return bonuses;
     }
   }
 

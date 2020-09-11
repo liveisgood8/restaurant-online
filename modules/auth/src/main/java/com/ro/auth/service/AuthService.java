@@ -45,6 +45,7 @@ public class AuthService {
     user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
     user.setName(registrationRequest.getName());
     user.setSurname(registrationRequest.getSurname());
+    user.setBonuses(0);
     return userRepository.save(user);
   }
 }

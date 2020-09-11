@@ -15,11 +15,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrdersService {
-  @Autowired
-  private OrdersRepository ordersRepository;
+  private final OrdersRepository ordersRepository;
+  private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
-  private ApplicationEventMulticaster eventMulticaster;
+  public OrdersService(OrdersRepository ordersRepository, ApplicationEventMulticaster eventMulticaster) {
+    this.ordersRepository = ordersRepository;
+    this.eventMulticaster = eventMulticaster;
+  }
 
   public Order makeOrder(MakeOrderRequest makeOrderRequest, User user) {
     Order order = new Order();

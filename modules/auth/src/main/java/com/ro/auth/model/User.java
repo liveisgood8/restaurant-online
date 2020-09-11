@@ -27,6 +27,9 @@ public class User implements UserDetails {
   @Column
   private String surname;
 
+  @Column(columnDefinition = "integer default 0", nullable = false)
+  private Integer bonuses;
+
   @Column(columnDefinition = "boolean default true", nullable = false)
   private Boolean isEnabled = true;
 
@@ -107,5 +110,13 @@ public class User implements UserDetails {
 
   public void setSurname(String surname) {
     this.surname = surname;
+  }
+
+  public Integer getBonuses() {
+    return bonuses;
+  }
+
+  public void setBonuses(Integer bonuses) {
+    this.bonuses = bonuses;
   }
 }
