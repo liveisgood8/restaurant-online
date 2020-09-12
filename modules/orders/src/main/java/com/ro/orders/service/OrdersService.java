@@ -1,6 +1,7 @@
 package com.ro.orders.service;
 
 import com.ro.auth.model.User;
+import com.ro.auth.service.UserService;
 import com.ro.orders.controller.payloads.MakeOrderRequest;
 import com.ro.orders.events.OrderEvent;
 import com.ro.orders.model.Order;
@@ -16,15 +17,19 @@ import java.util.stream.Collectors;
 @Service
 public class OrdersService {
   private final OrdersRepository ordersRepository;
+  private final UserService userService;
   private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
-  public OrdersService(OrdersRepository ordersRepository, ApplicationEventMulticaster eventMulticaster) {
+  public OrdersService(OrdersRepository ordersRepository,
+                       UserService userService,
+                       ApplicationEventMulticaster eventMulticaster) {
     this.ordersRepository = ordersRepository;
+    this.userService = userService;
     this.eventMulticaster = eventMulticaster;
   }
 
-  public Order makeOrder(MakeOrderRequest makeOrderRequest, User user) {
+  public OrderWithBonuses makeOrder(MakeOrderRequest makeOrderRequest, User user) {
     Order order = new Order();
     order.setUser(user);
 
@@ -38,12 +43,24 @@ public class OrdersService {
         })
         .collect(Collectors.toSet());
     order.setOrderInfos(orderInfos);
-
     Order savedOrder = ordersRepository.save(order);
+
+    Integer bonuses = creditBonusesToUser(savedOrder);
 
     OrderEvent orderEvent = new OrderEvent(savedOrder, this);
     eventMulticaster.multicastEvent(orderEvent);
 
-    return savedOrder;
+    return new OrderWithBonuses(order, bonuses);
+  }
+
+
+  private Integer creditBonusesToUser(Order order) {
+    Integer orderBonuses = calculateBonuses(order);
+    userService.addBonuses(order.getUser().getId(), orderBonuses);
+    return orderBonuses;
+  }
+
+  private Integer calculateBonuses(Order order) {
+    return 100;
   }
 }

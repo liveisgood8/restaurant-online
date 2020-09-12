@@ -3,6 +3,7 @@ package com.ro.orders.controller;
 import com.ro.auth.model.User;
 import com.ro.orders.controller.payloads.MakeOrderRequest;
 import com.ro.orders.model.Order;
+import com.ro.orders.service.OrderWithBonuses;
 import com.ro.orders.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,7 +19,7 @@ public class OrdersController {
   private OrdersService ordersService;
 
   @PostMapping
-  public Order makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
+  public OrderWithBonuses makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
     return ordersService.makeOrder(makeOrderRequest, ((User) authentication.getPrincipal()));
   }
 }
