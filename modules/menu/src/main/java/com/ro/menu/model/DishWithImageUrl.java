@@ -1,7 +1,7 @@
 package com.ro.menu.model;
 
 public class DishWithImageUrl extends Dish {
-  private String imageUrl;
+  private final String imageUrl;
 
   public DishWithImageUrl(Dish dish, String imageUrl) {
     setId(dish.getId());
@@ -11,6 +11,9 @@ public class DishWithImageUrl extends Dish {
     setProtein(dish.getProtein());
     setFat(dish.getFat());
     setCarbohydrates(dish.getCarbohydrates());
+    setWeight(dish.getWeight());
+    setPrice(dish.getPrice());
+    setLikes(dish.getLikes());
     this.imageUrl = imageUrl;
   }
 

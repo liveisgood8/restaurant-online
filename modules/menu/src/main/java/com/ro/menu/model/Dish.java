@@ -1,7 +1,9 @@
 package com.ro.menu.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.menu.validation.InsertGroup;
 
 import javax.persistence.*;
@@ -9,6 +11,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Dish.class)
 @Entity
 @Table(name = "dishes")
 public class Dish implements Serializable {
@@ -26,14 +29,20 @@ public class Dish implements Serializable {
   @Column(nullable = false)
   private String description;
 
-  @Column(nullable = true)
+  @Column()
   private Double protein;
 
-  @Column(nullable = true)
+  @Column()
   private Double fat;
 
-  @Column(nullable = true)
+  @Column()
   private Double carbohydrates;
+
+  @Column(nullable = false)
+  private Integer weight;
+
+  @Column(nullable = false)
+  private Integer price;
 
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   @Column
@@ -43,6 +52,9 @@ public class Dish implements Serializable {
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
   private Category category;
+
+  @OneToOne(mappedBy = "dish")
+  private DishLikes likes;
 
   public Long getId() {
     return id;
@@ -106,5 +118,29 @@ public class Dish implements Serializable {
 
   public void setCategory(Category category) {
     this.category = category;
+  }
+
+  public Integer getWeight() {
+    return weight;
+  }
+
+  public void setWeight(Integer weight) {
+    this.weight = weight;
+  }
+
+  public Integer getPrice() {
+    return price;
+  }
+
+  public void setPrice(Integer price) {
+    this.price = price;
+  }
+
+  public DishLikes getLikes() {
+    return likes;
+  }
+
+  public void setLikes(DishLikes likes) {
+    this.likes = likes;
   }
 }

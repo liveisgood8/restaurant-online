@@ -5,6 +5,9 @@ import com.ro.auth.filter.JwtRequestFilter;
 import com.ro.auth.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,22 +27,16 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private JwtUserDetailsService jwtUserDetailsService;
-  private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-  private JwtRequestFilter jwtRequestFilter;
+  private final JwtUserDetailsService jwtUserDetailsService;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  private final JwtRequestFilter jwtRequestFilter;
 
   @Autowired
-  public void setJwtUserDetailsService(JwtUserDetailsService jwtUserDetailsService) {
+  public SecurityConfig(JwtUserDetailsService jwtUserDetailsService,
+                        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                        JwtRequestFilter jwtRequestFilter) {
     this.jwtUserDetailsService = jwtUserDetailsService;
-  }
-
-  @Autowired
-  public void setJwtAuthenticationEntryPoint(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
     this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
-  }
-
-  @Autowired
-  public void setJwtRequestFilter(JwtRequestFilter jwtRequestFilter) {
     this.jwtRequestFilter = jwtRequestFilter;
   }
 
@@ -70,11 +67,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers("/auth").permitAll()
         .antMatchers("/auth/registration").permitAll()
-        .anyRequest().authenticated()
         .and()
         .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
         .and()
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+    // Configure modules security
+    MenuModuleSecurity.configure(httpSecurity);
+
+    httpSecurity
+        .authorizeRequests()
+        .anyRequest().authenticated();
 
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
   }

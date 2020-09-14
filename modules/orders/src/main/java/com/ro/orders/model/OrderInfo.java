@@ -6,7 +6,7 @@ import com.ro.menu.model.Dish;
 
 import javax.persistence.*;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = OrderInfo.class)
 @Entity
 @Table(name = "orders_info")
 public class OrderInfo {
