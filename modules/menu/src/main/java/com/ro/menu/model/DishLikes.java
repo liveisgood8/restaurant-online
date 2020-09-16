@@ -1,5 +1,6 @@
 package com.ro.menu.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -13,6 +14,7 @@ public class DishLikes {
   @GeneratedValue
   private Long id;
 
+  @JsonBackReference
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "dish_id")
   private Dish dish;

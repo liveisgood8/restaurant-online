@@ -1,9 +1,6 @@
 package com.ro.menu.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import com.ro.menu.validation.InsertGroup;
 
 import javax.persistence.*;
@@ -11,10 +8,9 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Dish.class)
 @Entity
 @Table(name = "dishes")
-public class Dish implements Serializable {
+public class Dish {
   @Id
   @GeneratedValue
   private Long id;
@@ -53,6 +49,7 @@ public class Dish implements Serializable {
   @ManyToOne(fetch = FetchType.LAZY)
   private Category category;
 
+  @JsonManagedReference
   @OneToOne(mappedBy = "dish")
   private DishLikes likes;
 

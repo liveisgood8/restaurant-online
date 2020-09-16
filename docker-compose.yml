@@ -1,13 +1,23 @@
 version: '3.7'
 
 services: 
+#  db:
+#    build: ./docker/postgres
+#    ports: # Just for dev
+#      - 5432:5432
+#    environment:
+#      POSTGRES_USER: root
+#      POSTGRES_PASSWORD: root
   db:
-    build: ./docker/postgres
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
     ports: # Just for dev
-      - 5432:5432
-    environment: 
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
+      - 3306:3306
+    volumes:
+      - D:\Programms\mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ro
   adminer: # Just for dev
     image: adminer
     restart: always
