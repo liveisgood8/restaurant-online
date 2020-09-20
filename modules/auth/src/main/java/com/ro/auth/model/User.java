@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.Collection;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -42,9 +43,12 @@ public class User implements UserDetails {
   @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isBanned = false;
 
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private Set<UserAuthority> authorities;
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return null;
+    return authorities;
   }
 
   @Override

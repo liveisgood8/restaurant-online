@@ -7,6 +7,8 @@ public class MenuModuleSecurity {
   public static void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
         .authorizeRequests()
-        .antMatchers(HttpMethod.GET, "/menu/dishes/**").permitAll();
+        .antMatchers(HttpMethod.GET, "/menu/dishes/**").permitAll()
+        .antMatchers(HttpMethod.GET, "/menu/categories/**").permitAll()
+        .antMatchers("/menu/dishes/**").hasAuthority("ADMIN");
   }
 }
