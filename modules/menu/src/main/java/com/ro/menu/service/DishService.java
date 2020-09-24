@@ -1,8 +1,10 @@
 package com.ro.menu.service;
 
+import com.ro.auth.model.User;
+import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
-import com.ro.menu.model.DishLikes;
-import com.ro.menu.model.DishWithImageUrl;
+import com.ro.menu.model.DishEmotion;
+import com.ro.menu.model.DishWithImageUrlAndLikes;
 import com.ro.menu.repository.DishLikesRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
@@ -29,46 +31,37 @@ import java.util.stream.Collectors;
 public class DishService {
   private final Path UPLOAD_IMAGES_DIR;
   private final DishRepository dishRepository;
-  private final DishLikesRepository dishLikesRepository;
+  private final DishLikesRepository dishEmotionsRepository;
 
   @Autowired
   public DishService(@Value("${uploads.directory:uploads}") String uploadsDirectory,
                      DishRepository dishRepository,
-                     DishLikesRepository dishLikesRepository) throws IOException {
+                     DishLikesRepository dishEmotionsRepository) throws IOException {
     UPLOAD_IMAGES_DIR = Paths.get(uploadsDirectory, "dish-images");
     this.dishRepository = dishRepository;
-    this.dishLikesRepository = dishLikesRepository;
+    this.dishEmotionsRepository = dishEmotionsRepository;
     Files.createDirectories(UPLOAD_IMAGES_DIR);
   }
 
-  public List<DishWithImageUrl> getAll() {
+  public List<DishWithImageUrlAndLikes> getAll() {
     List<Dish> dishes = dishRepository.findAll();
     return getDishesWithImageUrl(dishes);
   }
 
-  public List<DishWithImageUrl> getByCategoryId(Long categoryId) {
+  public List<DishWithImageUrlAndLikes> getByCategoryId(Long categoryId) {
     List<Dish> dishes = dishRepository.findByCategoryId(categoryId);
     return getDishesWithImageUrl(dishes);
   }
 
-  private List<DishWithImageUrl> getDishesWithImageUrl(List<Dish> dishes) {
+  private List<DishWithImageUrlAndLikes> getDishesWithImageUrl(List<Dish> dishes) {
     return dishes.stream()
-        .map(x -> new DishWithImageUrl(x,
+        .map(x -> new DishWithImageUrlAndLikes(x,
             x.getImagePath() != null ? String.format("/menu/dishes/%s/image", x.getId()) : null))
         .collect(Collectors.toList());
   }
 
   @Transactional
   public Dish create(Dish dish) {
-    if (dish.getLikes() == null) {
-      DishLikes dishLikes = new DishLikes();
-      dishLikes.setDish(dish);
-      dishLikes.setLikeCount(0);
-      dishLikes.setDislikeCount(0);
-
-      dishLikes = dishLikesRepository.save(dishLikes);
-      dish.setLikes(dishLikes);
-    }
     return dishRepository.save(dish);
   }
 
@@ -110,47 +103,38 @@ public class DishService {
     dishRepository.updateImagePath(dishId, filePath);
   }
 
-  public Optional<DishLikes> getLikes(Long dishId) {
-    return dishLikesRepository.findByDishId(dishId);
+  public List<DishEmotion> getLikes(Long dishId) {
+    return dishEmotionsRepository.findByDishId(dishId);
   }
 
   @Transactional
-  public void setLike(Long dishId) {
+  public void setLike(Long dishId, User user)  {
+    createDishEmotion(DishEmotion.EmotionType.DISLIKE, dishId, user);
+  }
+
+  @Transactional
+  public void setDislike(Long dishId, User user) {
+    createDishEmotion(DishEmotion.EmotionType.LIKE, dishId, user);
+  }
+
+  @Transactional
+  public void createDishEmotion(DishEmotion.EmotionType type, Long dishId, User user) {
     Optional<Dish> dish = dishRepository.findById(dishId);
     if (dish.isEmpty()) {
       throw new EntityNotFoundException("Dish with id: " + dishId + " not found");
     }
 
-    DishLikes likes = dish.get().getLikes();
-    if (likes == null) {
-      likes = new DishLikes();
-      likes.setDish(dish.get());
-      likes.setLikeCount(1);
-      likes.setDislikeCount(0);
-    } else {
-      likes.setLikeCount(likes.getLikeCount() + 1);
+    Optional<DishEmotion> emotion = dishEmotionsRepository.findByEmotionTypeAndDishIdAndUserId(type,
+        dishId, user.getId());
+    if (emotion.isPresent()) {
+      throw new EmotionAlreadyExistException(type);
     }
 
-    dishRepository.save(dish.get());
-  }
+    DishEmotion newEmotion = new DishEmotion();
+    newEmotion.setDish(dish.get());
+    newEmotion.setEmotionType(type);
+    newEmotion.setUser(user);
 
-  @Transactional
-  public void setDislike(Long dishId) {
-    Optional<Dish> dish = dishRepository.findById(dishId);
-    if (dish.isEmpty()) {
-      throw new EntityNotFoundException("Dish with id: " + dishId + " not found");
-    }
-
-    DishLikes likes = dish.get().getLikes();
-    if (likes == null) {
-      likes = new DishLikes();
-      likes.setDish(dish.get());
-      likes.setLikeCount(0);
-      likes.setDislikeCount(1);
-    } else {
-      likes.setDislikeCount(likes.getDislikeCount() + 1);
-    }
-
-    dishRepository.save(dish.get());
+    dishEmotionsRepository.save(newEmotion);
   }
 }

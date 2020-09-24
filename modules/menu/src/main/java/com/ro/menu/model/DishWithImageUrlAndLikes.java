@@ -1,9 +1,11 @@
 package com.ro.menu.model;
 
-public class DishWithImageUrl extends Dish {
+import com.ro.menu.model.raw.DishLikes;
+
+public class DishWithImageUrlAndLikes extends Dish {
   private final String imageUrl;
 
-  public DishWithImageUrl(Dish dish, String imageUrl) {
+  public DishWithImageUrlAndLikes(Dish dish, String imageUrl) {
     setId(dish.getId());
     setName(dish.getName());
     setCategory(dish.getCategory());
@@ -13,7 +15,7 @@ public class DishWithImageUrl extends Dish {
     setCarbohydrates(dish.getCarbohydrates());
     setWeight(dish.getWeight());
     setPrice(dish.getPrice());
-    setLikes(dish.getLikes());
+    setLikes(new DishLikes(dish.getEmotions()));
     this.imageUrl = imageUrl;
   }
 

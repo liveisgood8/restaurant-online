@@ -1,7 +1,9 @@
 package com.ro.auth.exception;
 
+import com.ro.auth.model.User;
+
 public class UserAlreadyExistException extends RuntimeException {
-  public UserAlreadyExistException(String email) {
-    super("User with email: " + email + " is already exist");
+  public UserAlreadyExistException() {
+    super("Пользователь с указанным адресом эл. почты или номером телефона уже существует");
   }
 }

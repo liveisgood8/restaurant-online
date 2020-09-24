@@ -12,11 +12,11 @@ import java.util.List;
 
 @Repository
 public interface DishRepository extends JpaRepository<Dish, Long> {
-  @EntityGraph(attributePaths = {"likes"})
+  @EntityGraph(attributePaths = {"emotions"})
   @Override
   List<Dish> findAll();
 
-  @EntityGraph(attributePaths = {"likes"})
+  @EntityGraph(attributePaths = {"emotions"})
   List<Dish> findByCategoryId(Long categoryId);
 
   @Query("select dish.imagePath from Dish dish where dish.id = :id")

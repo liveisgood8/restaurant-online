@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import java.util.Collection;
 import java.util.Set;
 
@@ -15,6 +16,10 @@ public class User implements UserDetails {
   @GeneratedValue
   private Long id;
 
+  @Pattern(regexp="^((\\+7|7|8)+([0-9]){10})$")
+  @Column(unique = true, nullable = false)
+  private String phone;
+
   @Email
   @Column(unique = true, nullable = false)
   private String email;
@@ -24,9 +29,6 @@ public class User implements UserDetails {
 
   @Column
   private String name;
-
-  @Column
-  private String surname;
 
   @Column(columnDefinition = "integer default 0", nullable = false)
   private Integer bonuses;
@@ -84,6 +86,14 @@ public class User implements UserDetails {
     this.id = id;
   }
 
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
+  }
+
   public String getEmail() {
     return email;
   }
@@ -106,14 +116,6 @@ public class User implements UserDetails {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public String getSurname() {
-    return surname;
-  }
-
-  public void setSurname(String surname) {
-    this.surname = surname;
   }
 
   public Integer getBonuses() {

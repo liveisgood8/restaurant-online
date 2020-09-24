@@ -1,6 +1,7 @@
 package com.ro.auth.service;
 
 import com.ro.auth.controller.body.RegistrationRequest;
+import com.ro.auth.controller.body.UserUpdateRequest;
 import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.User;
 import com.ro.auth.repository.UserRepository;
@@ -9,6 +10,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -35,16 +39,31 @@ public class AuthService {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
   }
 
+  @Transactional
+  public User updateInfo(User user, UserUpdateRequest updateRequest) {
+      if (updateRequest.getName() != null) {
+      user.setName(updateRequest.getName());
+    }
+    if (updateRequest.getPassword() != null) {
+      user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+    }
+    return userRepository.save(user);
+  }
+
+
   public User register(RegistrationRequest registrationRequest) {
-    if (userRepository.findByEmail(registrationRequest.getEmail()).isPresent()) {
-      throw new UserAlreadyExistException(registrationRequest.getEmail());
+    Optional<User> alreadyExistedUser = userRepository.findByEmailOrPhone(
+        registrationRequest.getEmail(),
+        registrationRequest.getPhone());
+    if (alreadyExistedUser.isPresent()) {
+      throw new UserAlreadyExistException();
     }
 
     User user = new User();
+    user.setPhone(registrationRequest.getPhone());
     user.setEmail(registrationRequest.getEmail());
     user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
     user.setName(registrationRequest.getName());
-    user.setSurname(registrationRequest.getSurname());
     user.setBonuses(0);
     return userRepository.save(user);
   }

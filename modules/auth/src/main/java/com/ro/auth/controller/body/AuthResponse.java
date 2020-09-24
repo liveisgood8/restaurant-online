@@ -8,21 +8,25 @@ public class AuthResponse {
 
   public static class UserInfo {
     private final Long id;
+    private final String phone;
     private final String email;
     private final String name;
-    private final String surname;
     private final Integer bonuses;
 
     public UserInfo(User user) {
       this.id = user.getId();
+      this.phone = user.getPhone();
       this.email = user.getEmail();
       this.name = user.getName();
-      this.surname = user.getSurname();
       this.bonuses = user.getBonuses();
     }
 
     public Long getId() {
       return id;
+    }
+
+    public String getPhone() {
+      return phone;
     }
 
     public String getEmail() {
@@ -31,10 +35,6 @@ public class AuthResponse {
 
     public String getName() {
       return name;
-    }
-
-    public String getSurname() {
-      return surname;
     }
 
     public Integer getBonuses() {

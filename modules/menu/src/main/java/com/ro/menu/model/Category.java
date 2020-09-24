@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -11,6 +13,8 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 
+@Getter
+@Setter
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Category.class)
 @Entity(name = "category")
 @Table(name = "categories", uniqueConstraints = {
@@ -34,36 +38,4 @@ public class Category {
   @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
   private List<Dish> dishes;
-
-  public List<Dish> getDishes() {
-    return dishes;
-  }
-
-  public void setDishes(List<Dish> dishes) {
-    this.dishes = dishes;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getImagePath() {
-    return imagePath;
-  }
-
-  public void setImagePath(String imagePath) {
-    this.imagePath = imagePath;
-  }
 }
