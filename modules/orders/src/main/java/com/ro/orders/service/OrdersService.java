@@ -42,9 +42,16 @@ public class OrdersService {
           return orderInfo;
         })
         .collect(Collectors.toSet());
+    order.setStreet(makeOrderRequest.getStreet());
+    order.setHomeNumber(makeOrderRequest.getHomeNumber());
+    order.setEntranceNumber(makeOrderRequest.getEntranceNumber());
+    order.setFloorNumber(makeOrderRequest.getFloorNumber());
+    order.setApartmentNumber(makeOrderRequest.getApartmentNumber());
+    order.setPaymentMethod(makeOrderRequest.getPaymentMethod());
+    order.setIsApproved(makeOrderRequest.getPaymentMethod() == Order.PaymentMethod.BY_CARD_ONLINE);
     order.setOrderInfos(orderInfos);
-    Order savedOrder = ordersRepository.save(order);
 
+    Order savedOrder = ordersRepository.save(order);
     Integer bonuses = creditBonusesToUser(savedOrder);
 
     OrderEvent orderEvent = new OrderEvent(savedOrder, this);

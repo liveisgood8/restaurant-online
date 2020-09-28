@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.auth.model.User;
 import com.ro.orders.validation.InsertGroup;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -12,18 +14,48 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
+@Getter
+@Setter
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Order.class)
 @Entity
 @Table(name = "orders")
 public class Order {
+  public enum PaymentMethod {
+    BY_CASH_TO_THE_COURIER,
+    BY_CARD_TO_THE_COURIER,
+    BY_CARD_ONLINE,
+  }
+
   @Id
   @GeneratedValue
   private Long id;
 
   @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id")
   private User user;
+
+  @Column(nullable = false)
+  private String street;
+
+  @Column(nullable = false)
+  private Integer homeNumber;
+
+  @Column(nullable = false)
+  private Integer entranceNumber;
+
+  @Column(nullable = false)
+  private Integer floorNumber;
+
+  @Column(nullable = false)
+  private Integer apartmentNumber;
+
+  @Column(nullable = false)
+  private Boolean isApproved;
+
+  @Column(nullable = false)
+  @Enumerated
+  private PaymentMethod paymentMethod;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @NotNull(groups = {InsertGroup.class})
@@ -33,36 +65,4 @@ public class Order {
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "created_at")
   private Date createdAt;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  public Set<OrderInfo> getOrderInfos() {
-    return orderInfos;
-  }
-
-  public void setOrderInfos(Set<OrderInfo> orderInfos) {
-    this.orderInfos = orderInfos;
-  }
-
-  public Date getCreatedAt() {
-    return createdAt;
-  }
-
-  public void setCreatedAt(Date createdAt) {
-    this.createdAt = createdAt;
-  }
 }

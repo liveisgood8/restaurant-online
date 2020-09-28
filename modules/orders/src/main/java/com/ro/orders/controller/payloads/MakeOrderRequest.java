@@ -1,10 +1,22 @@
 package com.ro.orders.controller.payloads;
 
 import com.ro.menu.model.Dish;
+import com.ro.orders.model.Order;
+import lombok.Getter;
 
+import javax.persistence.Column;
+import javax.persistence.Enumerated;
 import java.util.Set;
 
+@Getter
 public class MakeOrderRequest {
+  private String street;
+  private Integer homeNumber;
+  private Integer entranceNumber;
+  private Integer floorNumber;
+  private Integer apartmentNumber;
+  private Boolean isApproved;
+  private Order.PaymentMethod paymentMethod;
   private Set<DishWithCount> entries;
 
   public static class DishWithCount {
@@ -26,13 +38,5 @@ public class MakeOrderRequest {
     public void setCount(Long count) {
       this.count = count;
     }
-  }
-
-  public Set<DishWithCount> getEntries() {
-    return entries;
-  }
-
-  public void setEntries(Set<DishWithCount> entries) {
-    this.entries = entries;
   }
 }
