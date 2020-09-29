@@ -68,6 +68,9 @@ public class OrdersService {
   }
 
   private Integer calculateBonuses(Order order) {
-    return 100;
+    int totalPrice = order.getOrderInfos().stream()
+        .mapToInt(o -> o.getCount() * o.getDish().getPrice())
+        .sum();
+    return (int) Math.round(totalPrice * 0.05);
   }
 }

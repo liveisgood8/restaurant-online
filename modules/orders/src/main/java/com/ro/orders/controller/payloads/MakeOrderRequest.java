@@ -4,8 +4,6 @@ import com.ro.menu.model.Dish;
 import com.ro.orders.model.Order;
 import lombok.Getter;
 
-import javax.persistence.Column;
-import javax.persistence.Enumerated;
 import java.util.Set;
 
 @Getter
@@ -21,7 +19,7 @@ public class MakeOrderRequest {
 
   public static class DishWithCount {
     private Dish dish;
-    private Long count;
+    private Integer count;
 
     public Dish getDish() {
       return dish;
@@ -31,11 +29,11 @@ public class MakeOrderRequest {
       this.dish = dish;
     }
 
-    public Long getCount() {
+    public Integer getCount() {
       return count;
     }
 
-    public void setCount(Long count) {
+    public void setCount(Integer count) {
       this.count = count;
     }
   }

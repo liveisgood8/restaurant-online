@@ -109,12 +109,12 @@ public class DishService {
 
   @Transactional
   public void setLike(Long dishId, User user)  {
-    createDishEmotion(DishEmotion.EmotionType.DISLIKE, dishId, user);
+    createDishEmotion(DishEmotion.EmotionType.LIKE, dishId, user);
   }
 
   @Transactional
   public void setDislike(Long dishId, User user) {
-    createDishEmotion(DishEmotion.EmotionType.LIKE, dishId, user);
+    createDishEmotion(DishEmotion.EmotionType.DISLIKE, dishId, user);
   }
 
   @Transactional

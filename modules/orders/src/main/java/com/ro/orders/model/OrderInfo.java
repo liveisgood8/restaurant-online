@@ -19,7 +19,7 @@ public class OrderInfo {
   private Long id;
 
   @Column(name = "count", nullable = false)
-  private Long count;
+  private Integer count;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)
