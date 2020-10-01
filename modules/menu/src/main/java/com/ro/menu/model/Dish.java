@@ -45,10 +45,13 @@ public class Dish {
   @Column(nullable = false)
   private Integer price;
 
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  @JsonIgnore
   @Column
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
+
+  @Transient
+  private String imageUrl;
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)

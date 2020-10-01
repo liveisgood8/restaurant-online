@@ -5,6 +5,7 @@ import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
 import com.ro.menu.model.DishWithImageUrlAndLikes;
+import com.ro.menu.model.raw.DishLikes;
 import com.ro.menu.repository.DishLikesRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
@@ -14,18 +15,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,20 +41,22 @@ public class DishService {
     Files.createDirectories(uploadImagesDir);
   }
 
-  public List<DishWithImageUrlAndLikes> getAll() {
+  public List<Dish> getAll() {
     List<Dish> dishes = dishRepository.findAll();
-    return getDishesWithImageUrl(dishes);
+    return getDishesWithImageUrlAndLikes(dishes);
   }
 
-  public List<DishWithImageUrlAndLikes> getByCategoryId(Long categoryId) {
+  public List<Dish> getByCategoryId(Long categoryId) {
     List<Dish> dishes = dishRepository.findByCategoryId(categoryId);
-    return getDishesWithImageUrl(dishes);
+    return getDishesWithImageUrlAndLikes(dishes);
   }
 
-  private List<DishWithImageUrlAndLikes> getDishesWithImageUrl(List<Dish> dishes) {
+  private List<Dish> getDishesWithImageUrlAndLikes(List<Dish> dishes) {
     return dishes.stream()
-        .map(x -> new DishWithImageUrlAndLikes(x,
-            x.getImagePath() != null ? String.format("/menu/dishes/%s/image", x.getId()) : null))
+        .peek(d -> {
+          d.setLikes(new DishLikes(d.getEmotions()));
+          d.setImageUrl(String.format("/menu/dishes/%s/image", d.getId()));
+        })
         .collect(Collectors.toList());
   }
 
@@ -87,7 +86,7 @@ public class DishService {
   }
 
   public void saveImage(Long dishId, MultipartFile file) throws IOException {
-    String newImagePath = FileUploadUtils.saveUploadedFile(uploadImagesDir, file,
+    String newImagePath = FileUploadUtils.saveUploadedImageAsPng(uploadImagesDir, file,
         "png", "jpg", "jpeg", "svg");
 
     String imagePathString = dishRepository.findImagePathById(dishId);

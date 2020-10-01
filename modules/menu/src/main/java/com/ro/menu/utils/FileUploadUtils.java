@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileUploadUtils {
-  public static String saveUploadedFile(Path uploadDirectory, MultipartFile file, String... expectedExtensions)
+  public static String saveUploadedImageAsPng(Path uploadDirectory, MultipartFile file, String... expectedExtensions)
       throws IOException {
     validateUploadedFileExtension(file, expectedExtensions);
 
@@ -26,6 +26,9 @@ public class FileUploadUtils {
         .toString();
 
     BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
+    if (bufferedImage == null) {
+      throw new IOException("Не удалось считать загружаемое изображение из буфера");
+    }
     ImageIO.write(bufferedImage, "png", new File(filePath));
 
     return filePath;

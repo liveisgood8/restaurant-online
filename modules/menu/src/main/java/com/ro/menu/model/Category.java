@@ -1,9 +1,6 @@
 package com.ro.menu.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,10 +26,13 @@ public class Category {
   @Column(length = 128, nullable = false)
   private String name;
 
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
+  @JsonIgnore
   @Column
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
+
+  @Transient
+  private String imageUrl;
 
   @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")

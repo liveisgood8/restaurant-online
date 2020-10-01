@@ -1,17 +1,25 @@
 package com.ro.auth.controller.body;
 
 import com.ro.auth.model.User;
+import lombok.Getter;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Getter
 public class AuthResponse {
   private final String accessToken;
   private final UserInfo userInfo;
 
+  @Getter
   public static class UserInfo {
     private final Long id;
     private final String phone;
     private final String email;
     private final String name;
     private final Integer bonuses;
+    private final Set<String> authorities;
 
     public UserInfo(User user) {
       this.id = user.getId();
@@ -19,6 +27,10 @@ public class AuthResponse {
       this.email = user.getEmail();
       this.name = user.getName();
       this.bonuses = user.getBonuses();
+      this.authorities = user.getAuthorities()
+          .stream()
+          .map(GrantedAuthority::getAuthority)
+          .collect(Collectors.toSet());
     }
 
     public Long getId() {

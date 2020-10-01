@@ -30,12 +30,8 @@ public class DishController {
   private DishService dishService;
 
   @GetMapping
-  public List<DishWithImageUrlAndLikes> getAll(@RequestParam Long categoryId) {
-    if (categoryId == null) {
-      return dishService.getAll();
-    } else {
-      return dishService.getByCategoryId(categoryId);
-    }
+  public List<Dish> getAll(@RequestParam Long categoryId) {
+    return categoryId == null ? dishService.getAll() : dishService.getByCategoryId(categoryId);
   }
 
   @GetMapping(value = "{id}/image", produces = MediaType.IMAGE_PNG_VALUE)

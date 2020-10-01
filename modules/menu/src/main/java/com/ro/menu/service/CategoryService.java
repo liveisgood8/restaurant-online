@@ -1,6 +1,5 @@
 package com.ro.menu.service;
 
-import com.ro.core.utils.FilenameUtils;
 import com.ro.menu.model.Category;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
@@ -11,18 +10,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -31,13 +26,17 @@ public class CategoryService {
 
   @Autowired
   public CategoryService(@Value("${uploads.directory:uploads}") String uploadsDirectory,
-                         CategoryRepository categoryRepository) {
+                         CategoryRepository categoryRepository) throws IOException {
     this.uploadImagesDir = Paths.get(uploadsDirectory, "category-images");
     this.categoryRepository = categoryRepository;
+    Files.createDirectories(uploadImagesDir);
   }
 
   public List<Category> getAll() {
-    return categoryRepository.findAll();
+    return categoryRepository.findAll()
+        .stream()
+        .peek(c -> c.setImageUrl(String.format("/menu/categories/%s/image", c.getId())))
+        .collect(Collectors.toList());
   }
 
   public byte[] getImageBytes(Long categoryId) throws IOException, EntityNotFoundException {
@@ -52,7 +51,7 @@ public class CategoryService {
   @Modifying
   @Transactional
   public void saveImage(Long categoryId, MultipartFile file) throws IOException {
-    String newImagePath = FileUploadUtils.saveUploadedFile(uploadImagesDir, file,
+    String newImagePath = FileUploadUtils.saveUploadedImageAsPng(uploadImagesDir, file,
         "png", "jpg", "jpeg", "svg");
 
     String imagePathString = categoryRepository.findImagePathById(categoryId);

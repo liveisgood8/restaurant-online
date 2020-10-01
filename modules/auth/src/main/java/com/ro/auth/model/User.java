@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 @Entity
@@ -46,7 +47,7 @@ public class User implements UserDetails {
   private Boolean isBanned = false;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-  private Set<UserAuthority> authorities;
+  private Set<UserAuthority> authorities = Collections.emptySet();
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

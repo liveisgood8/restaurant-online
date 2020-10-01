@@ -11,6 +11,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
   @Query("select c.imagePath from Category c where c.id = :id")
   String findImagePathById(Long id);
 
+  @Modifying
   @Query("update Category c set c.imagePath = :imagePath where c.id = :id")
   void updateImagePath(Long id, String imagePath);
 }
