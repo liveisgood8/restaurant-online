@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.auth.model.User;
+import com.ro.core.models.Address;
 import com.ro.orders.validation.InsertGroup;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,26 +37,15 @@ public class Order {
   private User user;
 
   @Column(nullable = false)
-  private String street;
-
-  @Column(nullable = false)
-  private Integer homeNumber;
-
-  @Column(nullable = false)
-  private Integer entranceNumber;
-
-  @Column(nullable = false)
-  private Integer floorNumber;
-
-  @Column(nullable = false)
-  private Integer apartmentNumber;
-
-  @Column(nullable = false)
   private Boolean isApproved;
 
   @Column(nullable = false)
   @Enumerated
   private PaymentMethod paymentMethod;
+
+  @OneToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "address_id", nullable = false)
+  private Address address;
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @NotNull(groups = {InsertGroup.class})

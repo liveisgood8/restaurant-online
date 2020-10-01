@@ -1,5 +1,6 @@
 package com.ro.orders.controller;
 
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.auth.model.User;
 import com.ro.orders.controller.payloads.MakeOrderRequest;
 import com.ro.orders.model.Order;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/orders")
 public class OrdersController {
@@ -20,6 +23,7 @@ public class OrdersController {
 
   @PostMapping
   public OrderWithBonuses makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
-    return ordersService.makeOrder(makeOrderRequest, ((User) authentication.getPrincipal()));
+    User user = authentication == null ? null : (User) authentication.getPrincipal();
+    return ordersService.makeOrder(makeOrderRequest, user);
   }
 }

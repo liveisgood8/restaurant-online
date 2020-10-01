@@ -8,6 +8,7 @@ import com.ro.menu.model.DishWithImageUrlAndLikes;
 import com.ro.menu.repository.DishLikesRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
+import com.ro.menu.utils.FileUploadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class DishService {
-  private final Path UPLOAD_IMAGES_DIR;
+  private final Path uploadImagesDir;
   private final DishRepository dishRepository;
   private final DishLikesRepository dishEmotionsRepository;
 
@@ -37,10 +38,10 @@ public class DishService {
   public DishService(@Value("${uploads.directory:uploads}") String uploadsDirectory,
                      DishRepository dishRepository,
                      DishLikesRepository dishEmotionsRepository) throws IOException {
-    UPLOAD_IMAGES_DIR = Paths.get(uploadsDirectory, "dish-images");
+    uploadImagesDir = Paths.get(uploadsDirectory, "dish-images");
     this.dishRepository = dishRepository;
     this.dishEmotionsRepository = dishEmotionsRepository;
-    Files.createDirectories(UPLOAD_IMAGES_DIR);
+    Files.createDirectories(uploadImagesDir);
   }
 
   public List<DishWithImageUrlAndLikes> getAll() {
@@ -86,21 +87,15 @@ public class DishService {
   }
 
   public void saveImage(Long dishId, MultipartFile file) throws IOException {
-    String filePath = UPLOAD_IMAGES_DIR.resolve(UUID.randomUUID().toString() + ".png")
-        .toString();
-
-    BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
-    ImageIO.write(bufferedImage, "png", new File(filePath));
+    String newImagePath = FileUploadUtils.saveUploadedFile(uploadImagesDir, file,
+        "png", "jpg", "jpeg", "svg");
 
     String imagePathString = dishRepository.findImagePathById(dishId);
     if (imagePathString != null) {
-      Path imagePath = Paths.get(imagePathString);
-      if (Files.exists(imagePath)) {
-        Files.delete(imagePath);
-      }
+      FileUploadUtils.deleteUploadedFile(imagePathString);
     }
 
-    dishRepository.updateImagePath(dishId, filePath);
+    dishRepository.updateImagePath(dishId, newImagePath);
   }
 
   public List<DishEmotion> getLikes(Long dishId) {

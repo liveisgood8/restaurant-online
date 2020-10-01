@@ -9,6 +9,7 @@ public class MenuModuleSecurity {
         .authorizeRequests()
         .antMatchers(HttpMethod.GET, "/menu/dishes/**").permitAll()
         .antMatchers(HttpMethod.GET, "/menu/categories/**").permitAll()
+        .antMatchers("/orders").permitAll()
         .antMatchers("/menu/dishes/**").hasAuthority("ADMIN");
   }
 }

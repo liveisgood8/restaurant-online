@@ -12,11 +12,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-
 @Getter
 @Setter
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = Category.class)
-@Entity(name = "category")
+@Entity
 @Table(name = "categories", uniqueConstraints = {
     @UniqueConstraint(columnNames = "name")
 })

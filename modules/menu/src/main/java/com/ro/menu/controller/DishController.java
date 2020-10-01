@@ -51,16 +51,16 @@ public class DishController {
     }
   }
 
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public Dish create(@Validated({Default.class, InsertGroup.class}) @RequestBody Dish dish) {
-    return dishService.create(dish);
-  }
-
   @PostMapping("{id}/image")
   public void uploadImage(@PathVariable Long id,
                           @RequestParam("file") MultipartFile file) throws IOException {
     dishService.saveImage(id, file);
+  }
+
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public Dish create(@Validated({Default.class, InsertGroup.class}) @RequestBody Dish dish) {
+    return dishService.create(dish);
   }
 
   @GetMapping("{id}/likes")
