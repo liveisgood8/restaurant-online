@@ -1,6 +1,7 @@
 package com.ro.menu.controller;
 
 import com.ro.auth.model.User;
+import com.ro.menu.controller.payload.UploadImageResponse;
 import com.ro.menu.model.raw.DishLikes;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
@@ -48,9 +49,10 @@ public class DishController {
   }
 
   @PostMapping("{id}/image")
-  public void uploadImage(@PathVariable Long id,
-                          @RequestParam("file") MultipartFile file) throws IOException {
-    dishService.saveImage(id, file);
+  public UploadImageResponse uploadImage(@PathVariable Long id,
+                                         @RequestParam("file") MultipartFile file) throws IOException {
+    String imageUrl = dishService.saveImage(id, file);
+    return new UploadImageResponse(imageUrl);
   }
 
   @PostMapping

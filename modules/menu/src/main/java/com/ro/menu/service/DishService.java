@@ -4,12 +4,12 @@ import com.ro.auth.model.User;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
-import com.ro.menu.model.DishWithImageUrlAndLikes;
 import com.ro.menu.model.raw.DishLikes;
 import com.ro.menu.repository.DishLikesRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
+import com.sun.istack.Nullable;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,8 +56,7 @@ public class DishService {
     return dishes.stream()
         .peek(d -> {
           d.setLikes(new DishLikes(d.getEmotions()));
-          d.setImageUrl(String.format("/menu/dishes/%s/image?%s", d.getId(),
-              FilenameUtils.getBaseName(d.getImagePath()).substring(0, 15)));
+          d.setImageUrl(makeImageUrl(d.getId(), d.getImagePath()));
         })
         .collect(Collectors.toList());
   }
@@ -87,7 +86,7 @@ public class DishService {
     return Files.readAllBytes(Paths.get(imagePath));
   }
 
-  public void saveImage(Long dishId, MultipartFile file) throws IOException {
+  public String saveImage(Long dishId, MultipartFile file) throws IOException {
     String newImagePath = FileUploadUtils.saveUploadedImageAsPng(uploadImagesDir, file,
         "png", "jpg", "jpeg", "svg");
 
@@ -97,6 +96,7 @@ public class DishService {
     }
 
     dishRepository.updateImagePath(dishId, newImagePath);
+    return makeImageUrl(dishId, newImagePath);
   }
 
   public List<DishEmotion> getLikes(Long dishId) {
@@ -132,5 +132,12 @@ public class DishService {
     newEmotion.setUser(user);
 
     dishEmotionsRepository.save(newEmotion);
+  }
+
+  private String makeImageUrl(Long dishId, @Nullable String imagePath) {
+    String fileNamePart = imagePath != null ?
+        FilenameUtils.getBaseName(imagePath).substring(0, 15) : "0";
+
+    return String.format("/menu/dishes/%s/image?%s", dishId, fileNamePart);
   }
 }

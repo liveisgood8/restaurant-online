@@ -1,5 +1,6 @@
 package com.ro.menu.controller;
 
+import com.ro.menu.controller.payload.UploadImageResponse;
 import com.ro.menu.model.Category;
 import com.ro.menu.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,10 @@ public class CategoryController {
   }
 
   @PostMapping("{id}/image")
-  public void uploadImage(@PathVariable Long id,
-                          @RequestParam("file") MultipartFile file) throws IOException {
-    categoryService.saveImage(id, file);
+  public UploadImageResponse uploadImage(@PathVariable Long id,
+                                         @RequestParam("file") MultipartFile file) throws IOException {
+    String imageUrl = categoryService.saveImage(id, file);
+    return new UploadImageResponse(imageUrl);
   }
 
   @GetMapping

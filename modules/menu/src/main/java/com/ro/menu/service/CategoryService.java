@@ -4,6 +4,7 @@ import com.ro.menu.model.Category;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
+import com.sun.istack.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,7 @@ public class CategoryService {
   public List<Category> getAll() {
     return categoryRepository.findAll()
         .stream()
-        .peek(c -> c.setImageUrl(String.format("/menu/categories/%s/image?%s", c.getId(),
-            FilenameUtils.getBaseName(c.getImagePath()).substring(0, 15))))
+        .peek(c -> c.setImageUrl(makeImageUrl(c.getId(), c.getImagePath())))
         .collect(Collectors.toList());
   }
 
@@ -53,7 +53,7 @@ public class CategoryService {
 
   @Modifying
   @Transactional
-  public void saveImage(Long categoryId, MultipartFile file) throws IOException {
+  public String saveImage(Long categoryId, MultipartFile file) throws IOException {
     String newImagePath = FileUploadUtils.saveUploadedImageAsPng(uploadImagesDir, file,
         "png", "jpg", "jpeg", "svg");
 
@@ -63,6 +63,7 @@ public class CategoryService {
     }
 
     categoryRepository.updateImagePath(categoryId, newImagePath);
+    return makeImageUrl(categoryId, newImagePath);
   }
 
   @Transactional
@@ -79,5 +80,12 @@ public class CategoryService {
 
   public void delete(Long id) {
     categoryRepository.deleteById(id);
+  }
+
+  private String makeImageUrl(Long categoryId, @Nullable String imagePath) {
+    String fileNamePart = imagePath != null ?
+        FilenameUtils.getBaseName(imagePath).substring(0, 15) : "0";
+
+    return String.format("/menu/categories/%s/image?%s", categoryId, fileNamePart);
   }
 }
