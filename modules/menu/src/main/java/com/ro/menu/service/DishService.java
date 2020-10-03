@@ -10,6 +10,7 @@ import com.ro.menu.repository.DishLikesRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,8 @@ public class DishService {
     return dishes.stream()
         .peek(d -> {
           d.setLikes(new DishLikes(d.getEmotions()));
-          d.setImageUrl(String.format("/menu/dishes/%s/image", d.getId()));
+          d.setImageUrl(String.format("/menu/dishes/%s/image?%s", d.getId(),
+              FilenameUtils.getBaseName(d.getImagePath()).substring(0, 15)));
         })
         .collect(Collectors.toList());
   }

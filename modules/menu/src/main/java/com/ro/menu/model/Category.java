@@ -3,10 +3,12 @@ package com.ro.menu.model;
 import com.fasterxml.jackson.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter

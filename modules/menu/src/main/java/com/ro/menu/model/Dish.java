@@ -5,10 +5,12 @@ import com.ro.menu.model.raw.DishLikes;
 import com.ro.menu.validation.InsertGroup;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.sql.Timestamp;
 import java.util.Set;
 
 @Getter
@@ -55,6 +57,7 @@ public class Dish {
 
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
   @JsonIgnore

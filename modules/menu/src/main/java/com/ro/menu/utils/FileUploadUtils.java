@@ -1,7 +1,7 @@
 package com.ro.menu.utils;
 
-import com.ro.core.utils.FilenameUtils;
 import com.sun.istack.NotNull;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;

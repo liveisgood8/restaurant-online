@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "dish_likes")
 public class DishEmotion {
-  public static enum EmotionType {
+  public enum EmotionType {
     LIKE,
     DISLIKE,
   }
@@ -27,12 +27,12 @@ public class DishEmotion {
 
   @JsonBackReference
   @ManyToOne
-  @JoinColumn(name = "dish_id")
+  @JoinColumn(name = "dish_id", nullable = false)
   private Dish dish;
 
   @JsonIgnore
   @ManyToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
   @Column(nullable = false)
