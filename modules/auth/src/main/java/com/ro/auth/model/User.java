@@ -1,31 +1,35 @@
 package com.ro.auth.model;
 
+import com.ro.auth.oauth2.AuthProvider;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "users")
-public class User implements UserDetails {
+public class User implements OAuth2User, UserDetails {
   @Id
   @GeneratedValue
   private Long id;
 
   @Pattern(regexp="^((\\+7|7|8)+([0-9]){10})$")
-  @Column(unique = true, nullable = false)
+  @Column(unique = true)
   private String phone;
 
   @Email
   @Column(unique = true, nullable = false)
   private String email;
 
-  @Column(nullable = false)
+  @Column
   private String password;
 
   @Column
@@ -46,8 +50,20 @@ public class User implements UserDetails {
   @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isBanned = false;
 
+  @Column(nullable = false, columnDefinition = "varchar(32) default 'NATIVE'")
+  @Enumerated(EnumType.STRING)
+  private AuthProvider authProvider;
+
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private Set<UserAuthority> authorities = Collections.emptySet();
+
+  @Transient
+  private final Map<String, Object> attributes = new HashMap<>();
+
+  @Override
+  public Map<String, Object> getAttributes() {
+    return attributes;
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -77,53 +93,5 @@ public class User implements UserDetails {
   @Override
   public boolean isEnabled() {
     return isEnabled;
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public String getPhone() {
-    return phone;
-  }
-
-  public void setPhone(String phone) {
-    this.phone = phone;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public Integer getBonuses() {
-    return bonuses;
-  }
-
-  public void setBonuses(Integer bonuses) {
-    this.bonuses = bonuses;
   }
 }

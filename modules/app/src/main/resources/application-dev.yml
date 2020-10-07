@@ -1,0 +1,17 @@
+server:
+  port: 10100
+management:
+  security:
+    enabled: false
+security:
+  basic:
+    enabled: false
+  ignored: /**
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true

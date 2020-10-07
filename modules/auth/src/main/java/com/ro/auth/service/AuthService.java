@@ -4,6 +4,8 @@ import com.ro.auth.controller.body.RegistrationRequest;
 import com.ro.auth.controller.body.UserUpdateRequest;
 import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.User;
+import com.ro.auth.oauth2.AuthProvider;
+import com.ro.auth.oauth2.user.info.OAuth2UserInfo;
 import com.ro.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,22 +18,16 @@ import java.util.Optional;
 
 @Service
 public class AuthService {
-  private AuthenticationManager authenticationManager;
-  private UserRepository userRepository;
-  private PasswordEncoder passwordEncoder;
+  private final AuthenticationManager authenticationManager;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Autowired
-  public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+  public AuthService(AuthenticationManager authenticationManager,
+                     UserRepository userRepository,
+                     PasswordEncoder passwordEncoder) {
     this.authenticationManager = authenticationManager;
-  }
-
-  @Autowired
-  public void setUserRepository(UserRepository userRepository) {
     this.userRepository = userRepository;
-  }
-
-  @Autowired
-  public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -50,7 +46,6 @@ public class AuthService {
     return userRepository.save(user);
   }
 
-
   public User register(RegistrationRequest registrationRequest) {
     Optional<User> alreadyExistedUser = userRepository.findByEmailOrPhone(
         registrationRequest.getEmail(),
@@ -65,6 +60,7 @@ public class AuthService {
     user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
     user.setName(registrationRequest.getName());
     user.setBonuses(0);
+    user.setAuthProvider(AuthProvider.NATIVE);
     return userRepository.save(user);
   }
 }

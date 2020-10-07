@@ -1,0 +1,6 @@
+log4j:
+  appender:
+    FILE: org.apache.log4j.FileAppender
+    FILE.Append: false
+    FILE.ImmediateFlush: true
+  rootLogger: DEBUG, FILE

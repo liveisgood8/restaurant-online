@@ -1,9 +1,10 @@
 package com.ro.auth.utils;
 
+import com.ro.auth.config.AuthProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,14 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenUtil {
-  private static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
+  private final long tokenExpirationMs;
+  private final String secret;
 
-  @Value("${jwt.secret}")
-  private String secret;
+  @Autowired
+  public JwtTokenUtil(AuthProperties authProperties) {
+    this.secret = authProperties.getTokenInfo().getTokenSecret();
+    this.tokenExpirationMs = authProperties.getTokenInfo().getTokenExpirationMs();
+  }
 
   public String getUsernameFromToken(String token) {
     return getClaimFromToken(token, Claims::getSubject);
@@ -48,7 +53,7 @@ public class JwtTokenUtil {
 
   private String generateToken(Map<String, Object> claims, String subject) {
     return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+        .setExpiration(new Date(System.currentTimeMillis() + tokenExpirationMs * 1000))
         .signWith(SignatureAlgorithm.HS512, secret).compact();
   }
 

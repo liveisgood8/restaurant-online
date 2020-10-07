@@ -2,12 +2,11 @@ package com.ro.auth.config;
 
 import com.ro.auth.filter.JwtAuthenticationEntryPoint;
 import com.ro.auth.filter.JwtRequestFilter;
+import com.ro.auth.oauth2.*;
 import com.ro.auth.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +15,14 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequestEntityConverter;
+import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
+import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,18 +32,29 @@ import java.util.Collections;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
   private final JwtUserDetailsService jwtUserDetailsService;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtRequestFilter jwtRequestFilter;
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+  private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
   @Autowired
   public SecurityConfig(JwtUserDetailsService jwtUserDetailsService,
                         JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                        JwtRequestFilter jwtRequestFilter) {
+                        JwtRequestFilter jwtRequestFilter,
+                        CustomOAuth2UserService customOAuth2UserService,
+                        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
+                        HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
     this.jwtUserDetailsService = jwtUserDetailsService;
     this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     this.jwtRequestFilter = jwtRequestFilter;
+    this.customOAuth2UserService = customOAuth2UserService;
+    this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+    this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
+    this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
   }
 
   @Autowired
@@ -45,11 +62,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     authenticationManagerBuilder
         .userDetailsService(jwtUserDetailsService)
         .passwordEncoder(passwordEncoder());
-  }
-
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
   }
 
   @Bean
@@ -61,16 +73,54 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
-        .csrf().disable()
-        .cors()
-        .and()
-        .authorizeRequests()
-        .antMatchers("/auth").permitAll()
-        .antMatchers("/auth/registration").permitAll()
-        .and()
-        .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-        .and()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .cors()
+              .and()
+            .sessionManagement()
+              .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+              .and()
+            .csrf()
+              .disable()
+            .formLogin()
+              .disable()
+            .httpBasic()
+              .disable()
+            .authorizeRequests()
+              .antMatchers("/",
+                    "/error",
+                    "/favicon.ico",
+                    "/**/*.png",
+                    "/**/*.gif",
+                    "/**/*.svg",
+                    "/**/*.jpg",
+                    "/**/*.html",
+                    "/**/*.css",
+                    "/**/*.js")
+                .permitAll()
+              .antMatchers("/auth")
+                .permitAll()
+              .antMatchers("/auth/registration")
+                .permitAll()
+              .and()
+              .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+              .and()
+            .oauth2Login()
+              .authorizationEndpoint()
+                .baseUri("/oauth2/authorize")
+                .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .and()
+              .redirectionEndpoint()
+                .baseUri("/oauth2/callback/*")
+                .and()
+              .userInfoEndpoint()
+                .userService(customOAuth2UserService)
+                .and()
+            .tokenEndpoint()
+              .accessTokenResponseClient(accessTokenResponseClient())
+              .and()
+            .successHandler(oAuth2AuthenticationSuccessHandler)
+            .failureHandler(oAuth2AuthenticationFailureHandler);
+
 
     // Configure modules security
     MenuModuleSecurity.configure(httpSecurity);
@@ -80,6 +130,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated();
 
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
   @Bean
@@ -97,6 +152,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  @Bean
+  public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+    return new HttpCookieOAuth2AuthorizationRequestRepository();
+  }
+
+  @Bean
+  public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+    DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient =
+            new DefaultAuthorizationCodeTokenResponseClient();
+    accessTokenResponseClient.setRequestEntityConverter(new OAuth2AuthorizationCodeGrantRequestEntityConverter());
+
+    OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
+            new OAuth2AccessTokenResponseHttpMessageConverter();
+    tokenResponseHttpMessageConverter.setTokenResponseConverter(new CustomTokenResponseConverter());
+
+    RestTemplate restTemplate = new RestTemplate(Arrays.asList(
+            new FormHttpMessageConverter(), tokenResponseHttpMessageConverter));
+    restTemplate.setErrorHandler(new OAuth2ErrorResponseErrorHandler());
+
+    accessTokenResponseClient.setRestOperations(restTemplate);
+    return accessTokenResponseClient;
   }
 
 }
