@@ -42,6 +42,7 @@ public class AuthService {
     }
     if (updateRequest.getPassword() != null) {
       user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
+      user.setIsCredentialsExpired(false);
     }
     return userRepository.save(user);
   }

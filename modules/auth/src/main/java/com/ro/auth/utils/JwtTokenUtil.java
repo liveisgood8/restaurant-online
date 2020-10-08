@@ -1,6 +1,8 @@
 package com.ro.auth.utils;
 
 import com.ro.auth.config.AuthProperties;
+import com.ro.auth.controller.body.AuthResponse;
+import com.ro.auth.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -46,13 +48,17 @@ public class JwtTokenUtil {
     return expiration.before(new Date());
   }
 
-  public String generateToken(UserDetails userDetails) {
+  public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
-    return generateToken(claims, userDetails.getUsername());
+    claims.put("user", new AuthResponse.UserInfo(user));
+    return generateToken(claims, user.getUsername());
   }
 
   private String generateToken(Map<String, Object> claims, String subject) {
-    return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+    return Jwts.builder()
+        .setClaims(claims)
+        .setSubject(subject)
+        .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + tokenExpirationMs * 1000))
         .signWith(SignatureAlgorithm.HS512, secret).compact();
   }
