@@ -1,16 +1,14 @@
 package com.ro.menu.model;
 
 import com.fasterxml.jackson.annotation.*;
-import com.ro.menu.model.raw.DishLikes;
 import com.ro.menu.validation.InsertGroup;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Set;
 
 @Getter
@@ -52,9 +50,6 @@ public class Dish {
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
 
-  @Transient
-  private String imageUrl;
-
   @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id", nullable = false)
@@ -63,8 +58,5 @@ public class Dish {
   @JsonIgnore
   @JsonManagedReference
   @OneToMany(mappedBy = "dish")
-  private Set<DishEmotion> emotions;
-
-  @Transient
-  private DishLikes likes;
+  private Set<DishEmotion> emotions = Collections.emptySet();
 }

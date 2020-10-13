@@ -1,16 +1,14 @@
 package com.ro.menu.service;
 
 import com.ro.auth.model.User;
+import com.ro.menu.dto.mappers.DishDtoMapper;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
-import com.ro.menu.model.raw.DishLikes;
 import com.ro.menu.repository.DishLikesRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
-import com.sun.istack.Nullable;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DishService {
@@ -43,22 +40,11 @@ public class DishService {
   }
 
   public List<Dish> getAll() {
-    List<Dish> dishes = dishRepository.findAll();
-    return getDishesWithImageUrlAndLikes(dishes);
+    return dishRepository.findAll();
   }
 
   public List<Dish> getByCategoryId(Long categoryId) {
-    List<Dish> dishes = dishRepository.findByCategoryId(categoryId);
-    return getDishesWithImageUrlAndLikes(dishes);
-  }
-
-  private List<Dish> getDishesWithImageUrlAndLikes(List<Dish> dishes) {
-    return dishes.stream()
-        .peek(d -> {
-          d.setLikes(new DishLikes(d.getEmotions()));
-          d.setImageUrl(makeImageUrl(d.getId(), d.getImagePath()));
-        })
-        .collect(Collectors.toList());
+    return dishRepository.findByCategoryId(categoryId);
   }
 
   @Transactional
@@ -66,11 +52,12 @@ public class DishService {
     return dishRepository.save(dish);
   }
 
+  // TODO Переделать на DTO
   @Transactional
-  public void update(Long id, Dish newDish) throws Exception {
+  public Dish update(Long id, Dish newDish) throws Exception {
     Dish dish = dishRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     NullAwareBeanUtilsBean.copyNonNullProperties(newDish, dish);
-    dishRepository.save(dish);
+    return dishRepository.save(dish);
   }
 
   public void delete(Long id) {
@@ -96,7 +83,7 @@ public class DishService {
     }
 
     dishRepository.updateImagePath(dishId, newImagePath);
-    return makeImageUrl(dishId, newImagePath);
+    return DishDtoMapper.makeImageUrl(dishId, newImagePath);
   }
 
   public List<DishEmotion> getLikes(Long dishId) {
@@ -132,12 +119,5 @@ public class DishService {
     newEmotion.setUser(user);
 
     dishEmotionsRepository.save(newEmotion);
-  }
-
-  private String makeImageUrl(Long dishId, @Nullable String imagePath) {
-    String fileNamePart = imagePath != null ?
-        FilenameUtils.getBaseName(imagePath).substring(0, 15) : "0";
-
-    return String.format("/menu/dishes/%s/image?%s", dishId, fileNamePart);
   }
 }

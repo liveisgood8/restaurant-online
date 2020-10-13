@@ -7,9 +7,11 @@ public class MenuModuleSecurity {
   public static void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
         .authorizeRequests()
-        .antMatchers(HttpMethod.GET, "/menu/dishes/**").permitAll()
-        .antMatchers(HttpMethod.GET, "/menu/categories/**").permitAll()
-        .antMatchers("/orders").permitAll()
-        .antMatchers("/menu/dishes/**").hasAuthority("ADMIN");
+          .antMatchers(HttpMethod.GET, "/menu/dishes/**").permitAll()
+          .antMatchers(HttpMethod.GET, "/menu/categories/**").permitAll()
+          .antMatchers("/orders").permitAll()
+          .antMatchers("/menu/dishes/*/likes/like").authenticated()
+          .antMatchers("/menu/dishes/*/likes/dislike").authenticated()
+          .antMatchers("/menu/dishes/**").hasAuthority("ADMIN");
   }
 }
