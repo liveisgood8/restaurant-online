@@ -1,9 +1,9 @@
 package com.ro.orders.controller;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.auth.model.User;
 import com.ro.orders.controller.payloads.MakeOrderRequest;
-import com.ro.orders.model.Order;
+import com.ro.orders.dto.mapper.OrderWithBonusesDtoMapper;
+import com.ro.orders.dto.objects.OrderWithBonusesDto;
 import com.ro.orders.service.OrderWithBonuses;
 import com.ro.orders.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +22,9 @@ public class OrdersController {
   private OrdersService ordersService;
 
   @PostMapping
-  public OrderWithBonuses makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
+  public OrderWithBonusesDto makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
-    return ordersService.makeOrder(makeOrderRequest, user);
+    OrderWithBonuses orderWithBonuses = ordersService.makeOrder(makeOrderRequest, user);
+    return OrderWithBonusesDtoMapper.INSTANCE.toDto(orderWithBonuses);
   }
 }

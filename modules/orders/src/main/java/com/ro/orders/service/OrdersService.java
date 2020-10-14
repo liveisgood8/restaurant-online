@@ -8,6 +8,7 @@ import com.ro.orders.controller.payloads.MakeOrderRequest;
 import com.ro.orders.events.OrderEvent;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderInfo;
+import com.ro.orders.repository.OrdersInfoRepository;
 import com.ro.orders.repository.OrdersRepository;
 import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,21 +27,25 @@ import java.util.stream.Collectors;
 @Service
 public class OrdersService {
   private final OrdersRepository ordersRepository;
+  private final OrdersInfoRepository ordersInfoRepository;
   private final UserService userService;
   private final AddressRepository addressRepository;
   private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
   public OrdersService(OrdersRepository ordersRepository,
+                       OrdersInfoRepository ordersInfoRepository,
                        UserService userService,
                        AddressRepository addressRepository,
                        ApplicationEventMulticaster eventMulticaster) {
     this.ordersRepository = ordersRepository;
+    this.ordersInfoRepository = ordersInfoRepository;
     this.userService = userService;
     this.addressRepository = addressRepository;
     this.eventMulticaster = eventMulticaster;
   }
 
+  @Transactional
   public OrderWithBonuses makeOrder(MakeOrderRequest makeOrderRequest, @Nullable User user) {
     Order order = new Order();
     order.setUser(user);
@@ -45,6 +53,7 @@ public class OrdersService {
     Set<OrderInfo> orderInfos = makeOrderRequest.getEntries().stream()
         .map(entry -> {
           OrderInfo orderInfo = new OrderInfo();
+          orderInfo.getId().setDishId(entry.getDish().getId());
           orderInfo.setDish(entry.getDish());
           orderInfo.setCount(entry.getCount());
           orderInfo.setOrder(order);
@@ -60,6 +69,11 @@ public class OrdersService {
     order.setOrderInfos(orderInfos);
 
     Order savedOrder = ordersRepository.save(order);
+
+    order.getOrderInfos().forEach(o -> o.getId().setOrderId(savedOrder.getId()));
+    List<OrderInfo> savedOrderInfos = ordersInfoRepository.saveAll(order.getOrderInfos());
+    savedOrder.setOrderInfos(new HashSet<>(savedOrderInfos));
+
     Integer bonuses = user == null ? 0 : creditBonusesToUser(savedOrder);
 
     OrderEvent orderEvent = new OrderEvent(savedOrder, this);

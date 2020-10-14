@@ -47,7 +47,7 @@ public class Order {
   @JoinColumn(name = "address_id", nullable = false)
   private Address address;
 
-  @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "id.orderId", orphanRemoval = true)
   @NotNull(groups = {InsertGroup.class})
   private Set<OrderInfo> orderInfos;
 

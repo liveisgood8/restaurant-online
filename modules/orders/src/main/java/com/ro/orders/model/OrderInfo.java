@@ -3,10 +3,12 @@ package com.ro.orders.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.menu.model.Dish;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -14,18 +16,27 @@ import javax.persistence.*;
 @Entity
 @Table(name = "orders_info")
 public class OrderInfo {
-  @Id
-  @GeneratedValue
-  private Long id;
+  @Embeddable
+  @Data
+  public static class OrderInfoId implements Serializable {
+    @Column(name = "dish_id", nullable = false)
+    private Long dishId;
+
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
+  }
+
+  @EmbeddedId
+  private OrderInfoId id = new OrderInfoId();
 
   @Column(name = "count", nullable = false)
   private Integer count;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "order_id", nullable = false)
+  @MapsId("orderId")
   private Order order;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "dish_id", nullable = false)
+  @MapsId("dishId")
   private Dish dish;
 }
