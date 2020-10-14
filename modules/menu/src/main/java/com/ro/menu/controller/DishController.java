@@ -1,7 +1,6 @@
 package com.ro.menu.controller;
 
 import com.ro.auth.model.User;
-import com.ro.core.utils.dto.MapperUtils;
 import com.ro.menu.controller.payload.UploadImageResponse;
 import com.ro.menu.dto.mappers.DishDtoMapper;
 import com.ro.menu.dto.objects.DishDto;
@@ -28,19 +27,16 @@ import java.util.List;
 @RequestMapping("/menu/dishes")
 public class DishController {
   private final DishService dishService;
-  private final DishDtoMapper dishDtoMapper;
 
   @Autowired
-  public DishController(DishService dishService,
-                        DishDtoMapper dishDtoMapper) {
+  public DishController(DishService dishService) {
     this.dishService = dishService;
-    this.dishDtoMapper = dishDtoMapper;
   }
 
   @GetMapping
   public List<DishDto> getAll(@RequestParam Long categoryId) {
     List<Dish> dishes = categoryId == null ? dishService.getAll() : dishService.getByCategoryId(categoryId);
-    return MapperUtils.mapObjectsListToDto(dishes, dishDtoMapper);
+    return DishDtoMapper.INSTANCE.toDto(dishes);
   }
 
   @GetMapping(value = "{id}/image", produces = MediaType.IMAGE_PNG_VALUE)
@@ -67,7 +63,7 @@ public class DishController {
   @ResponseStatus(HttpStatus.CREATED)
   public DishDto create(@Validated({Default.class, InsertGroup.class}) @RequestBody Dish dish) {
     Dish createdDish = dishService.create(dish);
-    return dishDtoMapper.toDto(createdDish);
+    return DishDtoMapper.INSTANCE.toDto(createdDish);
   }
 
   @PostMapping("{id}/likes/like")
@@ -85,7 +81,7 @@ public class DishController {
   @PatchMapping("{id}")
   public DishDto update(@PathVariable Long id, @RequestBody Dish dish) throws Exception {
     Dish updatedDish = dishService.update(id, dish);
-    return dishDtoMapper.toDto(updatedDish);
+    return DishDtoMapper.INSTANCE.toDto(updatedDish);
   }
 
   @DeleteMapping("{id}")
