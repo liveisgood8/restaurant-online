@@ -2,6 +2,8 @@ package com.ro.auth.service;
 
 import com.ro.auth.model.User;
 import com.ro.auth.repository.UserRepository;
+import com.ro.core.models.TelephoneNumber;
+import com.ro.core.utils.TelephoneNumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,7 +23,15 @@ public class JwtUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<User> user = userRepository.findByEmailOrPhone(username, username);
+    Optional<User> user;
+    try {
+      TelephoneNumber telephoneNumber = TelephoneNumberUtils.fromString(username);
+      user = userRepository
+          .findByTelephoneNumberCountryCodeAndTelephoneNumberNationalNumber(telephoneNumber.getCountryCode(),
+              telephoneNumber.getNationalNumber());
+    } catch (RuntimeException ignore) {
+      user = userRepository.findByEmail(username);
+    }
     if (user.isEmpty()) {
       throw new UsernameNotFoundException("User with email/phone: " + username + " not found");
     }

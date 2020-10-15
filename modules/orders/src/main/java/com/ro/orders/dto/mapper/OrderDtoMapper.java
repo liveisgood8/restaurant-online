@@ -7,9 +7,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(imports = { OrderInfoDtoMapper.class })
+@Mapper(uses = { OrderInfoDtoMapper.class, AddressDtoMapper.class })
 public interface OrderDtoMapper {
   OrderDtoMapper INSTANCE = Mappers.getMapper(OrderDtoMapper.class);
 
   OrderDto toDto(Order order);
+
+  @Mapping(target = "isApproved", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  Order toEntity(OrderDto orderDto);
 }

@@ -10,4 +10,8 @@ public interface OrderInfoDtoMapper {
   @Mapping(target = "orderId", source = "id.orderId")
   @Mapping(target = "dishId", source = "id.dishId")
   OrderInfoDto toDto(OrderInfo orderInfo);
+
+  @Mapping(target = "id.orderId", source = "orderId")
+  @Mapping(target = "id.dishId", source = "dishId")
+  OrderInfo toEntity(OrderInfoDto orderInfoDto);
 }

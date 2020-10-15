@@ -5,6 +5,9 @@ import com.ro.auth.service.UserService;
 import com.ro.core.models.Address;
 import com.ro.core.repository.AddressRepository;
 import com.ro.orders.controller.payloads.MakeOrderRequest;
+import com.ro.orders.dto.mapper.OrderDtoMapper;
+import com.ro.orders.dto.objects.AddressDto;
+import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.events.OrderEvent;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderInfo;
@@ -46,27 +49,11 @@ public class OrdersService {
   }
 
   @Transactional
-  public OrderWithBonuses makeOrder(MakeOrderRequest makeOrderRequest, @Nullable User user) {
-    Order order = new Order();
+  public OrderWithBonuses makeOrder(OrderDto orderDto, @Nullable User user) {
+    Order order = OrderDtoMapper.INSTANCE.toEntity(orderDto);
+    order.setAddress(handleOrderAddress(order.getAddress()));
     order.setUser(user);
-
-    Set<OrderInfo> orderInfos = makeOrderRequest.getEntries().stream()
-        .map(entry -> {
-          OrderInfo orderInfo = new OrderInfo();
-          orderInfo.getId().setDishId(entry.getDish().getId());
-          orderInfo.setDish(entry.getDish());
-          orderInfo.setCount(entry.getCount());
-          orderInfo.setOrder(order);
-          return orderInfo;
-        })
-        .collect(Collectors.toSet());
-
-    Address address = handleOrderAddress(makeOrderRequest);
-
-    order.setAddress(address);
-    order.setPaymentMethod(makeOrderRequest.getPaymentMethod());
-    order.setIsApproved(makeOrderRequest.getPaymentMethod() == Order.PaymentMethod.BY_CARD_ONLINE);
-    order.setOrderInfos(orderInfos);
+    order.setIsApproved(orderDto.getPaymentMethod() == Order.PaymentMethod.BY_CARD_ONLINE);
 
     Order savedOrder = ordersRepository.save(order);
 
@@ -82,14 +69,7 @@ public class OrdersService {
     return new OrderWithBonuses(order, bonuses);
   }
 
-  private Address handleOrderAddress(MakeOrderRequest makeOrderRequest) {
-    Address address = new Address();
-    address.setStreet(makeOrderRequest.getStreet());
-    address.setHomeNumber(makeOrderRequest.getHomeNumber());
-    address.setEntranceNumber(makeOrderRequest.getEntranceNumber());
-    address.setFloorNumber(makeOrderRequest.getFloorNumber());
-    address.setApartmentNumber(makeOrderRequest.getApartmentNumber());
-
+  private Address handleOrderAddress(Address address) {
     ExampleMatcher addressMatcher = ExampleMatcher.matchingAll()
         .withIgnorePaths("id")
         .withIgnoreCase();

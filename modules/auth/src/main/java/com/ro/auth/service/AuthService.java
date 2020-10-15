@@ -1,23 +1,26 @@
 package com.ro.auth.service;
 
-import com.ro.auth.controller.body.RegistrationRequest;
-import com.ro.auth.controller.body.UserUpdateRequest;
+import com.ro.auth.dto.mappers.UserDtoMapper;
+import com.ro.auth.dto.objects.UserDto;
 import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.User;
 import com.ro.auth.oauth2.AuthProvider;
-import com.ro.auth.oauth2.user.info.OAuth2UserInfo;
 import com.ro.auth.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Service
 public class AuthService {
+  private final static Logger logger = LoggerFactory.getLogger(AuthService.class);
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
@@ -36,32 +39,26 @@ public class AuthService {
   }
 
   @Transactional
-  public User updateInfo(User user, UserUpdateRequest updateRequest) {
-      if (updateRequest.getName() != null) {
-      user.setName(updateRequest.getName());
-    }
-    if (updateRequest.getPassword() != null) {
-      user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
-      user.setIsCredentialsExpired(false);
-    }
+  public User updateInfo(User user, UserDto userDto) {
+    UserDtoMapper.INSTANCE.mergeWithDto(user, userDto);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
     return userRepository.save(user);
   }
 
-  public User register(RegistrationRequest registrationRequest) {
-    Optional<User> alreadyExistedUser = userRepository.findByEmailOrPhone(
-        registrationRequest.getEmail(),
-        registrationRequest.getPhone());
-    if (alreadyExistedUser.isPresent()) {
+  public User register(UserDto userDto) {
+    User user = UserDtoMapper.INSTANCE.toEntity(userDto);
+    if (isUserExist(user)) {
       throw new UserAlreadyExistException();
     }
-
-    User user = new User();
-    user.setPhone(registrationRequest.getPhone());
-    user.setEmail(registrationRequest.getEmail());
-    user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-    user.setName(registrationRequest.getName());
+    user.setPassword(passwordEncoder.encode(userDto.getPassword()));
     user.setBonuses(0);
     user.setAuthProvider(AuthProvider.NATIVE);
     return userRepository.save(user);
+  }
+
+  private boolean isUserExist(User user) {
+    return userRepository.existsByEmailOrTelephoneNumberCountryCodeAndTelephoneNumberNationalNumber(user.getEmail(),
+        user.getTelephoneNumber().getCountryCode(),
+        user.getTelephoneNumber().getNationalNumber());
   }
 }

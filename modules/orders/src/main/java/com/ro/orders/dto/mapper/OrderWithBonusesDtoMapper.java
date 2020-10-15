@@ -5,7 +5,7 @@ import com.ro.orders.service.OrderWithBonuses;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(imports = { OrderDtoMapper.class, OrderInfoDtoMapper.class })
+@Mapper(uses = { OrderDtoMapper.class, OrderInfoDtoMapper.class })
 public interface OrderWithBonusesDtoMapper {
   OrderWithBonusesDtoMapper INSTANCE = Mappers.getMapper(OrderWithBonusesDtoMapper.class);
 

@@ -2,13 +2,12 @@ package com.ro.auth.controller;
 
 import com.ro.auth.controller.body.AuthRequest;
 import com.ro.auth.controller.body.AuthResponse;
-import com.ro.auth.controller.body.RegistrationRequest;
-import com.ro.auth.controller.body.UserUpdateRequest;
+import com.ro.auth.dto.mappers.UserDtoMapper;
+import com.ro.auth.dto.objects.UserDto;
 import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.User;
 import com.ro.auth.service.AuthService;
 import com.ro.auth.service.JwtUserDetailsService;
-import com.ro.auth.service.UserService;
 import com.ro.auth.utils.JwtTokenUtil;
 import com.ro.core.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -42,29 +39,31 @@ public class AuthController {
     User user = (User) jwtUserDetailsService.loadUserByUsername(authRequest.getLogin());
     String accessToken = jwtTokenUtil.generateToken(user);
 
-    return new AuthResponse(accessToken, new AuthResponse.UserInfo(user));
+    return new AuthResponse(accessToken, UserDtoMapper.INSTANCE.toDto(user));
   }
 
-  @PatchMapping("/user-info")
-  public User updateInfo(@RequestBody UserUpdateRequest updateRequest, Authentication authentication) {
-    User user = (User) authentication.getPrincipal();
-    return authService.updateInfo(user, updateRequest);
+  @PutMapping("/user")
+  public UserDto updateInfo(@RequestBody UserDto userDto, Authentication authentication) {
+      User user = (User) authentication.getPrincipal();
+    User updatedUser = authService.updateInfo(user, userDto);
+    return UserDtoMapper.INSTANCE.toDto(updatedUser);
   }
 
   @PostMapping("/registration")
-  public User register(@Valid @RequestBody RegistrationRequest registrationRequest) {
-    return authService.register(registrationRequest);
+  public UserDto register(@RequestBody UserDto userDto) {
+    User user = authService.register(userDto);
+    return UserDtoMapper.INSTANCE.toDto(user);
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST)
   @ExceptionHandler({UserAlreadyExistException.class})
-  public ApiError handleUserAlreadyExist(UserAlreadyExistException ex) {
-    return new ApiError(ex.getMessage());
+  public ApiError handleUserAlreadyExists(UserAlreadyExistException ex) {
+    return new ApiError("Пользователь с указанным адресом эл. почты или номером телефона уже существует");
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST)
   @ExceptionHandler({BadCredentialsException.class})
   public ApiError handleBadCredentials(BadCredentialsException ex) {
-    return new ApiError("Неверный адрес эл. почты (номер телефон) или пароль");
+    return new ApiError("Неверный адрес эл. почты (номер телефона) или пароль");
   }
 }

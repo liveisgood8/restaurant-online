@@ -1,30 +1,30 @@
 package com.ro.core.models;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "addresses")
 public class Address {
   @Id
   @GeneratedValue
-  Long id;
+  private Long id;
 
-  @Column(nullable = false)
+  @Column(nullable = false, length = 64)
   private String street;
 
   @Column(nullable = false)
-  private Integer homeNumber;
+  private Short homeNumber;
 
   @Column(nullable = false)
-  private Integer entranceNumber;
+  private Short entranceNumber;
 
   @Column(nullable = false)
-  private Integer floorNumber;
+  private Short floorNumber;
 
   @Column(nullable = false)
   private Integer apartmentNumber;

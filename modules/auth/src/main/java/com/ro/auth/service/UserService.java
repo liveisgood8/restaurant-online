@@ -1,10 +1,8 @@
 package com.ro.auth.service;
 
-import com.ro.auth.controller.body.UserUpdateRequest;
 import com.ro.auth.model.User;
 import com.ro.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;

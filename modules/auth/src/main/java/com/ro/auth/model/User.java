@@ -1,6 +1,7 @@
 package com.ro.auth.model;
 
 import com.ro.auth.oauth2.AuthProvider;
+import com.ro.core.models.TelephoneNumber;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,10 +22,6 @@ public class User implements OAuth2User, UserDetails {
   @GeneratedValue
   private Long id;
 
-  @Pattern(regexp="^((\\+7|7|8)+([0-9]){10})$")
-  @Column(unique = true)
-  private String phone;
-
   @Email
   @Column(unique = true, nullable = false)
   private String email;
@@ -38,17 +35,15 @@ public class User implements OAuth2User, UserDetails {
   @Column(columnDefinition = "integer default 0", nullable = false)
   private Integer bonuses;
 
-  @Column(columnDefinition = "boolean default true", nullable = false)
-  private Boolean isEnabled = true;
-
-  @Column(columnDefinition = "boolean default false", nullable = false)
-  private Boolean isExpired = false;
-
   @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isCredentialsExpired = false;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
   private Boolean isBanned = false;
+
+  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JoinColumn(name = "telephone_number_id")
+  private TelephoneNumber telephoneNumber;
 
   @Column(nullable = false, columnDefinition = "varchar(32) default 'NATIVE'")
   @Enumerated(EnumType.STRING)
@@ -72,7 +67,7 @@ public class User implements OAuth2User, UserDetails {
 
   @Override
   public boolean isAccountNonExpired() {
-    return !isExpired;
+    return true;
   }
 
   @Override
@@ -92,6 +87,6 @@ public class User implements OAuth2User, UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return isEnabled;
+    return true;
   }
 }

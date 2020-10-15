@@ -13,7 +13,7 @@ public class OrderDto {
   private Long id;
   private Boolean isApproved;
   private Order.PaymentMethod paymentMethod;
-  private Address address;
+  private AddressDto address;
   private Set<OrderInfoDto> orderInfos;
   private Date createdAt;
 }

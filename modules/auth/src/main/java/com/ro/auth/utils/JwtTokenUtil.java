@@ -2,6 +2,7 @@ package com.ro.auth.utils;
 
 import com.ro.auth.config.AuthProperties;
 import com.ro.auth.controller.body.AuthResponse;
+import com.ro.auth.dto.mappers.UserDtoMapper;
 import com.ro.auth.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -50,7 +51,7 @@ public class JwtTokenUtil {
 
   public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("user", new AuthResponse.UserInfo(user));
+    claims.put("user", UserDtoMapper.INSTANCE.toDto(user));
     return generateToken(claims, user.getUsername());
   }
 

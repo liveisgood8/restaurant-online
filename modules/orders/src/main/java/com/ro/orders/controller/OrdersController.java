@@ -3,6 +3,7 @@ package com.ro.orders.controller;
 import com.ro.auth.model.User;
 import com.ro.orders.controller.payloads.MakeOrderRequest;
 import com.ro.orders.dto.mapper.OrderWithBonusesDtoMapper;
+import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.dto.objects.OrderWithBonusesDto;
 import com.ro.orders.service.OrderWithBonuses;
 import com.ro.orders.service.OrdersService;
@@ -22,9 +23,9 @@ public class OrdersController {
   private OrdersService ordersService;
 
   @PostMapping
-  public OrderWithBonusesDto makeOrder(@RequestBody MakeOrderRequest makeOrderRequest, Authentication authentication) {
+  public OrderWithBonusesDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
-    OrderWithBonuses orderWithBonuses = ordersService.makeOrder(makeOrderRequest, user);
+    OrderWithBonuses orderWithBonuses = ordersService.makeOrder(orderDto, user);
     return OrderWithBonusesDtoMapper.INSTANCE.toDto(orderWithBonuses);
   }
 }
