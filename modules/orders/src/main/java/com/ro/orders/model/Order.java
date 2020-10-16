@@ -1,18 +1,18 @@
 package com.ro.orders.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.auth.model.User;
 import com.ro.core.models.Address;
-import com.ro.orders.validation.InsertGroup;
+import com.ro.core.models.TelephoneNumber;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -31,7 +31,6 @@ public class Order {
   @GeneratedValue
   private Long id;
 
-  @JsonIgnore
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   private User user;
@@ -43,16 +42,44 @@ public class Order {
   @Enumerated
   private PaymentMethod paymentMethod;
 
-  @OneToOne(cascade = CascadeType.REMOVE)
+  @OneToOne
   @JoinColumn(name = "address_id", nullable = false)
   private Address address;
 
+  @OneToOne
+  @JoinColumn(name = "telephone_number_id", nullable = false)
+  private TelephoneNumber telephoneNumber;
+
   @OneToMany(mappedBy = "id.orderId", orphanRemoval = true)
-  @NotNull(groups = {InsertGroup.class})
-  private Set<OrderInfo> orderInfos;
+  private Set<OrderPart> orderParts = Collections.emptySet();
+
+  @OneToMany(mappedBy = "order")
+  private Set<BonusesTransaction> transactions = new HashSet<>();
 
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "created_at")
   private Date createdAt;
+
+  public int getTotalPrice() {
+    int totalPartPrice = orderParts.stream()
+            .mapToInt(part -> part.getDish().getPrice() * part.getCount())
+            .sum();
+
+    return totalPartPrice - getReceivedBonuses();
+  }
+
+  public int getReceivedBonuses() {
+    return transactions.stream()
+            .mapToInt(BonusesTransaction::getAmount)
+            .filter(a -> a > 0)
+            .sum();
+  }
+
+  public int getSpentBonuses() {
+    return transactions.stream()
+            .mapToInt(BonusesTransaction::getAmount)
+            .filter(a -> a < 0)
+            .sum() * -1;
+  }
 }

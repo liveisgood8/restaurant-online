@@ -1,11 +1,9 @@
 package com.ro.orders.controller;
 
 import com.ro.auth.model.User;
-import com.ro.orders.controller.payloads.MakeOrderRequest;
-import com.ro.orders.dto.mapper.OrderWithBonusesDtoMapper;
+import com.ro.orders.dto.mapper.OrderDtoMapper;
 import com.ro.orders.dto.objects.OrderDto;
-import com.ro.orders.dto.objects.OrderWithBonusesDto;
-import com.ro.orders.service.OrderWithBonuses;
+import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.service.OrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
-
 @RestController
 @RequestMapping("/orders")
 public class OrdersController {
@@ -23,9 +19,9 @@ public class OrdersController {
   private OrdersService ordersService;
 
   @PostMapping
-  public OrderWithBonusesDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
+  public OrderDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
-    OrderWithBonuses orderWithBonuses = ordersService.makeOrder(orderDto, user);
-    return OrderWithBonusesDtoMapper.INSTANCE.toDto(orderWithBonuses);
+    OrderInfo orderInfo = ordersService.makeOrder(orderDto, user);
+    return OrderDtoMapper.INSTANCE.toDto(orderInfo);
   }
 }

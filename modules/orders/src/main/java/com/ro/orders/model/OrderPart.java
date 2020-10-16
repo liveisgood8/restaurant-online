@@ -12,10 +12,10 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = OrderInfo.class)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = OrderPart.class)
 @Entity
 @Table(name = "orders_info")
-public class OrderInfo {
+public class OrderPart {
   @Embeddable
   @Data
   public static class OrderInfoId implements Serializable {

@@ -1,8 +1,6 @@
 package com.ro.orders.dto.objects;
 
-import com.ro.core.models.Address;
 import com.ro.orders.model.Order;
-import com.ro.orders.model.OrderInfo;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,6 +12,11 @@ public class OrderDto {
   private Boolean isApproved;
   private Order.PaymentMethod paymentMethod;
   private AddressDto address;
-  private Set<OrderInfoDto> orderInfos;
+  private String phone;
+  private Integer spentBonuses;
+  private Integer receivedBonuses;
+  private Integer totalPrice;
+  private Set<OrderPartDto> orderParts;
   private Date createdAt;
+
 }

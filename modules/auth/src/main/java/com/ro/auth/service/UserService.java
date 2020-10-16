@@ -17,15 +17,4 @@ public class UserService {
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
-
-  @Transactional
-  public User addBonuses(Long userId, Integer additionalBonuses) {
-    Optional<User> user = userRepository.findById(userId);
-    if (user.isEmpty()) {
-      throw new EntityNotFoundException("User with id: " + userId + " not founded");
-    }
-
-    user.get().setBonuses(user.get().getBonuses() + additionalBonuses);
-    return userRepository.save(user.get());
-  }
 }

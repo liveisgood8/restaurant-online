@@ -1,16 +1,18 @@
 package com.ro.orders.service;
 
 import com.ro.auth.model.User;
-import com.ro.auth.service.UserService;
 import com.ro.core.models.Address;
 import com.ro.core.repository.AddressRepository;
-import com.ro.orders.controller.payloads.MakeOrderRequest;
+import com.ro.core.repository.TelephoneNumberRepository;
+import com.ro.menu.model.Dish;
+import com.ro.menu.repository.DishRepository;
 import com.ro.orders.dto.mapper.OrderDtoMapper;
-import com.ro.orders.dto.objects.AddressDto;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.events.OrderEvent;
+import com.ro.orders.lib.OrderInfo;
+import com.ro.orders.model.BonusesTransaction;
 import com.ro.orders.model.Order;
-import com.ro.orders.model.OrderInfo;
+import com.ro.orders.model.OrderPart;
 import com.ro.orders.repository.OrdersInfoRepository;
 import com.ro.orders.repository.OrdersRepository;
 import com.sun.istack.Nullable;
@@ -25,48 +27,77 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class OrdersService {
   private final OrdersRepository ordersRepository;
   private final OrdersInfoRepository ordersInfoRepository;
-  private final UserService userService;
+  private final TelephoneNumberRepository telephoneNumberRepository;
+  private final DishRepository dishRepository;
+  private final BonusesTransactionService bonusesTransactionService;
   private final AddressRepository addressRepository;
   private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
   public OrdersService(OrdersRepository ordersRepository,
                        OrdersInfoRepository ordersInfoRepository,
-                       UserService userService,
+                       TelephoneNumberRepository telephoneNumberRepository,
+                       DishRepository dishRepository,
+                       BonusesTransactionService bonusesTransactionService,
                        AddressRepository addressRepository,
                        ApplicationEventMulticaster eventMulticaster) {
     this.ordersRepository = ordersRepository;
     this.ordersInfoRepository = ordersInfoRepository;
-    this.userService = userService;
+    this.telephoneNumberRepository = telephoneNumberRepository;
+    this.dishRepository = dishRepository;
+    this.bonusesTransactionService = bonusesTransactionService;
     this.addressRepository = addressRepository;
     this.eventMulticaster = eventMulticaster;
   }
 
   @Transactional
-  public OrderWithBonuses makeOrder(OrderDto orderDto, @Nullable User user) {
+  public OrderInfo makeOrder(OrderDto orderDto, @Nullable User user) {
     Order order = OrderDtoMapper.INSTANCE.toEntity(orderDto);
-    order.setAddress(handleOrderAddress(order.getAddress()));
     order.setUser(user);
     order.setIsApproved(orderDto.getPaymentMethod() == Order.PaymentMethod.BY_CARD_ONLINE);
 
-    Order savedOrder = ordersRepository.save(order);
+    prepareOrderForSave(order);
+    Order finalOrder = ordersRepository.save(order);
 
-    order.getOrderInfos().forEach(o -> o.getId().setOrderId(savedOrder.getId()));
-    List<OrderInfo> savedOrderInfos = ordersInfoRepository.saveAll(order.getOrderInfos());
-    savedOrder.setOrderInfos(new HashSet<>(savedOrderInfos));
+    order.getOrderParts().forEach(o -> {
+      o.getId().setOrderId(finalOrder.getId());
+      o.setOrder(finalOrder);
+    });
+    List<OrderPart> savedOrderParts = ordersInfoRepository.saveAll(finalOrder.getOrderParts());
+    finalOrder.setOrderParts(new HashSet<>(savedOrderParts));
 
-    Integer bonuses = user == null ? 0 : creditBonusesToUser(savedOrder);
+    if (user != null && orderDto.getSpentBonuses() != null && orderDto.getSpentBonuses() != 0) {
+      BonusesTransaction outcomeTransaction = bonusesTransactionService.addOutcome(order,
+              user,
+              orderDto.getSpentBonuses());
+      finalOrder.getTransactions().add(outcomeTransaction);
+    }
 
-    OrderEvent orderEvent = new OrderEvent(savedOrder, this);
+    int bonuses = 0;
+    if (user != null) {
+      bonuses = calculateBonuses(finalOrder);
+      if (bonuses > 0) {
+        BonusesTransaction incomeTransaction = bonusesTransactionService.addIncome(order,
+                user,
+                bonuses);
+        finalOrder.getTransactions().add(incomeTransaction);
+      }
+    }
+
+    OrderEvent orderEvent = new OrderEvent(finalOrder, this);
     eventMulticaster.multicastEvent(orderEvent);
 
-    return new OrderWithBonuses(order, bonuses);
+    return new OrderInfo(finalOrder, bonuses);
+  }
+
+  private void prepareOrderForSave(Order order) {
+    order.setAddress(handleOrderAddress(order.getAddress()));
+    order.setTelephoneNumber(telephoneNumberRepository.save(order.getTelephoneNumber())); // TODO Check phone existence
   }
 
   private Address handleOrderAddress(Address address) {
@@ -78,16 +109,7 @@ public class OrdersService {
     return foundedAddress.orElseGet(() -> addressRepository.save(address));
   }
 
-  private Integer creditBonusesToUser(Order order) {
-    Integer orderBonuses = calculateBonuses(order);
-    userService.addBonuses(order.getUser().getId(), orderBonuses);
-    return orderBonuses;
-  }
-
-  private Integer calculateBonuses(Order order) {
-    int totalPrice = order.getOrderInfos().stream()
-        .mapToInt(o -> o.getCount() * o.getDish().getPrice())
-        .sum();
-    return (int) Math.round(totalPrice * 0.05);
+  private int calculateBonuses(Order order) {
+    return (int) Math.round(order.getTotalPrice() * 0.05);
   }
 }
