@@ -4,20 +4,17 @@ import com.ro.menu.dto.objects.DishDto;
 import com.ro.orders.model.Order;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.Set;
 
 @Data
-public class OrderDto {
+public class MakeOrderDto {
   @Data
   public static class OrderPartDto {
     private Long orderId;
-    private DishDto dish;
+    private Long dishId;
     private Integer count;
   }
 
-  private Long id;
-  private Boolean isApproved;
   private Order.PaymentMethod paymentMethod;
   private AddressDto address;
   private String phone;
@@ -25,5 +22,4 @@ public class OrderDto {
   private Integer receivedBonuses;
   private Integer totalPrice;
   private Set<OrderPartDto> orderParts;
-  private Date createdAt;
 }

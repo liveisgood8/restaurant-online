@@ -2,6 +2,7 @@ package com.ro.menu.service;
 
 import com.ro.auth.model.User;
 import com.ro.menu.dto.mappers.DishDtoMapper;
+import com.ro.menu.dto.mappers.ImageMapper;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
@@ -83,7 +84,7 @@ public class DishService {
     }
 
     dishRepository.updateImagePath(dishId, newImagePath);
-    return DishDtoMapper.makeImageUrl(dishId, newImagePath);
+    return ImageMapper.makeImageUrl(ImageMapper.ImageSource.DISH, dishId, newImagePath);
   }
 
   public List<DishEmotion> getLikes(Long dishId) {

@@ -1,5 +1,6 @@
 package com.ro.menu.service;
 
+import com.ro.menu.dto.mappers.ImageMapper;
 import com.ro.menu.model.Category;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
@@ -36,10 +37,7 @@ public class CategoryService {
   }
 
   public List<Category> getAll() {
-    return categoryRepository.findAll()
-        .stream()
-        .peek(c -> c.setImageUrl(makeImageUrl(c.getId(), c.getImagePath())))
-        .collect(Collectors.toList());
+    return categoryRepository.findAll();
   }
 
   public byte[] getImageBytes(Long categoryId) throws IOException, EntityNotFoundException {
@@ -63,14 +61,16 @@ public class CategoryService {
     }
 
     categoryRepository.updateImagePath(categoryId, newImagePath);
-    return makeImageUrl(categoryId, newImagePath);
+    return ImageMapper.makeImageUrl(ImageMapper.ImageSource.CATEGORY, categoryId, newImagePath);
   }
 
+  // TODO Переделать на DTO
   @Transactional
   public Category create(Category category) {
     return categoryRepository.save(category);
   }
 
+  // TODO Переделать на DTO
   @Transactional
   public void update(Long id, Category newCategory) throws Exception {
     Category category = categoryRepository.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -80,12 +80,5 @@ public class CategoryService {
 
   public void delete(Long id) {
     categoryRepository.deleteById(id);
-  }
-
-  private String makeImageUrl(Long categoryId, @Nullable String imagePath) {
-    String fileNamePart = imagePath != null ?
-        FilenameUtils.getBaseName(imagePath).substring(0, 15) : "0";
-
-    return String.format("/menu/categories/%s/image?%s", categoryId, fileNamePart);
   }
 }

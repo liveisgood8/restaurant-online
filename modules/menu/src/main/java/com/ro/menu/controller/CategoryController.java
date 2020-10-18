@@ -1,6 +1,8 @@
 package com.ro.menu.controller;
 
 import com.ro.menu.controller.payload.UploadImageResponse;
+import com.ro.menu.dto.mappers.CategoryDtoMapper;
+import com.ro.menu.dto.objects.CategoryDto;
 import com.ro.menu.model.Category;
 import com.ro.menu.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +44,16 @@ public class CategoryController {
   }
 
   @GetMapping
-  public List<Category> getAll() {
-    return categoryService.getAll();
+  public List<CategoryDto> getAll() {
+    List<Category> categories = categoryService.getAll();
+    return CategoryDtoMapper.INSTANCE.toDto(categories);
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public Category create(@Valid @RequestBody Category category) {
-    return categoryService.create(category);
+  public CategoryDto create(@Valid @RequestBody Category category) {
+    Category createdCategory = categoryService.create(category);
+    return CategoryDtoMapper.INSTANCE.toDto(createdCategory);
   }
 
   @PatchMapping("{id}")

@@ -54,7 +54,7 @@ public class Order {
   private Set<OrderPart> orderParts = Collections.emptySet();
 
   @OneToMany(mappedBy = "order")
-  private Set<BonusesTransaction> transactions = new HashSet<>();
+  private Set<BonusesTransaction> bonusesTransactions = new HashSet<>();
 
   @CreationTimestamp
   @Temporal(TemporalType.TIMESTAMP)
@@ -63,21 +63,21 @@ public class Order {
 
   public int getTotalPrice() {
     int totalPartPrice = orderParts.stream()
-            .mapToInt(part -> part.getDish().getPrice() * part.getCount())
+            .mapToInt(OrderPart::getTotalPrice)
             .sum();
 
     return totalPartPrice - getReceivedBonuses();
   }
 
   public int getReceivedBonuses() {
-    return transactions.stream()
+    return bonusesTransactions.stream()
             .mapToInt(BonusesTransaction::getAmount)
             .filter(a -> a > 0)
             .sum();
   }
 
   public int getSpentBonuses() {
-    return transactions.stream()
+    return bonusesTransactions.stream()
             .mapToInt(BonusesTransaction::getAmount)
             .filter(a -> a < 0)
             .sum() * -1;

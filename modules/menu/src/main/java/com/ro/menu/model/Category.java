@@ -33,9 +33,6 @@ public class Category {
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
 
-  @Transient
-  private String imageUrl;
-
   @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
   private List<Dish> dishes;

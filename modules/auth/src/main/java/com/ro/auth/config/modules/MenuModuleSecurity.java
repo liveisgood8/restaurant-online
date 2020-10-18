@@ -1,4 +1,4 @@
-package com.ro.auth.config;
+package com.ro.auth.config.modules;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,7 +9,6 @@ public class MenuModuleSecurity {
         .authorizeRequests()
           .antMatchers(HttpMethod.GET, "/menu/dishes/**").permitAll()
           .antMatchers(HttpMethod.GET, "/menu/categories/**").permitAll()
-          .antMatchers("/orders").permitAll()
           .antMatchers("/menu/dishes/*/likes/like").authenticated()
           .antMatchers("/menu/dishes/*/likes/dislike").authenticated()
           .antMatchers("/menu/dishes/**").hasAuthority("ADMIN");

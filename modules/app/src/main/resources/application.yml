@@ -36,6 +36,9 @@ spring:
     multipart:
       enabled: true
       location: ${java.io.tmpdir}
+  jackson:
+    serialization:
+      write_dates_as_timestamps: true
   security:
     oauth2:
       client:

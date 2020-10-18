@@ -1,5 +1,7 @@
 package com.ro.auth.config;
 
+import com.ro.auth.config.modules.MenuModuleSecurity;
+import com.ro.auth.config.modules.OrdersModuleSecurity;
 import com.ro.auth.filter.JwtAuthenticationEntryPoint;
 import com.ro.auth.filter.JwtRequestFilter;
 import com.ro.auth.oauth2.*;
@@ -124,6 +126,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     // Configure modules security
     MenuModuleSecurity.configure(httpSecurity);
+    OrdersModuleSecurity.configure(httpSecurity);
 
     httpSecurity
         .authorizeRequests()

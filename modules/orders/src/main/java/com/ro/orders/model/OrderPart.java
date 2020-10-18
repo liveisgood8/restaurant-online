@@ -32,6 +32,9 @@ public class OrderPart {
   @Column(name = "count", nullable = false)
   private Integer count;
 
+  @Column(name = "total_price", nullable = false)
+  private Integer totalPrice;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("orderId")
   private Order order;
@@ -39,4 +42,21 @@ public class OrderPart {
   @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("dishId")
   private Dish dish;
+
+  public void setDish(Dish dish) {
+    this.dish = dish;
+    recalculateTotalPrice();
+  }
+
+  public void setCount(Integer count) {
+    this.count = count;
+    recalculateTotalPrice();
+  }
+
+  private void recalculateTotalPrice() {
+    if (dish == null || dish.getPrice() == null || count == null) {
+      return;
+    }
+    totalPrice = dish.getPrice() * count;
+  }
 }
