@@ -1,7 +1,7 @@
 package com.ro.orders.dto.objects;
 
 import com.ro.menu.dto.objects.DishDto;
-import com.ro.orders.model.Order;
+import com.ro.orders.model.PaymentMethod;
 import lombok.Data;
 
 import java.util.Date;
@@ -18,7 +18,7 @@ public class OrderDto {
 
   private Long id;
   private Boolean isApproved;
-  private Order.PaymentMethod paymentMethod;
+  private PaymentMethod.Name paymentMethod;
   private AddressDto address;
   private String phone;
   private Integer spentBonuses;

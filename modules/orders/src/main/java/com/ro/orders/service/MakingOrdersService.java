@@ -7,14 +7,13 @@ import com.ro.core.repository.TelephoneNumberRepository;
 import com.ro.menu.model.Dish;
 import com.ro.menu.repository.DishRepository;
 import com.ro.orders.dto.mapper.MakeOrderDtoMapper;
-import com.ro.orders.dto.mapper.OrderDtoMapper;
 import com.ro.orders.dto.objects.MakeOrderDto;
-import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.events.OrderEvent;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.BonusesTransaction;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderPart;
+import com.ro.orders.model.PaymentMethod;
 import com.ro.orders.repository.OrdersInfoRepository;
 import com.ro.orders.repository.OrdersRepository;
 import com.sun.istack.Nullable;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
@@ -30,7 +28,6 @@ import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class MakingOrdersService {
@@ -68,7 +65,7 @@ public class MakingOrdersService {
   public OrderInfo makeOrder(MakeOrderDto makeOrderDto, @Nullable User user) {
     Order order = MakeOrderDtoMapper.INSTANCE.toOrderEntity(makeOrderDto);
     order.setUser(user);
-    order.setIsApproved(order.getPaymentMethod() == Order.PaymentMethod.BY_CARD_ONLINE);
+    order.setIsApproved(order.getPaymentMethod().getName() == PaymentMethod.Name.BY_CARD_ONLINE);
 
     prepareOrderForSave(order);
     Order finalOrder = ordersRepository.save(order);

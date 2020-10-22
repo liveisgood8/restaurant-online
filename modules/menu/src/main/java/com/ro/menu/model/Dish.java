@@ -20,13 +20,9 @@ public class Dish {
   @GeneratedValue
   private Long id;
 
-  @NotEmpty(groups = InsertGroup.class)
-  @Size(max = 255)
-  @Column(nullable = false)
+  @Column(nullable = false, length = 64)
   private String name;
 
-  @NotEmpty(groups = InsertGroup.class)
-  @Size(max = 255)
   @Column(nullable = false)
   private String description;
 
@@ -46,7 +42,7 @@ public class Dish {
   private Integer price;
 
   @JsonIgnore
-  @Column
+  @Column(name = "image_path")
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
 

@@ -1,0 +1,564 @@
+databaseChangeLog:
+- changeSet:
+    id: 1603376605301-1
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: addressesPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: apartmentNumber
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: entranceNumber
+            type: SMALLINT
+        - column:
+            constraints:
+              nullable: false
+            name: floorNumber
+            type: SMALLINT
+        - column:
+            constraints:
+              nullable: false
+            name: homeNumber
+            type: SMALLINT
+        - column:
+            constraints:
+              nullable: false
+            name: street
+            type: VARCHAR(64)
+        tableName: addresses
+- changeSet:
+    id: 1603376605301-2
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: bonuses_transactionsPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: amount
+            type: INT
+        - column:
+            name: created_at
+            type: datetime
+        - column:
+            constraints:
+              nullable: false
+            name: order_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: user_id
+            type: BIGINT
+        tableName: bonuses_transactions
+- changeSet:
+    id: 1603376605301-3
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: categoriesPK
+            name: id
+            type: BIGINT
+        - column:
+            name: imagePath
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(64)
+        tableName: categories
+- changeSet:
+    id: 1603376605301-4
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: dish_likesPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: emotionType
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: dish_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: user_id
+            type: BIGINT
+        tableName: dish_likes
+- changeSet:
+    id: 1603376605301-5
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: dishesPK
+            name: id
+            type: BIGINT
+        - column:
+            name: carbohydrates
+            type: DOUBLE
+        - column:
+            constraints:
+              nullable: false
+            name: description
+            type: VARCHAR(255)
+        - column:
+            name: fat
+            type: DOUBLE
+        - column:
+            name: image_path
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(64)
+        - column:
+            constraints:
+              nullable: false
+            name: price
+            type: INT
+        - column:
+            name: protein
+            type: DOUBLE
+        - column:
+            constraints:
+              nullable: false
+            name: weight
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: category_id
+            type: BIGINT
+        tableName: dishes
+- changeSet:
+    id: 1603376605301-6
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: count
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: total_price
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: order_partsPK
+            name: dish_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: order_partsPK
+            name: order_id
+            type: BIGINT
+        tableName: order_parts
+- changeSet:
+    id: 1603376605301-7
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: ordersPK
+            name: id
+            type: BIGINT
+        - column:
+            name: created_at
+            type: datetime
+        - column:
+            constraints:
+              nullable: false
+            name: isApproved
+            type: BIT
+        - column:
+            constraints:
+              nullable: false
+            name: address_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: payment_method_id
+            type: SMALLINT
+        - column:
+            constraints:
+              nullable: false
+            name: telephone_number_id
+            type: BIGINT
+        - column:
+            name: user_id
+            type: BIGINT
+        tableName: orders
+- changeSet:
+    id: 1603376605301-8
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: payment_methodsPK
+            name: id
+            type: SMALLINT
+        - column:
+            constraints:
+              nullable: false
+            name: name
+            type: VARCHAR(32)
+        tableName: payment_methods
+- changeSet:
+    id: 1603376605301-9
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: telephone_numbersPK
+            name: id
+            type: BIGINT
+        - column:
+            name: country_code
+            type: VARCHAR(3)
+        - column:
+            name: telephone_number
+            type: VARCHAR(15)
+        tableName: telephone_numbers
+- changeSet:
+    id: 1603376605301-10
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: user_authoritiesPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: authority
+            type: VARCHAR(64)
+        - column:
+            constraints:
+              nullable: false
+            name: user_id
+            type: BIGINT
+        tableName: user_authorities
+- changeSet:
+    id: 1603376605301-11
+    author: nexus (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: usersPK
+            name: id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            defaultValue: NATIVE
+            name: authProvider
+            type: VARCHAR(32)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueNumeric: 0
+            name: bonuses
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: email
+            type: VARCHAR(64)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: isBanned
+            type: BIT(1)
+        - column:
+            constraints:
+              nullable: false
+            defaultValueBoolean: false
+            name: isCredentialsExpired
+            type: BIT(1)
+        - column:
+            name: name
+            type: VARCHAR(32)
+        - column:
+            name: password
+            type: VARCHAR(128)
+        - column:
+            name: telephone_number_id
+            type: BIGINT
+        tableName: users
+- changeSet:
+    id: 1603376605301-12
+    author: nexus (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: email
+        constraintName: UC_USERSEMAIL_COL
+        tableName: users
+- changeSet:
+    id: 1603376605301-13
+    author: nexus (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: name
+        constraintName: UKt8o6pivur7nn124jehx7cygw5
+        tableName: categories
+- changeSet:
+    id: 1603376605301-14
+    author: nexus (generated)
+    changes:
+    - addUniqueConstraint:
+        columnNames: country_code, telephone_number
+        constraintName: unique full telephone number
+        tableName: telephone_numbers
+- changeSet:
+    id: 1603376605301-15
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: orders
+        constraintName: FK32ql8ubntj5uh44ph9659tiih
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+- changeSet:
+    id: 1603376605301-16
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: order_id
+        baseTableName: bonuses_transactions
+        constraintName: FK4v9y770tscjuiwjwv5l9ljih
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: orders
+        validate: true
+- changeSet:
+    id: 1603376605301-17
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: bonuses_transactions
+        constraintName: FK5vbdhyu0if1a8q5aqpfo9quar
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+- changeSet:
+    id: 1603376605301-18
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: telephone_number_id
+        baseTableName: orders
+        constraintName: FK809u7115rn4ir14ag5jxk5c51
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: telephone_numbers
+        validate: true
+- changeSet:
+    id: 1603376605301-19
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: payment_method_id
+        baseTableName: orders
+        constraintName: FKa03ljb6t6oa6mqtoifuwkb0kw
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: payment_methods
+        validate: true
+- changeSet:
+    id: 1603376605301-20
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: dish_id
+        baseTableName: dish_likes
+        constraintName: FKfe3rcdrpen9684c4vte2tgqh9
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: dishes
+        validate: true
+- changeSet:
+    id: 1603376605301-21
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: category_id
+        baseTableName: dishes
+        constraintName: FKgbu6erefir17660qutbbjnma7
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: categories
+        validate: true
+- changeSet:
+    id: 1603376605301-22
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: user_authorities
+        constraintName: FKhiiib540jf74gksgb87oofni
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+- changeSet:
+    id: 1603376605301-23
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: address_id
+        baseTableName: orders
+        constraintName: FKhlglkvf5i60dv6dn397ethgpt
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: addresses
+        validate: true
+- changeSet:
+    id: 1603376605301-24
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: telephone_number_id
+        baseTableName: users
+        constraintName: FKp70lacr33ghad9xmvcxbs3c59
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: telephone_numbers
+        validate: true
+- changeSet:
+    id: 1603376605301-25
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: order_id
+        baseTableName: order_parts
+        constraintName: FKq8djk3hm20rfxcmrbd63irspq
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: orders
+        validate: true
+- changeSet:
+    id: 1603376605301-26
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: dish_id
+        baseTableName: order_parts
+        constraintName: FKss2qc2uq5fduhvhsvq4uhvm9y
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: dishes
+        validate: true
+- changeSet:
+    id: 1603376605301-27
+    author: nexus (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: user_id
+        baseTableName: dish_likes
+        constraintName: FKt7e04tp0ymux6mwpyt6382oaq
+        deferrable: false
+        initiallyDeferred: false
+        referencedColumnNames: id
+        referencedTableName: users
+        validate: true
+

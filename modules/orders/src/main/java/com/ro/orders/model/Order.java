@@ -21,12 +21,6 @@ import java.util.Set;
 @Entity
 @Table(name = "orders")
 public class Order {
-  public enum PaymentMethod {
-    BY_CASH_TO_THE_COURIER,
-    BY_CARD_TO_THE_COURIER,
-    BY_CARD_ONLINE,
-  }
-
   @Id
   @GeneratedValue
   private Long id;
@@ -38,8 +32,8 @@ public class Order {
   @Column(nullable = false)
   private Boolean isApproved;
 
-  @Column(nullable = false)
-  @Enumerated
+  @OneToOne
+  @JoinColumn(name = "payment_method_id", nullable = false)
   private PaymentMethod paymentMethod;
 
   @OneToOne

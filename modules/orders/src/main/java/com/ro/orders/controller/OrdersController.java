@@ -35,7 +35,13 @@ public class OrdersController {
     } else {
       orders = crudOrdersService.getAll();
     }
-    return OrderDtoMapper.INSTANCE.toDto(orders);
+    return OrderDtoMapper.INSTANCE.toDtoWithoutParts(orders);
+  }
+
+  @GetMapping("{id}")
+  public OrderDto get(@PathVariable Long id) {
+    Order order = crudOrdersService.getWithParts(id);
+    return OrderDtoMapper.INSTANCE.toDto(order);
   }
 
   @PostMapping("{id}/approve")

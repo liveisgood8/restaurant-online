@@ -14,7 +14,8 @@ services:
     ports: # Just for dev
       - 3306:3306
     volumes:
-      - D:\Programms\mysql:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d
+      - D:/Programms/mysql:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ro

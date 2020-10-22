@@ -20,7 +20,7 @@ spring:
   application:
     name: ro-app
   datasource:
-    url: jdbc:mysql://localhost:3306/ro
+    url: jdbc:mysql://localhost:3306/ro?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: root
     validationQuery: SELECT 1

@@ -23,13 +23,13 @@ public class User implements OAuth2User, UserDetails {
   private Long id;
 
   @Email
-  @Column(unique = true, nullable = false)
+  @Column(unique = true, nullable = false, length = 64)
   private String email;
 
-  @Column
+  @Column(name = "password", length = 128)
   private String password;
 
-  @Column
+  @Column(name = "name", length = 32)
   private String name;
 
   @Column(columnDefinition = "integer default 0", nullable = false)

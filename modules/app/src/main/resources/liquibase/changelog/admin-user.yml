@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-admin-user
+      author: nexus
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: name
+                  value: admin
+              - column:
+                  name: email
+                  value: admin@admin.com
+              - column:
+                  name: password
+                  # password: admin
+                  value: $2y$12$76qBigSlz8dvS881k.EnhuyAuuoR/TfybVp03z1xD9xeIZeCIRFsa
+      rollback:
+        - delete:
+            tableName: users
+            where: name = 'admin' and email = 'admin@admin.com'

@@ -12,6 +12,7 @@ public interface MakeOrderDtoMapper {
   MakeOrderDtoMapper INSTANCE = Mappers.getMapper(MakeOrderDtoMapper.class);
 
   @Mapping(target = "telephoneNumber", source = "phone", qualifiedByName = "stringToTelephoneNumber")
+  @Mapping(target = "paymentMethod.name", source = "paymentMethod")
   Order toOrderEntity(MakeOrderDto makeOrderDto);
 
   @Mapping(target = "id.orderId", source = "orderId")

@@ -23,9 +23,7 @@ public class Category {
   @GeneratedValue
   private Long id;
 
-  @NotEmpty
-  @Size(max = 128)
-  @Column(length = 128, nullable = false)
+  @Column(nullable = false, length = 64)
   private String name;
 
   @JsonIgnore

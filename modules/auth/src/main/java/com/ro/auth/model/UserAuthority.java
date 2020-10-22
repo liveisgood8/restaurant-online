@@ -1,9 +1,11 @@
 package com.ro.auth.model;
 
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "user_authorities")
 public class UserAuthority implements GrantedAuthority {
@@ -15,31 +17,11 @@ public class UserAuthority implements GrantedAuthority {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column
+  @Column(name = "authority", nullable = false, length = 64)
   private String authority;
-
-  public Long getId() {
-    return id;
-  }
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
 
   @Override
   public String getAuthority() {
     return authority;
-  }
-
-  public void setAuthority(String authority) {
-    this.authority = authority;
   }
 }

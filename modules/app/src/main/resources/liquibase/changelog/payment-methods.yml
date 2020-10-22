@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-payment-methods
+      author: nexus
+      changes:
+        - insert:
+            tableName: payment_methods
+            columns:
+              - column:
+                  name: name
+                  value: BY_CASH_TO_THE_COURIER
+        - insert:
+           tableName: payment_methods
+           columns:
+             - column:
+                 name: name
+                 value: BY_CARD_TO_THE_COURIER
+        - insert:
+            tableName: payment_methods
+            columns:
+              - column:
+                  name: name
+                  value: BY_CARD_ONLINE
+      rollback:
+        - delete:
+            tableName: payment_methods
+            where: name in ('BY_CASH_TO_THE_COURIER', 'BY_CARD_TO_THE_COURIER', 'BY_CARD_ONLINE')

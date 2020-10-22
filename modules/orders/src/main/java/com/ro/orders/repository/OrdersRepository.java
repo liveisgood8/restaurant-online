@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface OrdersRepository extends JpaRepository<Order, Long> {
+  List<Order> findByIsApproved(boolean isApproved);
+
   @EntityGraph(attributePaths = { "orderParts" })
-  List<Order> findWithOrderPartsWithBonusesTransactionsAndByIsApproved(boolean isApproved);
+  Optional<Order> findWithOrderPartsById(Long id);
 
   @Modifying
   @Query("update Order o set o.isApproved = ?1 where o.id = ?2")

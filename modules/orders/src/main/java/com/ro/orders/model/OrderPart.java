@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Setter
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = OrderPart.class)
 @Entity
-@Table(name = "orders_info")
+@Table(name = "order_parts")
 public class OrderPart {
   @Embeddable
   @Data

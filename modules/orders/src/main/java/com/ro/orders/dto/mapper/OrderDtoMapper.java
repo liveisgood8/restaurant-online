@@ -9,6 +9,7 @@ import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderPart;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -20,11 +21,22 @@ import java.util.List;
 public interface OrderDtoMapper {
   OrderDtoMapper INSTANCE = Mappers.getMapper(OrderDtoMapper.class);
 
+  @Mapping(target = "paymentMethod", source = "paymentMethod.name")
   @Mapping(target = "phone", source = "telephoneNumber", qualifiedByName = "telephoneNumberToString")
   OrderDto toDto(Order order);
   List<OrderDto> toDto(List<Order> orders);
 
+  @Named("toDtoWithoutParts")
+  @Mapping(target = "paymentMethod", source = "paymentMethod.name")
+  @Mapping(target = "orderParts", ignore = true)
+  @Mapping(target = "phone", source = "telephoneNumber", qualifiedByName = "telephoneNumberToString")
+  OrderDto toDtoWithoutParts(Order order);
+
+  @IterableMapping(qualifiedByName = "toDtoWithoutParts")
+  List<OrderDto> toDtoWithoutParts(List<Order> order);
+
   @Mapping(target = "phone", source = "order.telephoneNumber", qualifiedByName = "telephoneNumberToString")
+  @Mapping(target = "paymentMethod", source = "order.paymentMethod.name")
   @Mapping(target = ".", source = "order")
   OrderDto toDto(OrderInfo orderInfo);
 

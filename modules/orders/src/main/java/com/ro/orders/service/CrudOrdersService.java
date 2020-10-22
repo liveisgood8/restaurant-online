@@ -6,6 +6,7 @@ import com.ro.orders.repository.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -22,6 +23,11 @@ public class CrudOrdersService {
   }
 
   public List<Order> getApproved(boolean isApproved) {
-    return ordersRepository.findWithOrderPartsWithBonusesTransactionsAndByIsApproved(isApproved);
+    return ordersRepository.findByIsApproved(isApproved);
+  }
+
+  public Order getWithParts(Long id) {
+    return ordersRepository.findWithOrderPartsById(id)
+        .orElseThrow(() -> new EntityNotFoundException("Order with id: " + id + " not founded"));
   }
 }
