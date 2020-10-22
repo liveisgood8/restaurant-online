@@ -12,6 +12,4 @@ spring:
     exclude:
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true

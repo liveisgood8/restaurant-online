@@ -9,3 +9,6 @@ databaseChangeLog:
   - include:
       file: admin-user.yml
       relativeToChangelogFile: true
+  - include:
+      file: bonuses-balance-view.yml
+      relativeToChangelogFile: true
