@@ -1,6 +1,6 @@
 package com.ro.orders.dto.mapper;
 
-import com.ro.core.models.Address;
+import com.ro.core.model.Address;
 import com.ro.orders.dto.objects.AddressDto;
 import org.mapstruct.Mapper;
 

@@ -1,10 +1,8 @@
 package com.ro.orders.dto.mapper;
 
-import com.ro.core.models.TelephoneNumber;
+import com.ro.core.model.TelephoneNumber;
 import com.ro.core.utils.TelephoneNumberUtils;
 import com.ro.menu.dto.mappers.DishDtoMapper;
-import com.ro.menu.dto.objects.DishDto;
-import com.ro.orders.dto.objects.MakeOrderDto;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.Order;
@@ -40,6 +38,7 @@ public interface OrderDtoMapper {
   @Mapping(target = ".", source = "order")
   OrderDto toDto(OrderInfo orderInfo);
 
+  @Mapping(target = "paymentMethod.name", source = "paymentMethod")
   @Mapping(target = "telephoneNumber", source = "phone", qualifiedByName = "stringToTelephoneNumber")
   @Mapping(target = "createdAt", ignore = true)
   Order toEntity(OrderDto orderDto);

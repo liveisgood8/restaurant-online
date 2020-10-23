@@ -2,7 +2,7 @@ package com.ro.auth.service;
 
 import com.ro.auth.model.User;
 import com.ro.auth.repository.UserRepository;
-import com.ro.core.models.TelephoneNumber;
+import com.ro.core.model.TelephoneNumber;
 import com.ro.core.utils.TelephoneNumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

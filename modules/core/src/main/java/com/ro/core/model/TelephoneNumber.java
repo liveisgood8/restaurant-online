@@ -1,4 +1,4 @@
-package com.ro.core.models;
+package com.ro.core.model;
 
 import lombok.Data;
 

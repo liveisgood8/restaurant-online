@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/auth-providers.yml
+  - changeSet:
+      id: insert-auth-providers
+      author: nexus
+      changes:
+        - insert:
+            tableName: auth_providers
+            columns:
+              - column:
+                  name: name
+                  value: NATIVE
+        - insert:
+            tableName: auth_providers
+            columns:
+              - column:
+                  name: name
+                  value: VK
+        - insert:
+            tableName: auth_providers
+            columns:
+              - column:
+                  name: name
+                  value: GOOGLE
+        - insert:
+            tableName: auth_providers
+            columns:
+              - column:
+                  name: name
+                  value: FACEBOOK
+      rollback:
+        - delete:
+            tableName: auth_providers
+            where: name in ('NATIVE', 'VK', 'GOOGLE', 'FACEBOOK')

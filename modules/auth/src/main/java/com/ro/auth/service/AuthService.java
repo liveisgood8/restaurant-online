@@ -3,15 +3,15 @@ package com.ro.auth.service;
 import com.ro.auth.dto.mappers.UserDtoMapper;
 import com.ro.auth.dto.objects.UserDto;
 import com.ro.auth.exception.UserAlreadyExistException;
+import com.ro.auth.model.AuthProvider;
 import com.ro.auth.model.User;
-import com.ro.auth.oauth2.AuthProvider;
+import com.ro.auth.repository.AuthProviderRepository;
 import com.ro.auth.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,14 +23,17 @@ public class AuthService {
   private final static Logger logger = LoggerFactory.getLogger(AuthService.class);
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
+  private final AuthProviderRepository authProviderRepository;
   private final PasswordEncoder passwordEncoder;
 
   @Autowired
   public AuthService(AuthenticationManager authenticationManager,
                      UserRepository userRepository,
+                     AuthProviderRepository authProviderRepository,
                      PasswordEncoder passwordEncoder) {
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
+    this.authProviderRepository = authProviderRepository;
     this.passwordEncoder = passwordEncoder;
   }
 
@@ -50,9 +53,13 @@ public class AuthService {
     if (isUserExist(user)) {
       throw new UserAlreadyExistException();
     }
+
+    AuthProvider authProvider = authProviderRepository.findByName(AuthProvider.NATIVE)
+        .orElseThrow(() -> new AuthenticationServiceException("Native auth provider not founded"));
+
     user.setPassword(passwordEncoder.encode(userDto.getPassword()));
     user.setBonuses(0);
-    user.setAuthProvider(AuthProvider.NATIVE);
+    user.setAuthProvider(authProvider);
     return userRepository.save(user);
   }
 

@@ -2,8 +2,7 @@ package com.ro.auth.dto.mappers;
 
 import com.ro.auth.dto.objects.UserDto;
 import com.ro.auth.model.User;
-import com.ro.auth.model.UserAuthority;
-import com.ro.core.models.TelephoneNumber;
+import com.ro.core.model.TelephoneNumber;
 import com.ro.core.utils.TelephoneNumberUtils;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;

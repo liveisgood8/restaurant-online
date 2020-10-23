@@ -3,8 +3,8 @@ package com.ro.orders.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.auth.model.User;
-import com.ro.core.models.Address;
-import com.ro.core.models.TelephoneNumber;
+import com.ro.core.model.Address;
+import com.ro.core.model.TelephoneNumber;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -29,7 +29,7 @@ public class Order {
   @JoinColumn(name = "user_id")
   private User user;
 
-  @Column(nullable = false)
+  @Column(name = "is_approved", nullable = false)
   private Boolean isApproved;
 
   @OneToOne

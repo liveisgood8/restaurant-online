@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/authorities.yml
+  - changeSet:
+      id: insert-authorities
+      author: nexus
+      changes:
+        - insert:
+            tableName: authorities
+            columns:
+              - column:
+                  name: name
+                  value: ADMIN
+      rollback:
+        - delete:
+            tableName: authorities
+            where: name in ('ADMIN')

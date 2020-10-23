@@ -1,7 +1,6 @@
 package com.ro.auth.utils;
 
 import com.ro.auth.config.AuthProperties;
-import com.ro.auth.controller.body.AuthResponse;
 import com.ro.auth.dto.mappers.UserDtoMapper;
 import com.ro.auth.model.User;
 import io.jsonwebtoken.Claims;

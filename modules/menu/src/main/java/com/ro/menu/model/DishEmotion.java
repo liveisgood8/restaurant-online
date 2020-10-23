@@ -35,6 +35,6 @@ public class DishEmotion {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(nullable = false)
+  @Column(name = "emotion_type", nullable = false)
   private EmotionType emotionType;
 }

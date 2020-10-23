@@ -1,4 +1,5 @@
 databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/payment-methods.yml
   - changeSet:
       id: insert-payment-methods
       author: nexus

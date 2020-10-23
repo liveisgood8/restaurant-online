@@ -1,7 +1,6 @@
 package com.ro.auth.model;
 
-import com.ro.auth.oauth2.AuthProvider;
-import com.ro.core.models.TelephoneNumber;
+import com.ro.core.model.TelephoneNumber;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,7 +9,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Pattern;
 import java.util.*;
 
 @Setter
@@ -23,7 +21,7 @@ public class User implements OAuth2User, UserDetails {
   private Long id;
 
   @Email
-  @Column(unique = true, nullable = false, length = 64)
+  @Column(name = "email", unique = true, nullable = false, length = 64)
   private String email;
 
   @Column(name = "password", length = 128)
@@ -32,21 +30,21 @@ public class User implements OAuth2User, UserDetails {
   @Column(name = "name", length = 32)
   private String name;
 
-  @Column(columnDefinition = "integer default 0", nullable = false)
+  @Column(name = "bonuses", columnDefinition = "integer default 0", nullable = false)
   private Integer bonuses;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
+  @Column(name = "is_credentials_expired", columnDefinition = "boolean default false", nullable = false)
   private Boolean isCredentialsExpired = false;
 
-  @Column(columnDefinition = "boolean default false", nullable = false)
+  @Column(name = "is_banned", columnDefinition = "boolean default false", nullable = false)
   private Boolean isBanned = false;
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   @JoinColumn(name = "telephone_number_id")
   private TelephoneNumber telephoneNumber;
 
-  @Column(nullable = false, columnDefinition = "varchar(32) default 'NATIVE'")
-  @Enumerated(EnumType.STRING)
+  @OneToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "auth_provider_id", nullable = false)
   private AuthProvider authProvider;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)

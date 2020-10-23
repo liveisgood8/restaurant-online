@@ -18,7 +18,7 @@ public class OrderDto {
 
   private Long id;
   private Boolean isApproved;
-  private PaymentMethod.Name paymentMethod;
+  private String paymentMethod;
   private AddressDto address;
   private String phone;
   private Integer spentBonuses;

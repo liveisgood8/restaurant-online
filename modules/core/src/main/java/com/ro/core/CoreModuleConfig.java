@@ -4,6 +4,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @EnableJpaRepositories(basePackages = "com.ro.core.repository")
-@EntityScan(basePackages = "com.ro.core.models")
+@EntityScan(basePackages = "com.ro.core.model")
 public class CoreModuleConfig {
 }

@@ -1,7 +1,6 @@
 package com.ro.menu.service;
 
 import com.ro.auth.model.User;
-import com.ro.menu.dto.mappers.DishDtoMapper;
 import com.ro.menu.dto.mappers.ImageMapper;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;

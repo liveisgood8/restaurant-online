@@ -14,7 +14,7 @@ public class MakeOrderDto {
     private Integer count;
   }
 
-  private PaymentMethod.Name paymentMethod;
+  private String paymentMethod;
   private AddressDto address;
   private String phone;
   private Integer spentBonuses;

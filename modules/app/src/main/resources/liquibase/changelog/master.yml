@@ -7,6 +7,12 @@ databaseChangeLog:
       file: payment-methods.yml
       relativeToChangelogFile: true
   - include:
+      file: authorities.yml
+      relativeToChangelogFile: true
+  - include:
+      file: auth-providers.yml
+      relativeToChangelogFile: true
+  - include:
       file: admin-user.yml
       relativeToChangelogFile: true
   - include:

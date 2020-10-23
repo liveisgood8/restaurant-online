@@ -20,39 +20,35 @@ public class Dish {
   @GeneratedValue
   private Long id;
 
-  @Column(nullable = false, length = 64)
+  @Column(name = "name", nullable = false, length = 64)
   private String name;
 
-  @Column(nullable = false)
+  @Column(name = "description", nullable = false)
   private String description;
 
-  @Column
+  @Column(name = "protein")
   private Double protein;
 
-  @Column
+  @Column(name = "fat")
   private Double fat;
 
-  @Column
+  @Column(name = "carbohydrates")
   private Double carbohydrates;
 
-  @Column(nullable = false)
-  private Integer weight;
+  @Column(name = "weight", nullable = false)
+  private Short weight;
 
-  @Column(nullable = false)
-  private Integer price;
+  @Column(name = "price", nullable = false)
+  private Short price;
 
-  @JsonIgnore
   @Column(name = "image_path")
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
 
-  @JsonBackReference
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
-  @JsonIgnore
-  @JsonManagedReference
   @OneToMany(mappedBy = "dish")
   private Set<DishEmotion> emotions = Collections.emptySet();
 }

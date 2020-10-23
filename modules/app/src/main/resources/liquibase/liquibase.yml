@@ -4,5 +4,5 @@ driver: com.mysql.cj.jdbc.Driver
 ignoreClasspathPrefix: true
 username: root
 password: root
-referenceUrl: hibernate:spring:com.ro.menu,com.ro.auth,com.ro.orders,com.ro.core?dialect=org.hibernate.dialect.MySQLDialect
+referenceUrl: hibernate:spring:com.ro.menu.model,com.ro.auth.model,com.ro.orders.model,com.ro.core.model?dialect=org.hibernate.dialect.MySQLDialect
 url: jdbc:mysql://localhost:3306/ro?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC

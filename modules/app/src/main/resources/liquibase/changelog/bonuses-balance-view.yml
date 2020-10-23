@@ -1,4 +1,5 @@
 databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/bonuses-balance-view.yml
   - changeSet:
       id: create-bonuses-balance-view
       author: nexus

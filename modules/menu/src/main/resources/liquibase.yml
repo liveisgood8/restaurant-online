@@ -1,8 +1,0 @@
-changeLogFile: liquibase/db/changelog/db.changelog-master.yaml
-diffChangeLogFile: liquibase/db/changelog/db.changelog.yaml
-driver: com.mysql.cj.jdbc.Driver
-ignoreClasspathPrefix: true
-username: root
-password: root
-referenceUrl: hibernate:spring:com.ro.menu?dialect=org.hibernate.dialect.MySQLDialect
-url: jdbc:mysql://localhost:3306/ro?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC

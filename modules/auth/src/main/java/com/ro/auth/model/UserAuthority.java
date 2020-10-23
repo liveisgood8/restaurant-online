@@ -17,11 +17,12 @@ public class UserAuthority implements GrantedAuthority {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(name = "authority", nullable = false, length = 64)
-  private String authority;
+  @OneToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "authority_id", nullable = false)
+  private Authority authority;
 
   @Override
   public String getAuthority() {
-    return authority;
+    return authority.getName();
   }
 }

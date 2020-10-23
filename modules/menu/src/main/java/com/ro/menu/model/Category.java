@@ -23,15 +23,13 @@ public class Category {
   @GeneratedValue
   private Long id;
 
-  @Column(nullable = false, length = 64)
+  @Column(name = "name", nullable = false, length = 64)
   private String name;
 
-  @JsonIgnore
-  @Column
+  @Column(name = "image_path")
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
 
-  @JsonManagedReference
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
   private List<Dish> dishes;
 }

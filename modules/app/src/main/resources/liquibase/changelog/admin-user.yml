@@ -1,4 +1,5 @@
 databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/admin-user.yml
   - changeSet:
       id: insert-admin-user
       author: nexus
@@ -16,7 +17,22 @@ databaseChangeLog:
                   name: password
                   # password: admin
                   value: $2y$12$76qBigSlz8dvS881k.EnhuyAuuoR/TfybVp03z1xD9xeIZeCIRFsa
+              - column:
+                  name: auth_provider_id
+                  valueComputed: (select id from auth_providers where name = 'NATIVE')
+        - insert:
+            tableName: user_authorities
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: (select id from users where email = 'admin@admin.com')
+              - column:
+                  name: authority_id
+                  valueComputed: (select id from authorities where name = 'ADMIN')
       rollback:
         - delete:
             tableName: users
-            where: name = 'admin' and email = 'admin@admin.com'
+            where: email = 'admin@admin.com'
+        - delete:
+            tableName: user_authorities
+            where: user_id = (select id from users where email = 'admin@admin.com') and authority_id = (select id from authorities where name = 'ADMIN')

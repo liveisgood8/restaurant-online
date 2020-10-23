@@ -1,8 +1,6 @@
-package com.ro.core.models;
+package com.ro.core.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -14,18 +12,18 @@ public class Address {
   @GeneratedValue
   private Long id;
 
-  @Column(nullable = false, length = 64)
+  @Column(name = "street", nullable = false, length = 64)
   private String street;
 
-  @Column(nullable = false)
+  @Column(name = "home_number", nullable = false)
   private Short homeNumber;
 
-  @Column(nullable = false)
+  @Column(name = "entrance_number", nullable = false)
   private Short entranceNumber;
 
-  @Column(nullable = false)
+  @Column(name = "floor_number", nullable = false)
   private Short floorNumber;
 
-  @Column(nullable = false)
+  @Column(name = "apartment_number", nullable = false)
   private Integer apartmentNumber;
 }

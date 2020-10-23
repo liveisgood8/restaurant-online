@@ -1,7 +1,7 @@
 package com.ro.orders.service;
 
 import com.ro.auth.model.User;
-import com.ro.core.models.Address;
+import com.ro.core.model.Address;
 import com.ro.core.repository.AddressRepository;
 import com.ro.core.repository.TelephoneNumberRepository;
 import com.ro.menu.model.Dish;
@@ -65,7 +65,7 @@ public class MakingOrdersService {
   public OrderInfo makeOrder(MakeOrderDto makeOrderDto, @Nullable User user) {
     Order order = MakeOrderDtoMapper.INSTANCE.toOrderEntity(makeOrderDto);
     order.setUser(user);
-    order.setIsApproved(order.getPaymentMethod().getName() == PaymentMethod.Name.BY_CARD_ONLINE);
+    order.setIsApproved(order.getPaymentMethod().getName().equals(PaymentMethod.BY_CARD_ONLINE));
 
     prepareOrderForSave(order);
     Order finalOrder = ordersRepository.save(order);
