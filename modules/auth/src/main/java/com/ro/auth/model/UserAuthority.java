@@ -10,7 +10,7 @@ import javax.persistence.*;
 @Table(name = "user_authorities")
 public class UserAuthority implements GrantedAuthority {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @ManyToOne

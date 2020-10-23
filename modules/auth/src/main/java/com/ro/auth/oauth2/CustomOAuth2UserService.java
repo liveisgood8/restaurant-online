@@ -2,6 +2,7 @@ package com.ro.auth.oauth2;
 
 import com.ro.auth.model.AuthProvider;
 import com.ro.auth.model.User;
+import com.ro.auth.oauth2.exception.OAuth2AuthenticationProcessingException;
 import com.ro.auth.oauth2.user.info.OAuth2UserInfo;
 import com.ro.auth.oauth2.user.info.OAuth2UserInfoFactory;
 import com.ro.auth.oauth2.user.loaders.VkUserInfoLoader;

@@ -17,7 +17,7 @@ import java.util.*;
 @Table(name = "users")
 public class User implements OAuth2User, UserDetails {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @Email

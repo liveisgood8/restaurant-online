@@ -3,7 +3,8 @@ package com.ro.auth.service;
 import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.AuthProvider;
 import com.ro.auth.model.User;
-import com.ro.auth.oauth2.OAuth2AuthenticationProcessingException;
+import com.ro.auth.oauth2.exception.OAuth2AuthenticationProcessingException;
+import com.ro.auth.oauth2.exception.OAuth2ProviderNotExistException;
 import com.ro.auth.oauth2.user.info.OAuth2UserInfo;
 import com.ro.auth.repository.AuthProviderRepository;
 import com.ro.auth.repository.UserRepository;
@@ -34,7 +35,7 @@ public class OAuth2Service {
         }
 
         AuthProvider provider = authProviderRepository.findByName(authProvider)
-            .orElseThrow(() -> new OAuth2AuthenticationProcessingException("Auth provider not founded: " + authProvider));
+            .orElseThrow(() -> new OAuth2ProviderNotExistException(authProvider));
 
         User user = new User();
         user.setEmail(oAuth2UserInfo.getEmail());

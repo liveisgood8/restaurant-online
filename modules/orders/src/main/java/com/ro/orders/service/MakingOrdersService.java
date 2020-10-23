@@ -9,6 +9,7 @@ import com.ro.menu.repository.DishRepository;
 import com.ro.orders.dto.mapper.MakeOrderDtoMapper;
 import com.ro.orders.dto.objects.MakeOrderDto;
 import com.ro.orders.events.OrderEvent;
+import com.ro.orders.exception.PaymentMethodNotExistException;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.BonusesTransaction;
 import com.ro.orders.model.Order;
@@ -16,6 +17,7 @@ import com.ro.orders.model.OrderPart;
 import com.ro.orders.model.PaymentMethod;
 import com.ro.orders.repository.OrdersInfoRepository;
 import com.ro.orders.repository.OrdersRepository;
+import com.ro.orders.repository.PaymentMethodRepository;
 import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ApplicationEventMulticaster;
@@ -35,6 +37,7 @@ public class MakingOrdersService {
   private final OrdersInfoRepository ordersInfoRepository;
   private final TelephoneNumberRepository telephoneNumberRepository;
   private final DishRepository dishRepository;
+  private final PaymentMethodRepository paymentMethodRepository;
   private final BonusesTransactionService bonusesTransactionService;
   private final AddressRepository addressRepository;
   private final ApplicationEventMulticaster eventMulticaster;
@@ -44,6 +47,7 @@ public class MakingOrdersService {
                              OrdersInfoRepository ordersInfoRepository,
                              TelephoneNumberRepository telephoneNumberRepository,
                              DishRepository dishRepository,
+                             PaymentMethodRepository paymentMethodRepository,
                              BonusesTransactionService bonusesTransactionService,
                              AddressRepository addressRepository,
                              ApplicationEventMulticaster eventMulticaster) {
@@ -51,6 +55,7 @@ public class MakingOrdersService {
     this.ordersInfoRepository = ordersInfoRepository;
     this.telephoneNumberRepository = telephoneNumberRepository;
     this.dishRepository = dishRepository;
+    this.paymentMethodRepository = paymentMethodRepository;
     this.bonusesTransactionService = bonusesTransactionService;
     this.addressRepository = addressRepository;
     this.eventMulticaster = eventMulticaster;
@@ -99,6 +104,10 @@ public class MakingOrdersService {
   }
 
   private void prepareOrderForSave(Order order) {
+    PaymentMethod paymentMethod = paymentMethodRepository.findByName(order.getPaymentMethod().getName())
+        .orElseThrow(() -> new PaymentMethodNotExistException(order.getPaymentMethod().getName()));
+
+    order.setPaymentMethod(paymentMethod);
     order.setAddress(handleOrderAddress(order.getAddress()));
     order.setTelephoneNumber(telephoneNumberRepository.save(order.getTelephoneNumber())); // TODO Check phone existence
   }

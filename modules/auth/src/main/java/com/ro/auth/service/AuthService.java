@@ -5,6 +5,7 @@ import com.ro.auth.dto.objects.UserDto;
 import com.ro.auth.exception.UserAlreadyExistException;
 import com.ro.auth.model.AuthProvider;
 import com.ro.auth.model.User;
+import com.ro.auth.oauth2.exception.OAuth2ProviderNotExistException;
 import com.ro.auth.repository.AuthProviderRepository;
 import com.ro.auth.repository.UserRepository;
 import org.slf4j.Logger;
@@ -55,7 +56,7 @@ public class AuthService {
     }
 
     AuthProvider authProvider = authProviderRepository.findByName(AuthProvider.NATIVE)
-        .orElseThrow(() -> new AuthenticationServiceException("Native auth provider not founded"));
+        .orElseThrow(() -> new OAuth2ProviderNotExistException(AuthProvider.NATIVE));
 
     user.setPassword(passwordEncoder.encode(userDto.getPassword()));
     user.setBonuses(0);

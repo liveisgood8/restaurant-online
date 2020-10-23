@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(name = "bonuses_transactions")
 public class BonusesTransaction {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
     @Column(name = "amount", nullable = false)

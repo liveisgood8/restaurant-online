@@ -22,7 +22,7 @@ public class DishEmotion {
   }
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @JsonBackReference

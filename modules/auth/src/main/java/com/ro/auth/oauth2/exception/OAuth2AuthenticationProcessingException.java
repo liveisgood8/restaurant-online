@@ -1,4 +1,4 @@
-package com.ro.auth.oauth2;
+package com.ro.auth.oauth2.exception;
 
 import org.springframework.security.core.AuthenticationException;
 
