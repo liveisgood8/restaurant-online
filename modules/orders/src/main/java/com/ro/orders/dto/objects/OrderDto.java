@@ -14,6 +14,7 @@ public class OrderDto {
     private Long orderId;
     private DishDto dish;
     private Integer count;
+    private Integer totalPrice;
   }
 
   private Long id;
