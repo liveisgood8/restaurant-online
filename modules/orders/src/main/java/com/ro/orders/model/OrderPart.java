@@ -3,9 +3,7 @@ package com.ro.orders.model;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.menu.model.Dish;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,6 +16,8 @@ import java.io.Serializable;
 public class OrderPart {
   @Embeddable
   @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
   public static class OrderInfoId implements Serializable {
     @Column(name = "dish_id", nullable = false)
     private Long dishId;

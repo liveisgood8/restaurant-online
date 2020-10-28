@@ -16,6 +16,9 @@ public interface OrdersRepository extends JpaRepository<Order, Long> {
   @EntityGraph(attributePaths = { "orderParts" })
   Optional<Order> findWithOrderPartsById(Long id);
 
+  @EntityGraph(attributePaths = { "orderParts" })
+  Optional<Order> findWithPartsById(Long id);
+
   @Modifying
   @Query("update Order o set o.isApproved = ?1 where o.id = ?2")
   void setIsApprovedById(boolean isApproved, Long id);

@@ -2,7 +2,6 @@ package com.ro.orders.controller;
 
 import com.ro.auth.model.User;
 import com.ro.orders.dto.mapper.OrderDtoMapper;
-import com.ro.orders.dto.objects.MakeOrderDto;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.Order;
@@ -19,12 +18,15 @@ import java.util.List;
 public class OrdersController {
   private final MakingOrdersService makingOrdersService;
   private final CrudOrdersService crudOrdersService;
+  private final OrderDtoMapper orderDtoMapper;
 
   @Autowired
   public OrdersController(MakingOrdersService makingOrdersService,
-                          CrudOrdersService crudOrdersService) {
+                          CrudOrdersService crudOrdersService,
+                          OrderDtoMapper orderDtoMapper) {
     this.makingOrdersService = makingOrdersService;
     this.crudOrdersService = crudOrdersService;
+    this.orderDtoMapper = orderDtoMapper;
   }
 
   @GetMapping
@@ -35,24 +37,29 @@ public class OrdersController {
     } else {
       orders = crudOrdersService.getAll();
     }
-    return OrderDtoMapper.INSTANCE.toDtoWithoutParts(orders);
+    return orderDtoMapper.toDtoWithoutParts(orders);
   }
 
   @GetMapping("{id}")
   public OrderDto get(@PathVariable Long id) {
     Order order = crudOrdersService.getWithParts(id);
-    return OrderDtoMapper.INSTANCE.toDto(order);
+    return orderDtoMapper.toDto(order);
   }
 
+//  @PutMapping("{id}")
+//  public OrderDto put(@RequestBody OrderDto orderDto) {
+//
+//  }
+  
   @PostMapping("{id}/approve")
   public void approveOrder(@PathVariable Long id) {
     makingOrdersService.approveOrder(id);
   }
 
   @PostMapping
-  public OrderDto makeOrder(@RequestBody MakeOrderDto makeOrderDto, Authentication authentication) {
+  public OrderDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
-    OrderInfo orderInfo = makingOrdersService.makeOrder(makeOrderDto, user);
-    return OrderDtoMapper.INSTANCE.toDto(orderInfo);
+    OrderInfo orderInfo = makingOrdersService.makeOrder(orderDto, user);
+    return orderDtoMapper.toDto(orderInfo);
   }
 }

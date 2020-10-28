@@ -6,8 +6,8 @@ import com.ro.core.repository.AddressRepository;
 import com.ro.core.repository.TelephoneNumberRepository;
 import com.ro.menu.model.Dish;
 import com.ro.menu.repository.DishRepository;
-import com.ro.orders.dto.mapper.MakeOrderDtoMapper;
-import com.ro.orders.dto.objects.MakeOrderDto;
+import com.ro.orders.dto.mapper.OrderDtoMapper;
+import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.events.OrderEvent;
 import com.ro.orders.exception.PaymentMethodNotExistException;
 import com.ro.orders.lib.OrderInfo;
@@ -40,6 +40,7 @@ public class MakingOrdersService {
   private final PaymentMethodRepository paymentMethodRepository;
   private final BonusesTransactionService bonusesTransactionService;
   private final AddressRepository addressRepository;
+  private final OrderDtoMapper orderDtoMapper;
   private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
@@ -50,6 +51,7 @@ public class MakingOrdersService {
                              PaymentMethodRepository paymentMethodRepository,
                              BonusesTransactionService bonusesTransactionService,
                              AddressRepository addressRepository,
+                             OrderDtoMapper orderDtoMapper,
                              ApplicationEventMulticaster eventMulticaster) {
     this.ordersRepository = ordersRepository;
     this.ordersInfoRepository = ordersInfoRepository;
@@ -58,6 +60,7 @@ public class MakingOrdersService {
     this.paymentMethodRepository = paymentMethodRepository;
     this.bonusesTransactionService = bonusesTransactionService;
     this.addressRepository = addressRepository;
+    this.orderDtoMapper = orderDtoMapper;
     this.eventMulticaster = eventMulticaster;
   }
 
@@ -67,8 +70,8 @@ public class MakingOrdersService {
   }
 
   @Transactional
-  public OrderInfo makeOrder(MakeOrderDto makeOrderDto, @Nullable User user) {
-    Order order = MakeOrderDtoMapper.INSTANCE.toOrderEntity(makeOrderDto);
+  public OrderInfo makeOrder(OrderDto orderDto, @Nullable User user) {
+    Order order = orderDtoMapper.toEntity(orderDto);
     order.setUser(user);
     order.setIsApproved(order.getPaymentMethod().getName().equals(PaymentMethod.BY_CARD_ONLINE));
 
@@ -79,10 +82,10 @@ public class MakingOrdersService {
     List<OrderPart> savedOrderParts = ordersInfoRepository.saveAll(finalOrder.getOrderParts());
     finalOrder.setOrderParts(new HashSet<>(savedOrderParts));
 
-    if (user != null && makeOrderDto.getSpentBonuses() != null && makeOrderDto.getSpentBonuses() != 0) {
+    if (user != null && order.getSpentBonuses() != 0) {
       BonusesTransaction outcomeTransaction = bonusesTransactionService.addOutcome(order,
           user,
-          makeOrderDto.getSpentBonuses());
+          orderDto.getSpentBonuses());
       finalOrder.getBonusesTransactions().add(outcomeTransaction);
     }
 

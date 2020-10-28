@@ -7,27 +7,22 @@ import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderPart;
-import org.mapstruct.IterableMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
+import jdk.jfr.Name;
+import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(uses = { AddressDtoMapper.class, DishDtoMapper.class })
+@Mapper(uses = { AddressDtoMapper.class, OrderPartDtoMapper.class },
+    componentModel = "spring",
+    injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface OrderDtoMapper {
-  OrderDtoMapper INSTANCE = Mappers.getMapper(OrderDtoMapper.class);
-
   @Mapping(target = "paymentMethod", source = "paymentMethod.name")
   @Mapping(target = "phone", source = "telephoneNumber", qualifiedByName = "telephoneNumberToString")
   OrderDto toDto(Order order);
   List<OrderDto> toDto(List<Order> orders);
 
   @Named("toDtoWithoutParts")
-  @Mapping(target = "paymentMethod", source = "paymentMethod.name")
   @Mapping(target = "orderParts", ignore = true)
-  @Mapping(target = "phone", source = "telephoneNumber", qualifiedByName = "telephoneNumberToString")
   OrderDto toDtoWithoutParts(Order order);
 
   @IterableMapping(qualifiedByName = "toDtoWithoutParts")
@@ -42,13 +37,6 @@ public interface OrderDtoMapper {
   @Mapping(target = "telephoneNumber", source = "phone", qualifiedByName = "stringToTelephoneNumber")
   @Mapping(target = "createdAt", ignore = true)
   Order toEntity(OrderDto orderDto);
-
-  @Mapping(target = "id.orderId", source = "orderId")
-  @Mapping(target = "id.dishId", source = "dish.id")
-  OrderPart orderPartDtoToEntity(OrderDto.OrderPartDto orderPartDto);
-
-  @Mapping(target = "orderId", source = "id.orderId")
-  OrderDto.OrderPartDto orderPartToDto(OrderPart orderPart);
 
   @Named("stringToTelephoneNumber")
   default TelephoneNumber stringToTelephoneNumber(String phone) {

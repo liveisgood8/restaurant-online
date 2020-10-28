@@ -9,14 +9,6 @@ import java.util.Set;
 
 @Data
 public class OrderDto {
-  @Data
-  public static class OrderPartDto {
-    private Long orderId;
-    private DishDto dish;
-    private Integer count;
-    private Integer totalPrice;
-  }
-
   private Long id;
   private Boolean isApproved;
   private String paymentMethod;

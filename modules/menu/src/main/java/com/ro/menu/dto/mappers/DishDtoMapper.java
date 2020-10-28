@@ -14,10 +14,8 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.Set;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface DishDtoMapper {
-  DishDtoMapper INSTANCE = Mappers.getMapper(DishDtoMapper.class);
-
   @Mapping(target = "imageUrl", expression = "java(ImageMapper.makeImageUrl(ImageMapper.ImageSource.DISH, " +
       "dish.getId(), dish.getImagePath()))")
   @Mapping(target = "likes", source = "emotions", qualifiedByName = "emotionsToDishDtoLikes")
