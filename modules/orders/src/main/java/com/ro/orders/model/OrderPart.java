@@ -43,6 +43,13 @@ public class OrderPart {
   @MapsId("dishId")
   private Dish dish;
 
+  public void setOrder(Order order) {
+    this.order = order;
+    if (order != null) {
+      this.id.orderId = order.getId();
+    }
+  }
+
   public void setDish(Dish dish) {
     this.dish = dish;
     recalculateTotalPrice();

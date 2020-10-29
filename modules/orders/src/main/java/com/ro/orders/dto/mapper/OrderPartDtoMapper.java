@@ -31,21 +31,25 @@ public abstract class OrderPartDtoMapper {
     this.ordersRepository = ordersRepository;
   }
 
+  @Mapping(target = "orderId", source = "id.orderId")
+  public abstract OrderPartDto toDto(OrderPart orderPart);
+
   @Mapping(target = "id.dishId", source = "dish.id")
   @Mapping(target = "id.orderId", source = "orderId")
   @Mapping(target = "order", source = "orderId", qualifiedByName = "orderIdToOrder")
   public abstract OrderPart toEntity(OrderPartDto orderPartDto);
 
-  @Mapping(target = "orderId", source = "id.orderId")
-  public abstract OrderPartDto toDto(OrderPart orderPart);
-
-  Dish dishDtoToDish(DishDto dishDto) {
+  protected Dish dishDtoToDish(DishDto dishDto) {
     return dishRepository.findById(dishDto.getId())
         .orElseThrow(() -> new EntityNotFoundException("Dish with id: " + dishDto.getId() + " is not founded"));
   }
 
   @Named("orderIdToOrder")
-  Order orderIdToOrder(Long orderId) {
+  protected Order orderIdToOrder(Long orderId) {
+    if (orderId == null) {
+      return null;
+    }
+
     return ordersRepository.findById(orderId)
         .orElseThrow(() -> new EntityNotFoundException("Order with id: " + orderId + " is not founded"));
   }

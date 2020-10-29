@@ -15,7 +15,7 @@ import com.ro.orders.model.BonusesTransaction;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderPart;
 import com.ro.orders.model.PaymentMethod;
-import com.ro.orders.repository.OrdersInfoRepository;
+import com.ro.orders.repository.OrderPartsRepository;
 import com.ro.orders.repository.OrdersRepository;
 import com.ro.orders.repository.PaymentMethodRepository;
 import com.sun.istack.Nullable;
@@ -34,7 +34,7 @@ import java.util.Optional;
 @Service
 public class MakingOrdersService {
   private final OrdersRepository ordersRepository;
-  private final OrdersInfoRepository ordersInfoRepository;
+  private final OrderPartsRepository ordersInfoRepository;
   private final TelephoneNumberRepository telephoneNumberRepository;
   private final DishRepository dishRepository;
   private final PaymentMethodRepository paymentMethodRepository;
@@ -45,7 +45,7 @@ public class MakingOrdersService {
 
   @Autowired
   public MakingOrdersService(OrdersRepository ordersRepository,
-                             OrdersInfoRepository ordersInfoRepository,
+                             OrderPartsRepository ordersInfoRepository,
                              TelephoneNumberRepository telephoneNumberRepository,
                              DishRepository dishRepository,
                              PaymentMethodRepository paymentMethodRepository,

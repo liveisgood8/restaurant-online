@@ -44,10 +44,10 @@ public class Order {
   @JoinColumn(name = "telephone_number_id", nullable = false)
   private TelephoneNumber telephoneNumber;
 
-  @OneToMany(mappedBy = "id.orderId", orphanRemoval = true)
-  private Set<OrderPart> orderParts = Collections.emptySet();
+  @OneToMany(mappedBy = "id.orderId", orphanRemoval = true, cascade = CascadeType.ALL)
+  private Set<OrderPart> orderParts = new HashSet<>();
 
-  @OneToMany(mappedBy = "order")
+  @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
   private Set<BonusesTransaction> bonusesTransactions = new HashSet<>();
 
   @CreationTimestamp
@@ -60,7 +60,7 @@ public class Order {
             .mapToInt(OrderPart::getTotalPrice)
             .sum();
 
-    return totalPartPrice - getReceivedBonuses();
+    return totalPartPrice - getSpentBonuses();
   }
 
   public int getReceivedBonuses() {

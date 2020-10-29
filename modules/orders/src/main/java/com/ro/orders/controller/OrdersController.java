@@ -59,7 +59,11 @@ public class OrdersController {
   @PostMapping
   public OrderDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
-    OrderInfo orderInfo = makingOrdersService.makeOrder(orderDto, user);
-    return orderDtoMapper.toDto(orderInfo);
+    Order order = orderDtoMapper.toEntity(orderDto);
+    order.setUser(user);
+    order.getBonusesTransactions().forEach(t -> t.setUser(user));
+
+    order = crudOrdersService.save(order);
+    return orderDtoMapper.toDto(order);
   }
 }

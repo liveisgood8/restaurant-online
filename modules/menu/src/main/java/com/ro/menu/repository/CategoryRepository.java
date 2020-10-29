@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import javax.transaction.Transactional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-  @Query("select c.imagePath from Category c where c.id = :id")
+  @Query("select c.imagePath from Category c where c.id = ?1")
   String findImagePathById(Long id);
 
   @Modifying
-  @Query("update Category c set c.imagePath = :imagePath where c.id = :id")
+  @Query("update Category c set c.imagePath = ?2 where c.id = ?1")
   void updateImagePath(Long id, String imagePath);
 }

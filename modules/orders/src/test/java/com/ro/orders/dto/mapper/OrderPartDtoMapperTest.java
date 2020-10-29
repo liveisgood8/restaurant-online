@@ -84,14 +84,28 @@ class OrderPartDtoMapperTest {
   @Test
   void toEntity_whenOrderNotFounded() {
     EasyRandom easyRandom = new EasyRandom();
-    OrderPartDto orderDto = easyRandom.nextObject(OrderPartDto.class);
+    OrderPartDto partDto = easyRandom.nextObject(OrderPartDto.class);
 
     Dish dish = easyRandom.nextObject(Dish.class);
 
-    Mockito.doReturn(Optional.empty()).when(ordersRepository).findById(orderDto.getOrderId());
-    Mockito.doReturn(Optional.of(dish)).when(dishRepository).findById(orderDto.getDish().getId());
+    Mockito.doReturn(Optional.empty()).when(ordersRepository).findById(partDto.getOrderId());
+    Mockito.doReturn(Optional.of(dish)).when(dishRepository).findById(partDto.getDish().getId());
 
-    assertThrows(EntityNotFoundException.class, () -> mapper.toEntity(orderDto));
+    assertThrows(EntityNotFoundException.class, () -> mapper.toEntity(partDto));
+  }
+
+  @Test
+  void toEntity_whenOrderIdIsNull() {
+    EasyRandom easyRandom = new EasyRandom();
+    OrderPartDto partDto = easyRandom.nextObject(OrderPartDto.class);
+    partDto.setOrderId(null);
+
+    Dish dish = easyRandom.nextObject(Dish.class);
+    Mockito.doReturn(Optional.of(dish)).when(dishRepository).findById(partDto.getDish().getId());
+
+    OrderPart entity = mapper.toEntity(partDto);
+    assertNull(entity.getId().getOrderId());
+    assertNull(entity.getOrder());
   }
 
   @Test

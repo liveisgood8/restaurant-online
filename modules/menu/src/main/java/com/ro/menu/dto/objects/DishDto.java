@@ -30,8 +30,8 @@ public class DishDto {
   private Double protein;
   private Double fat;
   private Double carbohydrates;
-  private Integer weight;
-  private Integer price;
+  private Short weight;
+  private Short price;
   private String imageUrl;
   private LikesDto likes;
 }

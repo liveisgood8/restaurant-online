@@ -11,7 +11,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication
-@EnableConfigurationProperties(AuthProperties.class)
 @Import({
 		CoreModuleConfig.class,
 		AuthModuleConfig.class,

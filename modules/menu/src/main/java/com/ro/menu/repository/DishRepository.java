@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
@@ -19,11 +20,11 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
   @EntityGraph(attributePaths = {"emotions"})
   List<Dish> findByCategoryId(Long categoryId);
 
-  @Query("select dish.imagePath from Dish dish where dish.id = :id")
+  @Query("select dish.imagePath from Dish dish where dish.id = ?1")
   String findImagePathById(Long id);
 
   @Transactional
   @Modifying
-  @Query("update Dish dish set dish.imagePath = :imagePath where dish.id = :id")
+  @Query("update Dish dish set dish.imagePath = ?2 where dish.id = ?1")
   void updateImagePath(Long id, String imagePath);
 }

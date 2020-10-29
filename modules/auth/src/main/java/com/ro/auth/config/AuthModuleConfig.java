@@ -1,6 +1,7 @@
 package com.ro.auth.config;
 
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
+@EnableConfigurationProperties(AuthProperties.class)
 @ComponentScan(basePackages = "com.ro.auth")
 @EntityScan(basePackages = "com.ro.auth.model")
 @EnableJpaRepositories(basePackages = "com.ro.auth.repository")
