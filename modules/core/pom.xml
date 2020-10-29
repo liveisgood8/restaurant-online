@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.ro</groupId>
         <artifactId>root</artifactId>
-        <version>0.1.0</version>
-        <relativePath>../../</relativePath>
+        <version>0.0.1</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>core</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>core</name>
     <packaging>jar</packaging>
 
@@ -20,15 +20,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>
-            <version>8.12.11</version>
         </dependency>
 
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.4</version>
         </dependency>
     </dependencies>
 </project>

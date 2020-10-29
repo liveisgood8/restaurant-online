@@ -5,19 +5,28 @@
     <parent>
         <groupId>com.ro</groupId>
         <artifactId>root</artifactId>
-        <version>0.1.0</version>
-        <relativePath>../../</relativePath>
+        <version>0.0.1</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>auth</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>auth-module</name>
+    <version>0.0.1</version>
+    <name>auth</name>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>com.ro</groupId>
             <artifactId>core</artifactId>
-            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
         </dependency>
 
         <dependency>
@@ -48,7 +57,6 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
         </dependency>
     </dependencies>
 

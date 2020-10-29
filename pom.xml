@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.ro</groupId>
   <artifactId>root</artifactId>
-  <version>0.1.0</version>
+  <version>0.0.1</version>
   <packaging>pom</packaging>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.3.2.RELEASE</version>
-    <relativePath/>
-  </parent>
+  <properties>
+    <!-- General -->
+    <java.version>11</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Dependencies -->
+    <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
+    <org.projectlombok.version>1.18.12</org.projectlombok.version>
+    <org.springframework.boot.spring-boot-dependencies.version>2.3.2.RELEASE</org.springframework.boot.spring-boot-dependencies.version>
+    <mysql.mysql-connector-java.version>8.0.21</mysql.mysql-connector-java.version>
+    <org.liquibase.liquibase-core>4.1.1</org.liquibase.liquibase-core>
+    <org.jeasy.easy-random-core>4.2.0</org.jeasy.easy-random-core>
+    <io.jsonwebtoken.jjwt.version>0.9.1</io.jsonwebtoken.jjwt.version>
+    <com.googlecode.libphonenumber.libphonenumber.version>8.12.11</com.googlecode.libphonenumber.libphonenumber.version>
+    <commons-beanutil.version>1.9.4</commons-beanutil.version>
+    <org.apache.xmlgraphics.batik-transcoder.version>1.13</org.apache.xmlgraphics.batik-transcoder.version>
+    <com.twelvemonkeys.imageio.imageio-batik.version>3.6</com.twelvemonkeys.imageio.imageio-batik.version>
+
+    <!-- Plugins -->
+    <org.apache.maven.plugins.maven-compiler-plugin.version>3.8.1</org.apache.maven.plugins.maven-compiler-plugin.version>
+    <org.liquibase.liquibase-maven-plugin.version>4.1.1</org.liquibase.liquibase-maven-plugin.version>
+    <org.liquibase.ext.liquibase-hibernate5.version>4.1.1</org.liquibase.ext.liquibase-hibernate5.version>
+  </properties>
 
   <modules>
+    <module>bom</module>
     <module>modules/app</module>
     <module>modules/core</module>
     <module>modules/auth</module>
@@ -22,47 +39,86 @@
     <module>modules/orders</module>
   </modules>
 
-  <properties>
-    <java.version>1.11</java.version>
-    <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
-    <org.projectlombok.version>1.18.12</org.projectlombok.version>
-  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.ro</groupId>
+        <artifactId>bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>${org.springframework.boot.spring-boot-dependencies.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${org.projectlombok.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${org.mapstruct.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.mysql-connector-java.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-core</artifactId>
+        <version>${org.liquibase.liquibase-core}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt</artifactId>
+        <version>${io.jsonwebtoken.jjwt.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.googlecode.libphonenumber</groupId>
+        <artifactId>libphonenumber</artifactId>
+        <version>${com.googlecode.libphonenumber.libphonenumber.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>${commons-beanutil.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-transcoder</artifactId>
+        <version>${org.apache.xmlgraphics.batik-transcoder.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.twelvemonkeys.imageio</groupId>
+        <artifactId>imageio-batik</artifactId>
+        <version>${com.twelvemonkeys.imageio.imageio-batik.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>${org.projectlombok.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mapstruct</groupId>
-      <artifactId>mapstruct</artifactId>
-      <version>${org.mapstruct.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.21</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.liquibase</groupId>
-      <artifactId>liquibase-core</artifactId>
-      <version>4.1.1</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.jeasy</groupId>
       <artifactId>easy-random-core</artifactId>
-      <version>4.2.0</version>
+      <version>${org.jeasy.easy-random-core}</version>
       <scope>test</scope>
     </dependency>
 
@@ -74,35 +130,34 @@
   </dependencies>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>11</source>
-          <target>11</target>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.mapstruct</groupId>
-              <artifactId>mapstruct-processor</artifactId>
-              <version>${org.mapstruct.version}</version>
-            </path>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>${org.projectlombok.version}</version>
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
-      </plugin>
-    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${org.apache.maven.plugins.maven-compiler-plugin.version}</version>
+          <configuration>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
+            <annotationProcessorPaths>
+              <path>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${org.mapstruct.version}</version>
+              </path>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${org.projectlombok.version}</version>
+              </path>
+            </annotationProcessorPaths>
+          </configuration>
+        </plugin>
+
+        <plugin>
           <groupId>org.liquibase</groupId>
           <artifactId>liquibase-maven-plugin</artifactId>
-          <version>4.1.1</version>
+          <version>${org.liquibase.liquibase-maven-plugin.version}</version>
           <configuration>
             <propertyFileWillOverride>true</propertyFileWillOverride>
             <propertyFile>target/classes/liquibase/liquibase.yml</propertyFile>
@@ -115,12 +170,12 @@
             <dependency>
               <groupId>org.liquibase.ext</groupId>
               <artifactId>liquibase-hibernate5</artifactId>
-              <version>4.1.1</version>
+              <version>${org.liquibase.ext.liquibase-hibernate5.version}</version>
             </dependency>
             <dependency>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-starter-data-jpa</artifactId>
-              <version>2.3.2.RELEASE</version>
+              <version>${org.springframework.boot.spring-boot-dependencies.version}</version>
             </dependency>
             <dependency>
               <groupId>javax.validation</groupId>

@@ -5,25 +5,28 @@
 	<parent>
 		<groupId>com.ro</groupId>
 		<artifactId>root</artifactId>
-		<version>0.1.0</version>
-		<relativePath>../../</relativePath>
+		<version>0.0.1</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>orders</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>orders-module</name>
+	<version>0.0.1</version>
+	<name>orders</name>
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.ro</groupId>
 			<artifactId>auth</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.ro</groupId>
 			<artifactId>menu</artifactId>
-			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 
 		<dependency>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.ro</groupId>
+    <artifactId>bom</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <com.ro.app.version>0.0.1</com.ro.app.version>
+        <com.ro.auth.version>0.0.1</com.ro.auth.version>
+        <com.ro.core.version>0.0.1</com.ro.core.version>
+        <com.ro.menu.version>0.0.1</com.ro.menu.version>
+        <com.ro.orders.version>0.0.1</com.ro.orders.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>auth</artifactId>
+                <version>${com.ro.auth.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>app</artifactId>
+                <version>${com.ro.app.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>core</artifactId>
+                <version>${com.ro.core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>menu</artifactId>
+                <version>${com.ro.menu.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>orders</artifactId>
+                <version>${com.ro.orders.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>

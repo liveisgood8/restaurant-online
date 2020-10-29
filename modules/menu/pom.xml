@@ -5,24 +5,28 @@
 	<parent>
 		<groupId>com.ro</groupId>
 		<artifactId>root</artifactId>
-		<version>0.1.0</version>
-		<relativePath>../../</relativePath>
+		<version>0.0.1</version>
+		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>menu</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>menu-module</name>
+	<version>0.0.1</version>
+	<name>menu</name>
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.ro</groupId>
 			<artifactId>core</artifactId>
-			<version>${project.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.ro</groupId>
 			<artifactId>auth</artifactId>
-			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 
 		<dependency>
@@ -43,13 +47,11 @@
 		<dependency>
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>batik-transcoder</artifactId>
-			<version>1.13</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.twelvemonkeys.imageio</groupId>
 			<artifactId>imageio-batik</artifactId>
-			<version>3.6</version>
 		</dependency>
 	</dependencies>
 

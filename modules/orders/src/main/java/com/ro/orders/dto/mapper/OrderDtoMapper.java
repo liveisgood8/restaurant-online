@@ -15,36 +15,37 @@ import java.util.List;
 @Mapper(uses = { AddressDtoMapper.class, OrderPartDtoMapper.class },
     componentModel = "spring",
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface OrderDtoMapper {
+public abstract class OrderDtoMapper {
   @Mapping(target = "paymentMethod", source = "paymentMethod.name")
   @Mapping(target = "phone", source = "telephoneNumber", qualifiedByName = "telephoneNumberToString")
-  OrderDto toDto(Order order);
-  List<OrderDto> toDto(List<Order> orders);
+  public abstract OrderDto toDto(Order order);
+  public abstract List<OrderDto> toDto(List<Order> orders);
 
+  @InheritConfiguration
   @Named("toDtoWithoutParts")
   @Mapping(target = "orderParts", ignore = true)
-  OrderDto toDtoWithoutParts(Order order);
+  public abstract OrderDto toDtoWithoutParts(Order order);
 
   @IterableMapping(qualifiedByName = "toDtoWithoutParts")
-  List<OrderDto> toDtoWithoutParts(List<Order> order);
+  public abstract List<OrderDto> toDtoWithoutParts(List<Order> order);
 
   @Mapping(target = "phone", source = "order.telephoneNumber", qualifiedByName = "telephoneNumberToString")
   @Mapping(target = "paymentMethod", source = "order.paymentMethod.name")
   @Mapping(target = ".", source = "order")
-  OrderDto toDto(OrderInfo orderInfo);
+  public abstract OrderDto toDto(OrderInfo orderInfo);
 
   @Mapping(target = "paymentMethod.name", source = "paymentMethod")
   @Mapping(target = "telephoneNumber", source = "phone", qualifiedByName = "stringToTelephoneNumber")
   @Mapping(target = "createdAt", ignore = true)
-  Order toEntity(OrderDto orderDto);
+  public abstract Order toEntity(OrderDto orderDto);
 
   @Named("stringToTelephoneNumber")
-  default TelephoneNumber stringToTelephoneNumber(String phone) {
+  protected TelephoneNumber stringToTelephoneNumber(String phone) {
     return TelephoneNumberUtils.fromString(phone);
   }
 
   @Named("telephoneNumberToString")
-  default String telephoneNumberToString(TelephoneNumber telephoneNumber) {
+  protected String telephoneNumberToString(TelephoneNumber telephoneNumber) {
     return TelephoneNumberUtils.toString(telephoneNumber);
   }
 }

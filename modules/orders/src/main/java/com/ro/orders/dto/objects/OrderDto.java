@@ -1,7 +1,5 @@
 package com.ro.orders.dto.objects;
 
-import com.ro.menu.dto.objects.DishDto;
-import com.ro.orders.model.PaymentMethod;
 import lombok.Data;
 
 import java.util.Date;
