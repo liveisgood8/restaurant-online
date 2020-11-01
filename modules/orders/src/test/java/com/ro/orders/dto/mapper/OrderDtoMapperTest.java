@@ -9,7 +9,9 @@ import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.dto.objects.OrderPartDto;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderPart;
+import com.ro.orders.model.PaymentMethod;
 import com.ro.orders.repository.OrdersRepository;
+import com.ro.orders.repository.PaymentMethodRepository;
 import org.jeasy.random.EasyRandom;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,9 @@ class OrderDtoMapperTest {
   private AddressDtoMapper addressDtoMapper;
 
   @Mock
+  private PaymentMethodRepository paymentMethodRepository;
+
+  @Mock
   private OrdersRepository ordersRepository;
 
   private OrderDtoMapper mapper;
@@ -41,6 +46,7 @@ class OrderDtoMapperTest {
   void init() {
     mapper = new OrderDtoMapperImpl(addressDtoMapper, orderPartDtoMapper);
     mapper.setOrdersRepository(ordersRepository);
+    mapper.setPaymentMethodRepository(paymentMethodRepository);
   }
 
   @Test
@@ -75,6 +81,7 @@ class OrderDtoMapperTest {
     assertEquals(order.getCreatedAt(), orderDto.getCreatedAt());
     assertEquals(orderDto.getOrderParts().size(), 2);
   }
+
   @Test
   void toDtoWithoutParts() {
     EasyRandom easyRandom = new EasyRandom();
@@ -91,9 +98,13 @@ class OrderDtoMapperTest {
   void toEntity_whenDtoHasId() {
     EasyRandom easyRandom = new EasyRandom();
 
+    PaymentMethod paymentMethod = easyRandom.nextObject(PaymentMethod.class);
+    paymentMethod.setName(PaymentMethod.BY_CARD_ONLINE);
+
     OrderPartDto partDto = easyRandom.nextObject(OrderPartDto.class);
     OrderDto dto = easyRandom.nextObject(OrderDto.class);
     dto.setPhone("+79235941222");
+    dto.setPaymentMethod(paymentMethod.getName());
     dto.setOrderParts(Set.of(partDto));
 
     Order entity = easyRandom.nextObject(Order.class);
@@ -101,6 +112,7 @@ class OrderDtoMapperTest {
     partEntity.getDish().setPrice(partDto.getDish().getPrice());
     partEntity.setCount(partDto.getCount());
 
+    Mockito.when(paymentMethodRepository.findByName(dto.getPaymentMethod())).thenReturn(Optional.of(paymentMethod));
     Mockito.when(ordersRepository.findWithPartsById(dto.getId())).thenReturn(Optional.of(entity));
     Mockito.when(addressDtoMapper.toEntity(dto.getAddress())).thenReturn(easyRandom.nextObject(Address.class));
     Mockito.when(orderPartDtoMapper.toEntity(partDto)).thenReturn(partEntity);
@@ -122,10 +134,15 @@ class OrderDtoMapperTest {
   void toEntity_whenDtoHasNotId() {
     EasyRandom easyRandom = new EasyRandom();
 
+    PaymentMethod paymentMethod = easyRandom.nextObject(PaymentMethod.class);
+    paymentMethod.setName(PaymentMethod.BY_CARD_ONLINE);
+
     OrderPartDto partDto = easyRandom.nextObject(OrderPartDto.class);
+
     OrderDto dto = easyRandom.nextObject(OrderDto.class);
     dto.setId(null);
     dto.setPhone("+79235941222");
+    dto.setPaymentMethod(paymentMethod.getName());
     dto.setSpentBonuses(312412);
     dto.setReceivedBonuses(3242342);
     dto.setOrderParts(Set.of(partDto));
@@ -134,6 +151,7 @@ class OrderDtoMapperTest {
     partEntity.getDish().setPrice(partDto.getDish().getPrice());
     partEntity.setCount(partDto.getCount());
 
+    Mockito.when(paymentMethodRepository.findByName(dto.getPaymentMethod())).thenReturn(Optional.of(paymentMethod));
     Mockito.when(addressDtoMapper.toEntity(dto.getAddress())).thenReturn(easyRandom.nextObject(Address.class));
     Mockito.when(orderPartDtoMapper.toEntity(partDto)).thenReturn(partEntity);
 

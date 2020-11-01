@@ -47,7 +47,7 @@ public class Order {
   @OneToMany(mappedBy = "id.orderId", orphanRemoval = true, cascade = CascadeType.ALL)
   private Set<OrderPart> orderParts = new HashSet<>();
 
-  @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "order", orphanRemoval = true)
   private Set<BonusesTransaction> bonusesTransactions = new HashSet<>();
 
   @CreationTimestamp

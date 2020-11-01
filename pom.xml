@@ -23,6 +23,7 @@
     <commons-beanutil.version>1.9.4</commons-beanutil.version>
     <org.apache.xmlgraphics.batik-transcoder.version>1.13</org.apache.xmlgraphics.batik-transcoder.version>
     <com.twelvemonkeys.imageio.imageio-batik.version>3.6</com.twelvemonkeys.imageio.imageio-batik.version>
+    <org.springframework.secutiry.spring-security-test.version>5.4.1</org.springframework.secutiry.spring-security-test.version>
 
     <!-- Plugins -->
     <org.apache.maven.plugins.maven-compiler-plugin.version>3.8.1</org.apache.maven.plugins.maven-compiler-plugin.version>
@@ -110,6 +111,13 @@
         <groupId>com.twelvemonkeys.imageio</groupId>
         <artifactId>imageio-batik</artifactId>
         <version>${com.twelvemonkeys.imageio.imageio-batik.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-test</artifactId>
+        <version>${org.springframework.secutiry.spring-security-test.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -4,11 +4,14 @@ import com.ro.core.model.TelephoneNumber;
 import com.ro.core.utils.TelephoneNumberUtils;
 import com.ro.menu.dto.mappers.DishDtoMapper;
 import com.ro.orders.dto.objects.OrderDto;
+import com.ro.orders.exception.PaymentMethodNotExistException;
 import com.ro.orders.lib.OrderInfo;
 import com.ro.orders.model.BonusesTransaction;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.OrderPart;
+import com.ro.orders.model.PaymentMethod;
 import com.ro.orders.repository.OrdersRepository;
+import com.ro.orders.repository.PaymentMethodRepository;
 import jdk.jfr.Name;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +24,16 @@ import java.util.List;
     injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public abstract class OrderDtoMapper {
   private OrdersRepository ordersRepository;
+  private PaymentMethodRepository paymentMethodRepository;
 
   @Autowired
   public void setOrdersRepository(OrdersRepository ordersRepository) {
     this.ordersRepository = ordersRepository;
+  }
+
+  @Autowired
+  public void setPaymentMethodRepository(PaymentMethodRepository paymentMethodRepository) {
+    this.paymentMethodRepository = paymentMethodRepository;
   }
 
   @Mapping(target = "paymentMethod", source = "paymentMethod.name")
@@ -71,14 +80,21 @@ public abstract class OrderDtoMapper {
     }
 
     mergeWithDto(orderDto, order);
+    order.getOrderParts().forEach(p -> p.setOrder(order));
 
     return order;
   }
 
-  @Mapping(target = "paymentMethod.name", source = "paymentMethod")
+  @Mapping(target = "paymentMethod", source = "paymentMethod", qualifiedByName = "toEntityPaymentMethod")
   @Mapping(target = "telephoneNumber", source = "phone", qualifiedByName = "stringToTelephoneNumber")
   @Mapping(target = "createdAt", ignore = true)
   protected abstract void mergeWithDto(OrderDto dto, @MappingTarget Order order);
+
+  @Named("toEntityPaymentMethod")
+  protected PaymentMethod toEntityPaymentMethod(String paymentMethodName) {
+    return paymentMethodRepository.findByName(paymentMethodName)
+        .orElseThrow(() -> new PaymentMethodNotExistException(paymentMethodName));
+  }
 
   @Named("stringToTelephoneNumber")
   protected TelephoneNumber stringToTelephoneNumber(String phone) {

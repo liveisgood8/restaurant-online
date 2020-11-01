@@ -3,12 +3,14 @@ package com.ro.menu.dto.objects;
 import com.ro.menu.model.DishEmotion;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 
 @Data
 public class DishDto {
   @Data
+  @NoArgsConstructor
   public static class LikesDto {
     private int likeCount = 0;
     private int dislikeCount = 0;

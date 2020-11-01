@@ -1,6 +1,8 @@
 package com.ro.orders.controller;
 
 import com.ro.auth.model.User;
+import com.ro.core.exceptions.RoIllegalArgumentException;
+import com.ro.core.exceptions.RoIllegalStateException;
 import com.ro.orders.dto.mapper.OrderDtoMapper;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.lib.OrderInfo;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -59,9 +62,14 @@ public class OrdersController {
   @PostMapping
   public OrderDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
+
     Order order = orderDtoMapper.toEntity(orderDto);
     order.setUser(user);
-    order.getBonusesTransactions().forEach(t -> t.setUser(user));
+    if (user == null) {
+      order.setBonusesTransactions(Collections.emptySet());
+    } else {
+      order.getBonusesTransactions().forEach(t -> t.setUser(user));
+    }
 
     order = crudOrdersService.save(order);
     return orderDtoMapper.toDto(order);
