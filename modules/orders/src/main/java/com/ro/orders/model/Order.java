@@ -47,7 +47,7 @@ public class Order {
   @OneToMany(mappedBy = "id.orderId", orphanRemoval = true, cascade = CascadeType.ALL)
   private Set<OrderPart> orderParts = new HashSet<>();
 
-  @OneToMany(mappedBy = "order", orphanRemoval = true)
+  @OneToMany(mappedBy = "order", orphanRemoval = true, cascade = CascadeType.ALL)
   private Set<BonusesTransaction> bonusesTransactions = new HashSet<>();
 
   @CreationTimestamp
@@ -56,11 +56,9 @@ public class Order {
   private Date createdAt;
 
   public int getTotalPrice() {
-    int totalPartPrice = orderParts.stream()
+    return orderParts.stream()
             .mapToInt(OrderPart::getTotalPrice)
             .sum();
-
-    return totalPartPrice - getSpentBonuses();
   }
 
   public int getReceivedBonuses() {

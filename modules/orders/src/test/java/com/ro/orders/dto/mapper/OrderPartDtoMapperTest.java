@@ -48,23 +48,27 @@ class OrderPartDtoMapperTest {
   @Test
   void toEntity() {
     EasyRandom easyRandom = new EasyRandom();
-    OrderPartDto orderDto = easyRandom.nextObject(OrderPartDto.class);
-
-    Order order = easyRandom.nextObject(Order.class);
-    order.setId(orderDto.getOrderId());
 
     Dish dish = easyRandom.nextObject(Dish.class);
+    dish.setPrice((short) 4234);
 
-    Mockito.doReturn(Optional.of(order)).when(ordersRepository).findById(orderDto.getOrderId());
-    Mockito.doReturn(Optional.of(dish)).when(dishRepository).findById(orderDto.getDish().getId());
+    OrderPartDto orderPartDto = easyRandom.nextObject(OrderPartDto.class);
+    orderPartDto.setCount(42);
+    orderPartDto.getDish().setPrice(dish.getPrice());
 
-    OrderPart orderPart = mapper.toEntity(orderDto);
+    Order order = easyRandom.nextObject(Order.class);
+    order.setId(orderPartDto.getOrderId());
 
-    assertEquals(orderPart.getId().getOrderId(), orderDto.getOrderId());
-    assertEquals(orderPart.getId().getDishId(), orderDto.getDish().getId());
+    Mockito.doReturn(Optional.of(order)).when(ordersRepository).findById(orderPartDto.getOrderId());
+    Mockito.doReturn(Optional.of(dish)).when(dishRepository).findById(orderPartDto.getDish().getId());
+
+    OrderPart orderPart = mapper.toEntity(orderPartDto);
+
+    assertEquals(orderPart.getId().getOrderId(), orderPartDto.getOrderId());
+    assertEquals(orderPart.getId().getDishId(), orderPartDto.getDish().getId());
     assertEquals(orderPart.getDish(), dish);
-    assertEquals(orderPart.getTotalPrice(), orderDto.getTotalPrice());
-    assertEquals(orderPart.getCount(), orderDto.getCount());
+    assertEquals(orderPart.getTotalPrice(), orderPartDto.getDish().getPrice() * orderPartDto.getCount());
+    assertEquals(orderPart.getCount(), orderPartDto.getCount());
   }
 
   @Test

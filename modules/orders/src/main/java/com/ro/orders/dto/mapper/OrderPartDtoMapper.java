@@ -37,7 +37,13 @@ public abstract class OrderPartDtoMapper {
   @Mapping(target = "id.dishId", source = "dish.id")
   @Mapping(target = "id.orderId", source = "orderId")
   @Mapping(target = "order", source = "orderId", qualifiedByName = "orderIdToOrder")
+  @Mapping(target = "totalPrice", source = ".", qualifiedByName = "entityTotalPrice")
   public abstract OrderPart toEntity(OrderPartDto orderPartDto);
+
+  @Named("entityTotalPrice")
+  protected Integer entityTotalPrice(OrderPartDto part) {
+    return part.getDish().getPrice() * part.getCount();
+  }
 
   protected Dish dishDtoToDish(DishDto dishDto) {
     return dishRepository.findById(dishDto.getId())

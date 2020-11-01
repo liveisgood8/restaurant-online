@@ -62,34 +62,4 @@ public class CrudOrdersService {
     return ordersRepository.save(order);
   }
 
-  @Transactional
-  public Order save(Order order) {
-    handleOrderTelephoneNumber(order);
-    handleOrderAddress(order);
-
-    order.setIsApproved(order.getPaymentMethod().getName().equals(PaymentMethod.BY_CARD_ONLINE));
-
-    return ordersRepository.save(order);
-  }
-
-  private void handleOrderTelephoneNumber(Order order) {
-    TelephoneNumber telephoneNumber = telephoneNumberRepository.findByCountryCodeAndNationalNumber(
-        order.getTelephoneNumber().getCountryCode(),
-        order.getTelephoneNumber().getNationalNumber())
-        .orElse(telephoneNumberRepository.save(order.getTelephoneNumber()));
-
-    order.setTelephoneNumber(telephoneNumber);
-  }
-
-  private void handleOrderAddress(Order order) {
-    ExampleMatcher addressMatcher = ExampleMatcher.matchingAll()
-        .withIgnorePaths("id")
-        .withIgnoreCase();
-
-    Address address = addressRepository.findOne(Example.of(order.getAddress(), addressMatcher))
-        .orElse(addressRepository.save(order.getAddress()));
-
-    order.setAddress(address);
-  }
-
 }

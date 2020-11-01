@@ -58,22 +58,6 @@ public abstract class OrderDtoMapper {
     Order order;
     if (orderDto.getId() == null) {
       order = new Order();
-
-      if (orderDto.getReceivedBonuses() != null && orderDto.getReceivedBonuses() > 0) {
-        BonusesTransaction transaction = new BonusesTransaction();
-        transaction.setOrder(order);
-        transaction.setAmount(orderDto.getReceivedBonuses());
-
-        order.getBonusesTransactions().add(transaction);
-      }
-
-      if (orderDto.getSpentBonuses() != null && orderDto.getSpentBonuses() > 0) {
-        BonusesTransaction transaction = new BonusesTransaction();
-        transaction.setOrder(order);
-        transaction.setAmount(-1 * orderDto.getSpentBonuses());
-
-        order.getBonusesTransactions().add(transaction);
-      }
     } else {
       order = ordersRepository.findWithPartsById(orderDto.getId())
           .orElseThrow(() -> new EntityNotFoundException("Order with id: " + orderDto.getId() + " is not founded"));

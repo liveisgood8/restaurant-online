@@ -63,15 +63,7 @@ public class OrdersController {
   public OrderDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();
 
-    Order order = orderDtoMapper.toEntity(orderDto);
-    order.setUser(user);
-    if (user == null) {
-      order.setBonusesTransactions(Collections.emptySet());
-    } else {
-      order.getBonusesTransactions().forEach(t -> t.setUser(user));
-    }
-
-    order = crudOrdersService.save(order);
+    Order order = makingOrdersService.save(orderDto, user);
     return orderDtoMapper.toDto(order);
   }
 }

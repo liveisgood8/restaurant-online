@@ -163,8 +163,8 @@ class OrderDtoMapperTest {
     assertEquals(dto.getPhone(), TelephoneNumberUtils.toString(order.getTelephoneNumber()));
     assertEquals(partEntity.getDish().getPrice() * partEntity.getCount() - order.getSpentBonuses(),
         order.getTotalPrice());
-    assertEquals(dto.getSpentBonuses(), order.getSpentBonuses());
-    assertEquals(dto.getReceivedBonuses(), order.getReceivedBonuses());
+    assertEquals(0, order.getSpentBonuses());
+    assertEquals(0, order.getReceivedBonuses());
   }
 
   @Test
