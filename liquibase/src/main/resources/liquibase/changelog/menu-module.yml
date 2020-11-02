@@ -1,0 +1,155 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/menu-module.yml
+  - changeSet:
+      id: 1603457296309-5
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: categories
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: categoriesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: image_path
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(64)
+  - changeSet:
+      id: 1603457296309-7
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: dishes
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: dishesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: carbohydrates
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: description
+                  type: VARCHAR(255)
+              - column:
+                  name: fat
+                  type: DOUBLE
+              - column:
+                  name: image_path
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(64)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: price
+                  type: SMALLINT
+              - column:
+                  name: protein
+                  type: DOUBLE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: weight
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: BIGINT
+  - changeSet:
+      id: 1603457296309-6
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: dish_likes
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: dish_likesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: emotion_type
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: dish_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+  - changeSet:
+      id: 1603457296309-15
+      author: nexus (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: UKt8o6pivur7nn124jehx7cygw5
+            tableName: categories
+  - changeSet:
+      id: 1603457296309-22
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: dish_id
+            baseTableName: dish_likes
+            constraintName: FKfe3rcdrpen9684c4vte2tgqh9
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: dishes
+            validate: true
+  - changeSet:
+      id: 1603457296309-23
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: dishes
+            constraintName: FKgbu6erefir17660qutbbjnma7
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: categories
+            validate: true
+  - changeSet:
+      id: 1603457296309-31
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: dish_likes
+            constraintName: FKt7e04tp0ymux6mwpyt6382oaq
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+

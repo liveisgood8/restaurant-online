@@ -1,7 +1,13 @@
 databaseChangeLog:
   - logicalFilePath: liquibase/changelog/master.yml
   - include:
-      file: base.yml
+      file: auth-module.yml
+      relativeToChangelogFile: true
+  - include:
+      file: menu-module.yml
+      relativeToChangelogFile: true
+  - include:
+      file: orders-module.yml
       relativeToChangelogFile: true
   - include:
       file: payment-methods.yml

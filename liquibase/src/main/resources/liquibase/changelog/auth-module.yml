@@ -1,0 +1,208 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/auth-module.yml
+  - changeSet:
+      id: 1603457296309-2
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: auth_providers
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: auth_providersPK
+                  name: id
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(64)
+  - changeSet:
+      id: 1603457296309-12
+      author: nexus (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_authoritiesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: authority_id
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: user_authorities
+  - changeSet:
+      id: 1603457296309-3
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: authorities
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: authoritiesPK
+                  name: id
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(64)
+  - changeSet:
+      id: 1603457296309-11
+      author: nexus (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: telephone_numbersPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: country_code
+                  type: VARCHAR(3)
+              - column:
+                  name: telephone_number
+                  type: VARCHAR(15)
+            tableName: telephone_numbers
+  - changeSet:
+      id: 1603457296309-13
+      author: nexus (generated)
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: usersPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0
+                  name: bonuses
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(64)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: is_banned
+                  type: BIT(1)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: false
+                  name: is_credentials_expired
+                  type: BIT(1)
+              - column:
+                  name: name
+                  type: VARCHAR(32)
+              - column:
+                  name: password
+                  type: VARCHAR(128)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: auth_provider_id
+                  type: TINYINT
+              - column:
+                  name: telephone_number_id
+                  type: BIGINT
+            tableName: users
+  - changeSet:
+      id: 1603457296309-14
+      author: nexus (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: email
+            constraintName: UC_USERSEMAIL_COL
+            tableName: users
+  - changeSet:
+      id: 1603457296309-16
+      author: nexus (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: country_code, telephone_number
+            constraintName: unique full telephone number
+            tableName: telephone_numbers
+  - changeSet:
+      id: 1603457296309-24
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_authorities
+            constraintName: FKhiiib540jf74gksgb87oofni
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1603457296309-26
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: authority_id
+            baseTableName: user_authorities
+            constraintName: FKmwsrmuc2q63yd3u3217guv6wg
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: authorities
+            validate: true
+  - changeSet:
+      id: 1603457296309-27
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: telephone_number_id
+            baseTableName: users
+            constraintName: FKp70lacr33ghad9xmvcxbs3c59
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: telephone_numbers
+            validate: true
+  - changeSet:
+      id: 1603457296309-28
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: auth_provider_id
+            baseTableName: users
+            constraintName: FKpqbmh75uli6vewvy2r7cj58l2
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: auth_providers
+            validate: true

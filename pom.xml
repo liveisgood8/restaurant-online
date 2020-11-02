@@ -33,6 +33,7 @@
 
   <modules>
     <module>bom</module>
+    <module>liquibase</module>
     <module>modules/app</module>
     <module>modules/core</module>
     <module>modules/auth</module>

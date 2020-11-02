@@ -6,8 +6,10 @@ spring:
     password: password
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: true
+  liquibase:
+    change-log: classpath:/liquibase/changelog/master.yml

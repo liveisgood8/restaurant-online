@@ -7,6 +7,7 @@
     <packaging>pom</packaging>
 
     <properties>
+        <com.ro.liquibase.version>0.0.1</com.ro.liquibase.version>
         <com.ro.app.version>0.0.1</com.ro.app.version>
         <com.ro.auth.version>0.0.1</com.ro.auth.version>
         <com.ro.core.version>0.0.1</com.ro.core.version>
@@ -16,6 +17,12 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>liquibase</artifactId>
+                <version>${com.ro.liquibase.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.ro</groupId>
                 <artifactId>auth</artifactId>
