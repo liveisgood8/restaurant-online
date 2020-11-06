@@ -33,7 +33,7 @@ public class OrdersController {
   }
 
   @GetMapping
-  public List<OrderDto> get(@RequestParam Boolean isApproved) {
+  public List<OrderDto> get(@RequestParam(required = false) Boolean isApproved) {
     List<Order> orders;
     if (isApproved != null) {
       orders = crudOrdersService.getApproved(isApproved);

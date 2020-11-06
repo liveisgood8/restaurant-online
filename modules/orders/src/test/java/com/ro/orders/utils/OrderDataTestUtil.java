@@ -1,5 +1,6 @@
 package com.ro.orders.utils;
 
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.ro.core.CoreTestUtils;
 import com.ro.core.model.Address;
 import com.ro.core.model.TelephoneNumber;
@@ -17,11 +18,14 @@ import com.ro.orders.model.PaymentMethod;
 import com.ro.orders.repository.OrdersRepository;
 import com.ro.orders.repository.PaymentMethodRepository;
 import org.hibernate.Hibernate;
+import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 @Component
@@ -62,10 +66,15 @@ public class OrderDataTestUtil {
     }
 
     public Order createAndSaveOrder() {
+        return createAndSaveOrder(true);
+    }
+
+    public Order createAndSaveOrder(boolean isApproved) {
         Order order = CoreTestUtils.getRandomObject(Order.class);
         order.setPaymentMethod(paymentMethodRepository.findByName(PaymentMethod.BY_CARD_ONLINE).orElseThrow());
         order.setAddress(createAndSaveAddress());
         order.setTelephoneNumber(createAndSaveTelephoneNumber());
+        order.setIsApproved(isApproved);
         order.setUser(null);
 
         OrderPart firstPart = CoreTestUtils.getRandomObject(OrderPart.class);
@@ -81,9 +90,16 @@ public class OrderDataTestUtil {
     }
 
     private TelephoneNumber createAndSaveTelephoneNumber() {
+        Random random = new Random();
+        StringBuilder nationalNumberBuilder = new StringBuilder(10);
+        for (int i = 0; i < 10; i++) {
+            nationalNumberBuilder.append((char) ('0' + random.nextInt(10)));
+        }
+        String nationalNumber = nationalNumberBuilder.toString();
+
         TelephoneNumber telephoneNumber = new TelephoneNumber();
         telephoneNumber.setCountryCode("7");
-        telephoneNumber.setNationalNumber("9612654777");
+        telephoneNumber.setNationalNumber(nationalNumber);
 
         return telephoneNumberRepository.save(telephoneNumber);
     }

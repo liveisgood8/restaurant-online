@@ -8,7 +8,7 @@ import com.ro.core.utils.TelephoneNumberUtils;
 import com.ro.menu.config.MenuModuleConfig;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.menu.repository.DishRepository;
-import com.ro.orders.config.OrdersServiceConfig;
+import com.ro.orders.config.OrdersModuleConfig;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.dto.objects.OrderPartDto;
 import com.ro.orders.model.Order;
@@ -37,7 +37,7 @@ import static org.hamcrest.MatcherAssert.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {
-    OrdersServiceConfig.class,
+    OrdersModuleConfig.class,
     MenuModuleConfig.class,
     CoreModuleConfig.class,
     AuthModuleConfig.class,

@@ -4,20 +4,19 @@ import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
 import com.ro.menu.config.MenuModuleConfig;
-import com.ro.orders.config.OrdersServiceConfig;
+import com.ro.orders.config.OrdersModuleConfig;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.dto.objects.OrderPartDto;
 import com.ro.orders.model.Order;
 import com.ro.orders.repository.OrdersRepository;
-import com.ro.orders.service.CrudOrdersService;
 import com.ro.orders.utils.OrderDataTestUtil;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,11 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {
-        OrdersServiceConfig.class,
+        OrdersModuleConfig.class,
         MenuModuleConfig.class,
         CoreModuleConfig.class,
         AuthModuleConfig.class
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OrderControllerCrudIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -43,6 +43,32 @@ public class OrderControllerCrudIntegrationTest {
 
     @Autowired
     private OrderDataTestUtil orderDataTestUtil;
+
+    @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
+    void baseGetAllOrders() throws Exception {
+        Order givenFirstOrder = orderDataTestUtil.createAndSaveOrder(true);
+        Order givenSecondOrder = orderDataTestUtil.createAndSaveOrder(false);
+
+        mockMvc.perform(
+            get("/orders"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.*", hasSize(2)));
+        // TODO Order asserts
+    }
+
+    @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
+    void getNonApprovedOrders() throws Exception {
+        Order givenFirstOrder = orderDataTestUtil.createAndSaveOrder(true);
+        Order givenSecondOrder = orderDataTestUtil.createAndSaveOrder(false);
+
+        mockMvc.perform(
+            get("/orders?isApproved=0"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.*", hasSize(1)));
+        // TODO Order asserts
+    }
 
     @Test
     @WithMockUser(value = "test", authorities = "ADMIN")
