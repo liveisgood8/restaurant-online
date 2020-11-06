@@ -13,3 +13,6 @@ spring:
     show-sql: true
   liquibase:
     change-log: classpath:/liquibase/changelog/master.yml
+  jackson:
+    serialization:
+      write_dates_as_timestamps: true

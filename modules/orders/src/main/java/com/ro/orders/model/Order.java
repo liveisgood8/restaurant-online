@@ -36,11 +36,11 @@ public class Order {
   @JoinColumn(name = "payment_method_id", nullable = false)
   private PaymentMethod paymentMethod;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "address_id", nullable = false)
   private Address address;
 
-  @OneToOne
+  @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "telephone_number_id", nullable = false)
   private TelephoneNumber telephoneNumber;
 

@@ -2,21 +2,29 @@ package com.ro.orders.controller;
 
 import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
+import com.ro.core.CoreTestUtils;
 import com.ro.menu.config.MenuModuleConfig;
 import com.ro.orders.config.OrdersServiceConfig;
 import com.ro.orders.dto.objects.OrderDto;
+import com.ro.orders.dto.objects.OrderPartDto;
 import com.ro.orders.model.Order;
 import com.ro.orders.repository.OrdersRepository;
 import com.ro.orders.service.CrudOrdersService;
 import com.ro.orders.utils.OrderDataTestUtil;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -26,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
         CoreModuleConfig.class,
         AuthModuleConfig.class
 })
-public class OrderControllerCrudIntegrationTest extends AbstractControllerTest {
+public class OrderControllerCrudIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -37,14 +45,34 @@ public class OrderControllerCrudIntegrationTest extends AbstractControllerTest {
     private OrderDataTestUtil orderDataTestUtil;
 
     @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
     void updateOrder() throws Exception {
         Order givenOrder = orderDataTestUtil.createAndSaveOrder();
-        OrderDto updateOrder = orderDataTestUtil.createOrderDto();
 
+        OrderDto putOrder = orderDataTestUtil.createOrderDto(givenOrder.getId());
         mockMvc.perform(
-                put("/order/" + givenOrder.getId())
-                        .content(asJson(updateOrder)));
-
-        // TODO Assertation
+                put("/orders/" + givenOrder.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(CoreTestUtils.asJson(putOrder)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", equalTo(givenOrder.getId().intValue())))
+            .andExpect(jsonPath("$.isApproved", equalTo(putOrder.getIsApproved())))
+            .andExpect(jsonPath("$.phone", equalTo(putOrder.getPhone())))
+            .andExpect(jsonPath("$.totalPrice", equalTo(orderDataTestUtil.getOrderDtoTotalPrice(putOrder))))
+            .andExpect(jsonPath("$.paymentMethod", equalTo(putOrder.getPaymentMethod())))
+            .andExpect(jsonPath("$.createdAt", equalTo(givenOrder.getCreatedAt().getTime())))
+            .andExpect(jsonPath("$.address.id", notNullValue()))
+            .andExpect(jsonPath("$.address.street", equalTo(putOrder.getAddress().getStreet())))
+            .andExpect(jsonPath("$.address.homeNumber", equalTo(putOrder.getAddress().getHomeNumber().intValue())))
+            .andExpect(jsonPath("$.address.entranceNumber", equalTo(putOrder.getAddress().getEntranceNumber().intValue())))
+            .andExpect(jsonPath("$.address.floorNumber", equalTo(putOrder.getAddress().getFloorNumber().intValue())))
+            .andExpect(jsonPath("$.address.apartmentNumber", equalTo(putOrder.getAddress().getApartmentNumber())))
+            .andExpect(jsonPath("$.orderParts[*].orderId", everyItem(equalTo(givenOrder.getId().intValue()))))
+            .andExpect(jsonPath("$.orderParts[*].dish.id",
+                containsInAnyOrder(putOrder.getOrderParts().stream().map(op -> op.getDish().getId().intValue()).toArray())))
+            .andExpect(jsonPath("$.orderParts[*].count",
+                containsInAnyOrder(putOrder.getOrderParts().stream().map(OrderPartDto::getCount).toArray())))
+            .andExpect(jsonPath("$.orderParts[*].totalPrice",
+                containsInAnyOrder(putOrder.getOrderParts().stream().map(orderDataTestUtil::getOrderPartDtoTotalPrice).toArray())));
     }
 }

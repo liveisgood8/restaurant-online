@@ -49,10 +49,12 @@ public class OrdersController {
     return orderDtoMapper.toDto(order);
   }
 
-//  @PutMapping("{id}")
-//  public OrderDto put(@RequestBody OrderDto orderDto) {
-//
-//  }
+  @PutMapping("{id}")
+  public OrderDto put(@PathVariable Long id, @RequestBody OrderDto orderDto) {
+    Order order = orderDtoMapper.toEntity(orderDto);
+    order = crudOrdersService.update(id, order);
+    return orderDtoMapper.toDto(order);
+  }
   
   @PostMapping("{id}/approve")
   public void approveOrder(@PathVariable Long id) {

@@ -1,44 +1,26 @@
 package com.ro.orders.service;
 
 import com.ro.core.exceptions.RoIllegalArgumentException;
-import com.ro.core.model.Address;
-import com.ro.core.model.TelephoneNumber;
-import com.ro.core.repository.AddressRepository;
-import com.ro.core.repository.TelephoneNumberRepository;
 import com.ro.orders.model.Order;
-import com.ro.orders.model.PaymentMethod;
-import com.ro.orders.repository.BonusesTransactionRepository;
-import com.ro.orders.repository.OrderPartsRepository;
 import com.ro.orders.repository.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CrudOrdersService {
   private final OrdersRepository ordersRepository;
-  private final AddressRepository addressRepository;
-  private final TelephoneNumberRepository telephoneNumberRepository;
-  private final OrderPartsRepository orderPartsRepository;
-  private final BonusesTransactionRepository bonusesTransactionRepository;
+  private final OrderContactsService orderContactsService;
 
   @Autowired
   public CrudOrdersService(OrdersRepository ordersRepository,
-                           AddressRepository addressRepository,
-                           TelephoneNumberRepository telephoneNumberRepository,
-                           OrderPartsRepository orderPartsRepository,
-                           BonusesTransactionRepository bonusesTransactionRepository) {
+                           OrderContactsService orderContactsService) {
     this.ordersRepository = ordersRepository;
-    this.addressRepository = addressRepository;
-    this.telephoneNumberRepository = telephoneNumberRepository;
-    this.orderPartsRepository = orderPartsRepository;
-    this.bonusesTransactionRepository = bonusesTransactionRepository;
+
+    this.orderContactsService = orderContactsService;
   }
 
   public List<Order> getAll() {
@@ -59,6 +41,7 @@ public class CrudOrdersService {
     if (!order.getId().equals(id)) {
       throw new RoIllegalArgumentException("Order entity id must be the same as resource id");
     }
+    orderContactsService.saveOrderContacts(order);
     return ordersRepository.save(order);
   }
 

@@ -1,5 +1,6 @@
 package com.ro.orders.utils;
 
+import com.ro.core.CoreTestUtils;
 import com.ro.core.model.Address;
 import com.ro.core.model.TelephoneNumber;
 import com.ro.core.repository.AddressRepository;
@@ -61,16 +62,16 @@ public class OrderDataTestUtil {
     }
 
     public Order createAndSaveOrder() {
-        Order order = ObjectGenerator.getRandomObject(Order.class);
+        Order order = CoreTestUtils.getRandomObject(Order.class);
         order.setPaymentMethod(paymentMethodRepository.findByName(PaymentMethod.BY_CARD_ONLINE).orElseThrow());
         order.setAddress(createAndSaveAddress());
         order.setTelephoneNumber(createAndSaveTelephoneNumber());
         order.setUser(null);
 
-        OrderPart firstPart = ObjectGenerator.getRandomObject(OrderPart.class);
+        OrderPart firstPart = CoreTestUtils.getRandomObject(OrderPart.class);
         firstPart.setDish(createAndSaveDish());
 
-        OrderPart secondPart = ObjectGenerator.getRandomObject(OrderPart.class);
+        OrderPart secondPart = CoreTestUtils.getRandomObject(OrderPart.class);
         secondPart.setDish(createAndSaveDish());
 
         order = ordersRepository.save(order);
@@ -88,43 +89,55 @@ public class OrderDataTestUtil {
     }
 
     private Address createAndSaveAddress() {
-        Address address = ObjectGenerator.getRandomObject(Address.class);
+        Address address = CoreTestUtils.getRandomObject(Address.class);
         return addressRepository.save(address);
     }
 
-    public OrderDto createOrderDto() {
-        OrderDto orderDto = ObjectGenerator.getRandomObject(OrderDto.class);
+    public OrderDto createOrderDto(Long id) {
+        OrderDto orderDto = CoreTestUtils.getRandomObject(OrderDto.class);
+        orderDto.setId(id);
         orderDto.setPaymentMethod(PaymentMethod.BY_CASH_TO_THE_COURIER);
         orderDto.setPhone("+79612357845");
 
-        Set<OrderPartDto> orderParts = Set.of(createOrderPartDto(), createOrderPartDto());
+        Set<OrderPartDto> orderParts = Set.of(createOrderPartDto(id), createOrderPartDto(id));
         orderDto.setOrderParts(orderParts);
 
         return orderDto;
     }
 
-    public OrderPartDto createOrderPartDto() {
+    public OrderPartDto createOrderPartDto(Long orderId) {
         Dish dish = createAndSaveDish();
 
-        OrderPartDto partDto = ObjectGenerator.getRandomObject(OrderPartDto.class);
-        partDto.setOrderId(null);
+        OrderPartDto partDto = CoreTestUtils.getRandomObject(OrderPartDto.class);
+        partDto.setOrderId(orderId);
         partDto.getDish().setId(dish.getId());
         partDto.getDish().setName(dish.getName());
         partDto.getDish().setPrice(dish.getPrice());
         partDto.setCount(6);
+        partDto.setTotalPrice(partDto.getDish().getPrice() * partDto.getCount());
 
         return partDto;
     }
 
     public Dish createAndSaveDish() {
-        Category category = ObjectGenerator.getRandomObject(Category.class);
+        Category category = CoreTestUtils.getRandomObject(Category.class);
         category.setDishes(Collections.emptyList());
         category = categoryRepository.save(category);
 
-        Dish dish = ObjectGenerator.getRandomObject(Dish.class);
+        Dish dish = CoreTestUtils.getRandomObject(Dish.class);
         dish.setCategory(category);
         dish.setPrice((short) 312);
 
         return dishRepository.save(dish);
+    }
+
+    public Integer getOrderPartDtoTotalPrice(OrderPartDto orderPartDto) {
+        return orderPartDto.getDish().getPrice() * orderPartDto.getCount();
+    }
+
+    public Integer getOrderDtoTotalPrice(OrderDto orderDto) {
+        return orderDto.getOrderParts().stream()
+            .mapToInt(OrderPartDto::getTotalPrice)
+            .sum();
     }
 }

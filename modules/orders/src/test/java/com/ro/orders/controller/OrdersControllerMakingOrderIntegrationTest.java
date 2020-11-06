@@ -1,7 +1,9 @@
 package com.ro.orders.controller;
 
+import com.ro.auth.AuthTestUtils;
 import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
+import com.ro.core.CoreTestUtils;
 import com.ro.core.utils.TelephoneNumberUtils;
 import com.ro.menu.config.MenuModuleConfig;
 import com.ro.menu.repository.CategoryRepository;
@@ -11,7 +13,6 @@ import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.dto.objects.OrderPartDto;
 import com.ro.orders.model.Order;
 import com.ro.orders.model.PaymentMethod;
-import com.ro.orders.repository.PaymentMethodRepository;
 import com.ro.orders.utils.OrderDataTestUtil;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.*;
@@ -37,13 +37,14 @@ import static org.hamcrest.MatcherAssert.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {
-        OrdersServiceConfig.class,
-        MenuModuleConfig.class,
-        CoreModuleConfig.class,
-        AuthModuleConfig.class
+    OrdersServiceConfig.class,
+    MenuModuleConfig.class,
+    CoreModuleConfig.class,
+    AuthModuleConfig.class,
+    AuthTestUtils.class,
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class OrdersControllerMakingOrderIntegrationTest extends AbstractControllerTest {
+class OrdersControllerMakingOrderIntegrationTest {
 
   @Autowired
   private DishRepository dishRepository;
@@ -53,6 +54,9 @@ class OrdersControllerMakingOrderIntegrationTest extends AbstractControllerTest 
 
   @Autowired
   private OrderDataTestUtil orderDataTestUtil;
+
+  @Autowired
+  private AuthTestUtils authTestUtils;
 
   @Autowired
   private MockMvc mockMvc;
@@ -65,7 +69,7 @@ class OrdersControllerMakingOrderIntegrationTest extends AbstractControllerTest 
     ResultActions result = mockMvc.perform(
         post("/orders")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJson(givenOrder)))
+            .content(CoreTestUtils.asJson(givenOrder)))
         .andExpect(jsonPath("$.spentBonuses", is(0)))
         .andExpect(jsonPath("$.receivedBonuses", is(0)));
 
@@ -80,7 +84,7 @@ class OrdersControllerMakingOrderIntegrationTest extends AbstractControllerTest 
     ResultActions result = mockMvc.perform(
         post("/orders")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJson(givenOrder)))
+            .content(CoreTestUtils.asJson(givenOrder)))
         .andExpect(jsonPath("$.spentBonuses", is(0)))
         .andExpect(jsonPath("$.receivedBonuses", is(0)));
 
@@ -96,9 +100,9 @@ class OrdersControllerMakingOrderIntegrationTest extends AbstractControllerTest 
 
     ResultActions result = mockMvc.perform(
         post("/orders")
-            .with(user(createAndSaveUser()))
+            .with(user(authTestUtils.createAndSaveUserInDataSource()))
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJson(givenOrder)))
+            .content(CoreTestUtils.asJson(givenOrder)))
         .andExpect(jsonPath("$.spentBonuses", is(givenOrder.getSpentBonuses())))
         .andExpect(jsonPath("$.receivedBonuses", is(getExpectedReceivedBonuses(givenOrder))));
 
@@ -107,8 +111,7 @@ class OrdersControllerMakingOrderIntegrationTest extends AbstractControllerTest 
   }
 
   private OrderDto createOrderDtoForMakeOrder(String paymentMethodName) {
-    OrderDto orderDto = orderDataTestUtil.createOrderDto();
-    orderDto.setId(null);
+    OrderDto orderDto = orderDataTestUtil.createOrderDto(null);
     orderDto.setPaymentMethod(paymentMethodName);
 
     return orderDto;

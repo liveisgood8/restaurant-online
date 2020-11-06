@@ -31,6 +31,13 @@
 
             <dependency>
                 <groupId>com.ro</groupId>
+                <artifactId>auth</artifactId>
+                <type>test-jar</type>
+                <version>${com.ro.auth.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
                 <artifactId>app</artifactId>
                 <version>${com.ro.app.version}</version>
             </dependency>
@@ -38,6 +45,13 @@
             <dependency>
                 <groupId>com.ro</groupId>
                 <artifactId>core</artifactId>
+                <version>${com.ro.core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>core</artifactId>
+                <type>test-jar</type>
                 <version>${com.ro.core.version}</version>
             </dependency>
 
