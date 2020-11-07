@@ -3,11 +3,16 @@ package com.ro.orders.controller;
 import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
+import com.ro.core.model.Address;
+import com.ro.core.utils.TelephoneNumberUtils;
 import com.ro.menu.config.MenuModuleConfig;
+import com.ro.menu.model.Dish;
+import com.ro.menu.model.DishEmotion;
 import com.ro.orders.config.OrdersModuleConfig;
 import com.ro.orders.dto.objects.OrderDto;
 import com.ro.orders.dto.objects.OrderPartDto;
 import com.ro.orders.model.Order;
+import com.ro.orders.model.OrderPart;
 import com.ro.orders.repository.OrdersRepository;
 import com.ro.orders.utils.OrderDataTestUtil;
 import org.junit.jupiter.api.Test;
@@ -19,6 +24,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -50,11 +60,11 @@ public class OrderControllerCrudIntegrationTest {
         Order givenFirstOrder = orderDataTestUtil.createAndSaveOrder(true);
         Order givenSecondOrder = orderDataTestUtil.createAndSaveOrder(false);
 
-        mockMvc.perform(
-            get("/orders"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.*", hasSize(2)));
-        // TODO Order asserts
+        ResultActions resultActions = mockMvc.perform(
+                get("/orders"))
+                .andExpect(status().isOk());
+
+        assertGetOrderResponse(resultActions, List.of(givenFirstOrder, givenSecondOrder));
     }
 
     @Test
@@ -63,42 +73,164 @@ public class OrderControllerCrudIntegrationTest {
         Order givenFirstOrder = orderDataTestUtil.createAndSaveOrder(true);
         Order givenSecondOrder = orderDataTestUtil.createAndSaveOrder(false);
 
-        mockMvc.perform(
-            get("/orders?isApproved=0"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.*", hasSize(1)));
-        // TODO Order asserts
+        ResultActions resultActions = mockMvc.perform(
+                get("/orders?isApproved=0"))
+                .andExpect(status().isOk());
+
+        assertGetOrderResponse(resultActions, List.of(givenSecondOrder));
     }
 
     @Test
     @WithMockUser(value = "test", authorities = "ADMIN")
-    void updateOrder() throws Exception {
+    void getApprovedOrders() throws Exception {
+        Order givenFirstOrder = orderDataTestUtil.createAndSaveOrder(true);
+        Order givenSecondOrder = orderDataTestUtil.createAndSaveOrder(false);
+        Order givenThirdOrder = orderDataTestUtil.createAndSaveOrder(true);
+
+        ResultActions resultActions = mockMvc.perform(
+                get("/orders?isApproved=1"))
+                .andExpect(status().isOk());
+
+        assertGetOrderResponse(resultActions, List.of(givenFirstOrder, givenThirdOrder));
+    }
+
+    private void assertGetOrderResponse(ResultActions resultActions, List<Order> expectedOrders) throws Exception {
+        resultActions
+                .andExpect(jsonPath("$.*", hasSize(expectedOrders.size())));
+
+        int i = 0;
+        for (Order expectedOrder : expectedOrders) {
+            Address expectedAddress = expectedOrder.getAddress();
+            Set<OrderPart> expectedOrderParts = expectedOrder.getOrderParts();
+            Set<Dish> expectedOrderPartsDishes = expectedOrderParts.stream().map(OrderPart::getDish)
+                    .collect(Collectors.toSet());
+            String expectedPhone = TelephoneNumberUtils.toString(expectedOrder.getTelephoneNumber());
+
+            resultActions
+                    .andExpect(jsonPath("$.[" + i + "].id", equalTo(expectedOrder.getId().intValue())))
+                    .andExpect(jsonPath("$.[" + i + "].isApproved", equalTo(expectedOrder.getIsApproved())))
+                    .andExpect(jsonPath("$.[" + i + "].paymentMethod", equalTo(expectedOrder.getPaymentMethod().getName())))
+                    .andExpect(jsonPath("$.[" + i + "].address.id", equalTo(expectedAddress.getId().intValue())))
+                    .andExpect(jsonPath("$.[" + i + "].address.street", equalTo(expectedAddress.getStreet())))
+                    .andExpect(jsonPath("$.[" + i + "].address.homeNumber", equalTo(expectedAddress.getHomeNumber().intValue())))
+                    .andExpect(jsonPath("$.[" + i + "].address.entranceNumber", equalTo(expectedAddress.getEntranceNumber().intValue())))
+                    .andExpect(jsonPath("$.[" + i + "].address.floorNumber", equalTo(expectedAddress.getFloorNumber().intValue())))
+                    .andExpect(jsonPath("$.[" + i + "].address.apartmentNumber", equalTo(expectedAddress.getApartmentNumber())))
+                    .andExpect(jsonPath("$.[" + i + "].phone", equalTo(expectedPhone)))
+                    .andExpect(jsonPath("$.[" + i + "].spentBonuses", equalTo(expectedOrder.getSpentBonuses())))
+                    .andExpect(jsonPath("$.[" + i + "].receivedBonuses", equalTo(expectedOrder.getReceivedBonuses())))
+                    .andExpect(jsonPath("$.[" + i + "].totalPrice", equalTo(expectedOrder.getTotalPrice())))
+                    .andExpect(jsonPath("$.[" + i + "].createdAt", equalTo(expectedOrder.getCreatedAt().getTime())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts.*", hasSize(expectedOrderParts.size())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].orderId", everyItem(equalTo(expectedOrder.getId()))))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].count",
+                            containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getCount).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].totalPrice",
+                            containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getTotalPrice).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.id",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getId().intValue()).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.name",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getName).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.description",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getDescription).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.protein",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getProtein).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.fat",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getFat).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.carbohydrates",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getCarbohydrates).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.weight",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getWeight().intValue()).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.price",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getPrice().intValue()).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.imageUrl",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> "/menu/dishes/" + d.getId() + "/image").toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.likes.likeCount",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(this::getDishLikesCount).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.likes.dislikeCount",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(this::getDishDislikesCount).toArray())));
+
+            i++;
+        }
+    }
+
+    private int getDishLikesCount(Dish dish) {
+        int count = 0;
+        for (DishEmotion e : dish.getEmotions()) {
+            if (e.getEmotionType() == DishEmotion.EmotionType.LIKE) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int getDishDislikesCount(Dish dish) {
+        int count = 0;
+        for (DishEmotion e : dish.getEmotions()) {
+            if (e.getEmotionType() == DishEmotion.EmotionType.DISLIKE) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
+    void baseUpdateOrder() throws Exception {
         Order givenOrder = orderDataTestUtil.createAndSaveOrder();
 
         OrderDto putOrder = orderDataTestUtil.createOrderDto(givenOrder.getId());
-        mockMvc.perform(
+        ResultActions resultActions = mockMvc.perform(
                 put("/orders/" + givenOrder.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(CoreTestUtils.asJson(putOrder)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", equalTo(givenOrder.getId().intValue())))
-            .andExpect(jsonPath("$.isApproved", equalTo(putOrder.getIsApproved())))
-            .andExpect(jsonPath("$.phone", equalTo(putOrder.getPhone())))
-            .andExpect(jsonPath("$.totalPrice", equalTo(orderDataTestUtil.getOrderDtoTotalPrice(putOrder))))
-            .andExpect(jsonPath("$.paymentMethod", equalTo(putOrder.getPaymentMethod())))
-            .andExpect(jsonPath("$.createdAt", equalTo(givenOrder.getCreatedAt().getTime())))
-            .andExpect(jsonPath("$.address.id", notNullValue()))
-            .andExpect(jsonPath("$.address.street", equalTo(putOrder.getAddress().getStreet())))
-            .andExpect(jsonPath("$.address.homeNumber", equalTo(putOrder.getAddress().getHomeNumber().intValue())))
-            .andExpect(jsonPath("$.address.entranceNumber", equalTo(putOrder.getAddress().getEntranceNumber().intValue())))
-            .andExpect(jsonPath("$.address.floorNumber", equalTo(putOrder.getAddress().getFloorNumber().intValue())))
-            .andExpect(jsonPath("$.address.apartmentNumber", equalTo(putOrder.getAddress().getApartmentNumber())))
-            .andExpect(jsonPath("$.orderParts[*].orderId", everyItem(equalTo(givenOrder.getId().intValue()))))
-            .andExpect(jsonPath("$.orderParts[*].dish.id",
-                containsInAnyOrder(putOrder.getOrderParts().stream().map(op -> op.getDish().getId().intValue()).toArray())))
-            .andExpect(jsonPath("$.orderParts[*].count",
-                containsInAnyOrder(putOrder.getOrderParts().stream().map(OrderPartDto::getCount).toArray())))
-            .andExpect(jsonPath("$.orderParts[*].totalPrice",
-                containsInAnyOrder(putOrder.getOrderParts().stream().map(orderDataTestUtil::getOrderPartDtoTotalPrice).toArray())));
+                        .content(CoreTestUtils.asJson(putOrder)));
+
+        assertUpdateOrderResponse(resultActions, givenOrder, putOrder);
+    }
+
+    @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
+    void updateOrder_whenOrderPartSizeChanged() throws Exception {
+        Order givenOrder = orderDataTestUtil.createAndSaveOrder();
+
+        OrderDto putOrder = orderDataTestUtil.createOrderDto(givenOrder.getId());
+        putOrder.setOrderParts(Set.of(putOrder.getOrderParts().iterator().next()));
+
+        ResultActions resultActions = mockMvc.perform(
+                put("/orders/" + givenOrder.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(CoreTestUtils.asJson(putOrder)));
+
+        assertUpdateOrderResponse(resultActions, givenOrder, putOrder);
+    }
+
+    private void assertUpdateOrderResponse(ResultActions resultActions, Order givenOrder, OrderDto expectedOrder)
+            throws Exception {
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", equalTo(givenOrder.getId().intValue())))
+                .andExpect(jsonPath("$.isApproved", equalTo(expectedOrder.getIsApproved())))
+                .andExpect(jsonPath("$.phone", equalTo(expectedOrder.getPhone())))
+                .andExpect(jsonPath("$.totalPrice", equalTo(orderDataTestUtil.getOrderDtoTotalPrice(expectedOrder))))
+                .andExpect(jsonPath("$.paymentMethod", equalTo(expectedOrder.getPaymentMethod())))
+                .andExpect(jsonPath("$.createdAt", equalTo(givenOrder.getCreatedAt().getTime())))
+                .andExpect(jsonPath("$.address.id", notNullValue()))
+                .andExpect(jsonPath("$.address.street", equalTo(expectedOrder.getAddress().getStreet())))
+                .andExpect(jsonPath("$.address.homeNumber", equalTo(expectedOrder.getAddress().getHomeNumber().intValue())))
+                .andExpect(jsonPath("$.address.entranceNumber", equalTo(expectedOrder.getAddress().getEntranceNumber().intValue())))
+                .andExpect(jsonPath("$.address.floorNumber", equalTo(expectedOrder.getAddress().getFloorNumber().intValue())))
+                .andExpect(jsonPath("$.address.apartmentNumber", equalTo(expectedOrder.getAddress().getApartmentNumber())))
+                .andExpect(jsonPath("$.orderParts.*", hasSize(expectedOrder.getOrderParts().size())))
+                .andExpect(jsonPath("$.orderParts[*].orderId", everyItem(equalTo(givenOrder.getId().intValue()))))
+                .andExpect(jsonPath("$.orderParts[*].dish.id",
+                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(op -> op.getDish().getId().intValue()).toArray())))
+                .andExpect(jsonPath("$.orderParts[*].dish.name",
+                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(op -> op.getDish().getName()).toArray())))
+                .andExpect(jsonPath("$.orderParts[*].dish.price",
+                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(op -> op.getDish().getPrice().intValue()).toArray())))
+                .andExpect(jsonPath("$.orderParts[*].count",
+                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(OrderPartDto::getCount).toArray())))
+                .andExpect(jsonPath("$.orderParts[*].totalPrice",
+                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(orderDataTestUtil::getOrderPartDtoTotalPrice).toArray())));
     }
 }
