@@ -36,6 +36,8 @@ spring:
     show-sql: false
   servlet:
     multipart:
+      max-file-size: 2MB
+      max-request-size: 5MB
       enabled: true
       location: ${java.io.tmpdir}
   jackson:

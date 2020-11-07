@@ -32,6 +32,7 @@ public class OrderPart {
   @Column(name = "count", nullable = false)
   private Integer count;
 
+  @Setter(value = AccessLevel.NONE)
   @Column(name = "total_price", nullable = false)
   private Integer totalPrice;
 
