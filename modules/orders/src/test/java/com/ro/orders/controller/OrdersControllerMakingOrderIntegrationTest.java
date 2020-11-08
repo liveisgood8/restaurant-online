@@ -9,10 +9,10 @@ import com.ro.menu.config.MenuModuleConfig;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.orders.config.OrdersModuleConfig;
-import com.ro.orders.dto.objects.OrderDto;
-import com.ro.orders.dto.objects.OrderPartDto;
-import com.ro.orders.model.Order;
-import com.ro.orders.model.PaymentMethod;
+import com.ro.orders.data.dto.objects.OrderDto;
+import com.ro.orders.data.dto.objects.OrderPartDto;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.model.PaymentMethod;
 import com.ro.orders.utils.OrderDataTestUtil;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -127,8 +127,12 @@ class OrdersControllerMakingOrderIntegrationTest {
         .andExpect(jsonPath("$.paymentMethod", is(givenOrder.getPaymentMethod())))
         .andExpect(jsonPath("$.phone", is(givenOrder.getPhone())))
         .andExpect(jsonPath("$.orderParts[*]", hasSize(2)))
+        .andExpect(jsonPath("$.orderParts[*].dish.id", containsInAnyOrder(givenOrder.getOrderParts()
+                .stream().map(p -> p.getDish().getId().intValue()).toArray())))
         .andExpect(jsonPath("$.orderParts[*].dish.name", containsInAnyOrder(givenOrder.getOrderParts()
             .stream().map(p -> p.getDish().getName()).toArray())))
+        .andExpect(jsonPath("$.orderParts[*].sellingPrice", containsInAnyOrder(givenOrder.getOrderParts()
+                .stream().map(p -> p.getSellingPrice().intValue()).toArray())))
         .andExpect(jsonPath("$.orderParts[*].count", containsInAnyOrder(givenOrder.getOrderParts()
             .stream().map(OrderPartDto::getCount).toArray())))
         .andExpect(jsonPath("$.createdAt", notNullValue()));
@@ -179,6 +183,8 @@ class OrdersControllerMakingOrderIntegrationTest {
         .stream()
         .mapToInt(p -> p.getDish().getPrice() * p.getCount())
         .sum();
+
+    givenTotalPrice -= givenOrder.getSpentBonuses();
 
     return (int) Math.round(givenTotalPrice * 0.05);
   }

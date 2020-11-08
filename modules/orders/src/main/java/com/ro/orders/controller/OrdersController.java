@@ -1,19 +1,15 @@
 package com.ro.orders.controller;
 
-import com.ro.auth.model.User;
-import com.ro.core.exceptions.RoIllegalArgumentException;
-import com.ro.core.exceptions.RoIllegalStateException;
-import com.ro.orders.dto.mapper.OrderDtoMapper;
-import com.ro.orders.dto.objects.OrderDto;
-import com.ro.orders.lib.OrderInfo;
-import com.ro.orders.model.Order;
+import com.ro.auth.data.model.User;
+import com.ro.orders.data.dto.mapper.OrderDtoMapper;
+import com.ro.orders.data.dto.objects.OrderDto;
+import com.ro.orders.data.model.Order;
 import com.ro.orders.service.CrudOrdersService;
 import com.ro.orders.service.MakingOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController

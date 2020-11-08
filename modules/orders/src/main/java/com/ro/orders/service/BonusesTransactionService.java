@@ -1,14 +1,13 @@
 package com.ro.orders.service;
 
-import com.ro.auth.model.User;
-import com.ro.auth.repository.UserRepository;
-import com.ro.orders.model.BonusesTransaction;
-import com.ro.orders.model.Order;
-import com.ro.orders.repository.BonusesTransactionRepository;
+import com.ro.auth.data.model.User;
+import com.ro.auth.data.repository.UserRepository;
+import com.ro.orders.data.model.BonusesTransaction;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.repository.BonusesTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BonusesTransactionService {

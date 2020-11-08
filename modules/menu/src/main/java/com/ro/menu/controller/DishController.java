@@ -1,6 +1,6 @@
 package com.ro.menu.controller;
 
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.User;
 import com.ro.menu.controller.payload.UploadImageResponse;
 import com.ro.menu.dto.mappers.DishDtoMapper;
 import com.ro.menu.dto.objects.DishDto;

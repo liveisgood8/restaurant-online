@@ -1,8 +1,8 @@
 package com.ro.auth.utils;
 
 import com.ro.auth.config.AuthProperties;
-import com.ro.auth.dto.mappers.UserDtoMapper;
-import com.ro.auth.model.User;
+import com.ro.auth.data.dto.mappers.UserDtoMapper;
+import com.ro.auth.data.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,11 +19,14 @@ import java.util.function.Function;
 public class JwtTokenUtil {
   private final long tokenExpirationMs;
   private final String secret;
+  private final UserDtoMapper userDtoMapper;
 
   @Autowired
-  public JwtTokenUtil(AuthProperties authProperties) {
+  public JwtTokenUtil(AuthProperties authProperties,
+                      UserDtoMapper userDtoMapper) {
     this.secret = authProperties.getTokenInfo().getTokenSecret();
     this.tokenExpirationMs = authProperties.getTokenInfo().getTokenExpirationMs();
+    this.userDtoMapper = userDtoMapper;
   }
 
   public String getUsernameFromToken(String token) {
@@ -50,7 +53,7 @@ public class JwtTokenUtil {
 
   public String generateToken(User user) {
     Map<String, Object> claims = new HashMap<>();
-    claims.put("user", UserDtoMapper.INSTANCE.toDto(user));
+    claims.put("user", userDtoMapper.toDto(user));
     return generateToken(claims, user.getUsername());
   }
 

@@ -3,17 +3,18 @@ package com.ro.orders.controller;
 import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
-import com.ro.core.model.Address;
+import com.ro.core.data.model.Address;
 import com.ro.core.utils.TelephoneNumberUtils;
 import com.ro.menu.config.MenuModuleConfig;
+import com.ro.menu.dto.objects.DishDto;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
 import com.ro.orders.config.OrdersModuleConfig;
-import com.ro.orders.dto.objects.OrderDto;
-import com.ro.orders.dto.objects.OrderPartDto;
-import com.ro.orders.model.Order;
-import com.ro.orders.model.OrderPart;
-import com.ro.orders.repository.OrdersRepository;
+import com.ro.orders.data.dto.objects.OrderDto;
+import com.ro.orders.data.dto.objects.OrderPartDto;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.model.OrderPart;
+import com.ro.orders.data.repository.OrdersRepository;
 import com.ro.orders.utils.OrderDataTestUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +27,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -125,6 +126,8 @@ public class OrderControllerCrudIntegrationTest {
                     .andExpect(jsonPath("$.[" + i + "].orderParts[*].orderId", everyItem(equalTo(expectedOrder.getId()))))
                     .andExpect(jsonPath("$.[" + i + "].orderParts[*].count",
                             containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getCount).toArray())))
+                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].sellingPrice",
+                            containsInAnyOrder(expectedOrderParts.stream().map(part -> part.getSellingPrice().intValue()).toArray())))
                     .andExpect(jsonPath("$.[" + i + "].orderParts[*].totalPrice",
                             containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getTotalPrice).toArray())))
                     .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.id",
@@ -190,6 +193,50 @@ public class OrderControllerCrudIntegrationTest {
 
     @Test
     @WithMockUser(value = "test", authorities = "ADMIN")
+    void updateOrder_withSameOrderPartsAndPhoneAndNewAddress() throws Exception {
+        Order givenOrder = orderDataTestUtil.createAndSaveOrder();
+
+        OrderDto putOrder = createOrderDtoWithSameOrderParts(givenOrder);
+        putOrder.setPhone(TelephoneNumberUtils.toString(givenOrder.getTelephoneNumber()));
+        putOrder.getAddress().setId(null);
+
+        ResultActions resultActions = mockMvc.perform(
+            put("/orders/" + givenOrder.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(CoreTestUtils.asJson(putOrder)));
+
+        assertUpdateOrderResponse(resultActions, givenOrder, putOrder);
+    }
+
+    private OrderDto createOrderDtoWithSameOrderParts(Order partsSource) {
+        OrderDto orderDto = orderDataTestUtil.createOrderDto(partsSource.getId());
+
+        Set<OrderPartDto> putOrderParts = new HashSet<>();
+        for (OrderPart orderPart : partsSource.getOrderParts()) {
+            DishDto dishDto = new DishDto();
+            dishDto.setId(orderPart.getDish().getId());
+            dishDto.setName(orderPart.getDish().getName());
+            dishDto.setProtein(orderPart.getDish().getProtein());
+            dishDto.setFat(orderPart.getDish().getFat());
+            dishDto.setCarbohydrates(orderPart.getDish().getCarbohydrates());
+            dishDto.setWeight(orderPart.getDish().getWeight());
+            dishDto.setProtein(orderPart.getDish().getProtein());
+
+            OrderPartDto orderPartDto = new OrderPartDto();
+            orderPartDto.setDish(dishDto);
+            orderPartDto.setOrderId(orderPart.getId().getOrderId());
+            orderPartDto.setSellingPrice(orderPart.getSellingPrice());
+            orderPartDto.setCount(orderPart.getCount());
+
+            putOrderParts.add(orderPartDto);
+        }
+        orderDto.setOrderParts(putOrderParts);
+
+        return orderDto;
+    }
+
+    @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
     void updateOrder_whenOrderPartSizeChanged() throws Exception {
         Order givenOrder = orderDataTestUtil.createAndSaveOrder();
 
@@ -230,7 +277,7 @@ public class OrderControllerCrudIntegrationTest {
                         containsInAnyOrder(expectedOrder.getOrderParts().stream().map(op -> op.getDish().getPrice().intValue()).toArray())))
                 .andExpect(jsonPath("$.orderParts[*].count",
                         containsInAnyOrder(expectedOrder.getOrderParts().stream().map(OrderPartDto::getCount).toArray())))
-                .andExpect(jsonPath("$.orderParts[*].totalPrice",
-                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(orderDataTestUtil::getOrderPartDtoTotalPrice).toArray())));
+                .andExpect(jsonPath("$.orderParts[*].sellingPrice",
+                        containsInAnyOrder(expectedOrder.getOrderParts().stream().map(part -> part.getSellingPrice().intValue()).toArray())));
     }
 }

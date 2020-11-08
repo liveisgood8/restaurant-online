@@ -1,19 +1,18 @@
 package com.ro.orders.service;
 
-import com.ro.auth.model.User;
-import com.ro.orders.dto.mapper.OrderDtoMapper;
-import com.ro.orders.dto.objects.OrderDto;
+import com.ro.auth.data.model.User;
+import com.ro.orders.data.dto.mapper.OrderDtoMapper;
+import com.ro.orders.data.dto.objects.OrderDto;
 import com.ro.orders.events.OrderEvent;
-import com.ro.orders.model.BonusesTransaction;
-import com.ro.orders.model.Order;
-import com.ro.orders.model.PaymentMethod;
-import com.ro.orders.repository.OrdersRepository;
+import com.ro.orders.data.model.BonusesTransaction;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.model.PaymentMethod;
+import com.ro.orders.data.repository.OrdersRepository;
 import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MakingOrdersService {
@@ -34,7 +33,6 @@ public class MakingOrdersService {
     this.eventMulticaster = eventMulticaster;
   }
 
-  @Transactional
   public void approveOrder(Long id) {
     ordersRepository.setIsApprovedById(true, id);
   }

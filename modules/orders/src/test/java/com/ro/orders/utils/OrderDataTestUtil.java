@@ -1,30 +1,27 @@
 package com.ro.orders.utils;
 
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.ro.core.CoreTestUtils;
-import com.ro.core.model.Address;
-import com.ro.core.model.TelephoneNumber;
-import com.ro.core.repository.AddressRepository;
-import com.ro.core.repository.TelephoneNumberRepository;
+import com.ro.core.data.model.Address;
+import com.ro.core.data.model.TelephoneNumber;
+import com.ro.core.data.repository.AddressRepository;
+import com.ro.core.data.repository.TelephoneNumberRepository;
 import com.ro.menu.model.Category;
 import com.ro.menu.model.Dish;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.menu.repository.DishRepository;
-import com.ro.orders.dto.objects.OrderDto;
-import com.ro.orders.dto.objects.OrderPartDto;
-import com.ro.orders.model.Order;
-import com.ro.orders.model.OrderPart;
-import com.ro.orders.model.PaymentMethod;
-import com.ro.orders.repository.OrdersRepository;
-import com.ro.orders.repository.PaymentMethodRepository;
+import com.ro.orders.data.dto.objects.OrderDto;
+import com.ro.orders.data.dto.objects.OrderPartDto;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.model.OrderPart;
+import com.ro.orders.data.model.PaymentMethod;
+import com.ro.orders.data.repository.OrdersRepository;
+import com.ro.orders.data.repository.PaymentMethodRepository;
 import org.hibernate.Hibernate;
-import org.jeasy.random.EasyRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -58,6 +55,7 @@ public class OrderDataTestUtil {
 
     private void initializeOrderLazyProperties(Order order) {
         Hibernate.initialize(order.getAddress());
+        Hibernate.initialize(order.getTelephoneNumber());
         Hibernate.initialize(order.getBonusesTransactions());
         Hibernate.initialize(order.getOrderParts());
         order.getOrderParts().forEach(p -> {
@@ -65,10 +63,12 @@ public class OrderDataTestUtil {
         });
     }
 
+    @Transactional
     public Order createAndSaveOrder() {
         return createAndSaveOrder(true);
     }
 
+    @Transactional
     public Order createAndSaveOrder(boolean isApproved) {
         Order order = CoreTestUtils.getRandomObject(Order.class);
         order.setPaymentMethod(paymentMethodRepository.findByName(PaymentMethod.BY_CARD_ONLINE).orElseThrow());
@@ -93,7 +93,7 @@ public class OrderDataTestUtil {
         Random random = new Random();
         StringBuilder nationalNumberBuilder = new StringBuilder(10);
         for (int i = 0; i < 10; i++) {
-            nationalNumberBuilder.append((char) ('0' + random.nextInt(10)));
+            nationalNumberBuilder.append((char) ('0' + (random.nextInt(9) + 1)));
         }
         String nationalNumber = nationalNumberBuilder.toString();
 
@@ -129,8 +129,8 @@ public class OrderDataTestUtil {
         partDto.getDish().setId(dish.getId());
         partDto.getDish().setName(dish.getName());
         partDto.getDish().setPrice(dish.getPrice());
+        partDto.setSellingPrice(dish.getPrice());
         partDto.setCount(6);
-        partDto.setTotalPrice(partDto.getDish().getPrice() * partDto.getCount());
 
         return partDto;
     }

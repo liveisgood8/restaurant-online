@@ -1,6 +1,6 @@
 package com.ro.auth.service;
 
-import com.ro.auth.repository.UserRepository;
+import com.ro.auth.data.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

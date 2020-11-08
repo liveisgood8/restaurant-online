@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
@@ -40,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
   private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-  private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Autowired
   public SecurityConfig(JwtUserDetailsService jwtUserDetailsService,
@@ -49,21 +48,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         CustomOAuth2UserService customOAuth2UserService,
                         OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
                         OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                        HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
+                        PasswordEncoder passwordEncoder) {
     this.jwtUserDetailsService = jwtUserDetailsService;
     this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     this.jwtRequestFilter = jwtRequestFilter;
     this.customOAuth2UserService = customOAuth2UserService;
     this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
-    this.httpCookieOAuth2AuthorizationRequestRepository = httpCookieOAuth2AuthorizationRequestRepository;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @Autowired
   public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
     authenticationManagerBuilder
         .userDetailsService(jwtUserDetailsService)
-        .passwordEncoder(passwordEncoder());
+        .passwordEncoder(passwordEncoder);
   }
 
   @Bean
@@ -133,11 +132,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .anyRequest().authenticated();
 
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-  }
-
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
   }
 
   @Bean

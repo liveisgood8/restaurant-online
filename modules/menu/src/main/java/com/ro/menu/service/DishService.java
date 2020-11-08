@@ -1,6 +1,6 @@
 package com.ro.menu.service;
 
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.User;
 import com.ro.menu.dto.mappers.ImageMapper;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
@@ -12,10 +12,10 @@ import com.ro.menu.utils.FileUploadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

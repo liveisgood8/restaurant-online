@@ -129,8 +129,8 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
-                  name: total_price
-                  type: INT
+                  name: selling_price
+                  type: SMALLINT
               - column:
                   constraints:
                     nullable: false

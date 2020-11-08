@@ -1,12 +1,12 @@
 package com.ro.auth.oauth2;
 
-import com.ro.auth.model.AuthProvider;
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.AuthProvider;
+import com.ro.auth.data.model.User;
 import com.ro.auth.oauth2.exception.OAuth2AuthenticationProcessingException;
 import com.ro.auth.oauth2.user.info.OAuth2UserInfo;
 import com.ro.auth.oauth2.user.info.OAuth2UserInfoFactory;
 import com.ro.auth.oauth2.user.loaders.VkUserInfoLoader;
-import com.ro.auth.repository.UserRepository;
+import com.ro.auth.data.repository.UserRepository;
 import com.ro.auth.service.OAuth2Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.transaction.Transactional;
 import java.util.*;
 
 @Service

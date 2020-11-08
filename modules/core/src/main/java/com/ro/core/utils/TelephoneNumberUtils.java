@@ -3,7 +3,7 @@ package com.ro.core.utils;
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import com.ro.core.model.TelephoneNumber;
+import com.ro.core.data.model.TelephoneNumber;
 
 import java.util.Locale;
 

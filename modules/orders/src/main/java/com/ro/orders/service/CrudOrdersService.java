@@ -1,13 +1,13 @@
 package com.ro.orders.service;
 
 import com.ro.core.exceptions.RoIllegalArgumentException;
-import com.ro.orders.model.Order;
-import com.ro.orders.repository.OrdersRepository;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.repository.OrdersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
