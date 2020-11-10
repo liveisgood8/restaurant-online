@@ -13,6 +13,7 @@
         <com.ro.core.version>0.0.1</com.ro.core.version>
         <com.ro.menu.version>0.0.1</com.ro.menu.version>
         <com.ro.orders.version>0.0.1</com.ro.orders.version>
+        <com.ro.analytics.version>0.0.1</com.ro.analytics.version>
     </properties>
 
     <dependencyManagement>
@@ -65,6 +66,12 @@
                 <groupId>com.ro</groupId>
                 <artifactId>orders</artifactId>
                 <version>${com.ro.orders.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ro</groupId>
+                <artifactId>analytics</artifactId>
+                <version>${com.ro.analytics.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

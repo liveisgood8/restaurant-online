@@ -12,13 +12,9 @@ import java.util.Optional;
 public interface OrdersRepository extends JpaRepository<Order, Long> {
   List<Order> findByIsApproved(boolean isApproved);
 
+  @Query("select o from Order o inner join fetch o.orderParts op inner join fetch op.dish")
+  List<Order> findAllApprovedWithFullyFetchedParts();
+
   @EntityGraph(attributePaths = { "orderParts" })
   Optional<Order> findWithOrderPartsById(Long id);
-
-  @EntityGraph(attributePaths = { "orderParts" })
-  Optional<Order> findWithPartsById(Long id);
-
-  @Modifying
-  @Query("update Order o set o.isApproved = ?1 where o.id = ?2")
-  void setIsApprovedById(boolean isApproved, Long id);
 }

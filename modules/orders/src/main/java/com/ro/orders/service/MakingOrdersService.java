@@ -33,10 +33,6 @@ public class MakingOrdersService {
     this.eventMulticaster = eventMulticaster;
   }
 
-  public void approveOrder(Long id) {
-    ordersRepository.setIsApprovedById(true, id);
-  }
-
   @Transactional
   public Order save(OrderDto orderDto, @Nullable User user) {
     Order order = orderDtoMapper.toEntity(orderDto);

@@ -52,11 +52,6 @@ public class OrdersController {
     return orderDtoMapper.toDto(order);
   }
   
-  @PostMapping("{id}/approve")
-  public void approveOrder(@PathVariable Long id) {
-    makingOrdersService.approveOrder(id);
-  }
-
   @PostMapping
   public OrderDto makeOrder(@RequestBody OrderDto orderDto, Authentication authentication) {
     User user = authentication == null ? null : (User) authentication.getPrincipal();

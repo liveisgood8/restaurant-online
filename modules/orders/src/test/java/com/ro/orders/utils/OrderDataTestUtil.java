@@ -90,12 +90,7 @@ public class OrderDataTestUtil {
     }
 
     private TelephoneNumber createAndSaveTelephoneNumber() {
-        Random random = new Random();
-        StringBuilder nationalNumberBuilder = new StringBuilder(10);
-        for (int i = 0; i < 10; i++) {
-            nationalNumberBuilder.append((char) ('0' + (random.nextInt(9) + 1)));
-        }
-        String nationalNumber = nationalNumberBuilder.toString();
+        String nationalNumber = CoreTestUtils.getRandomDigitsString(10);
 
         TelephoneNumber telephoneNumber = new TelephoneNumber();
         telephoneNumber.setCountryCode("7");

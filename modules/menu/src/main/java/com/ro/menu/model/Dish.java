@@ -2,6 +2,7 @@ package com.ro.menu.model;
 
 import com.fasterxml.jackson.annotation.*;
 import com.ro.menu.validation.InsertGroup;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +12,13 @@ import javax.validation.constraints.Size;
 import java.util.Collections;
 import java.util.Set;
 
+@EqualsAndHashCode(of = {"id", "name"})
 @Getter
 @Setter
 @Entity
-@Table(name = "dishes")
+@Table(name = "dishes", indexes = {
+    @Index(name = "unique_name", columnList = "name", unique = true)
+})
 public class Dish {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

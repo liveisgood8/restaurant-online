@@ -76,6 +76,14 @@ databaseChangeLog:
                   name: category_id
                   type: BIGINT
   - changeSet:
+      id: 1603457296529-15
+      author: nexus (generated)
+      changes:
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: UKt8o6pivur7nn124jehx7dwqs1
+            tableName: dishes
+  - changeSet:
       id: 1603457296309-6
       author: nexus (generated)
       changes:

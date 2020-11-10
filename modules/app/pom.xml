@@ -40,6 +40,11 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.ro</groupId>
+			<artifactId>analytics</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>

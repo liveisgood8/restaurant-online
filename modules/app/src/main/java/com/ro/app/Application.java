@@ -1,5 +1,6 @@
 package com.ro.app;
 
+import com.ro.analytics.AnalyticsAppModuleConfig;
 import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.menu.config.MenuModuleConfig;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Import;
 		AuthModuleConfig.class,
 		MenuModuleConfig.class,
 		OrdersModuleConfig.class,
+		AnalyticsAppModuleConfig.class,
 })
 public class Application {
 

@@ -31,4 +31,11 @@ public class CoreTestUtils {
   public static <T> T getRandomObject(Class<T> clazz) {
     return easyRandom.nextObject(clazz);
   }
+  public static String getRandomDigitsString(int length) {
+    StringBuilder builder = new StringBuilder(10);
+    for (int i = 0; i < length; i++) {
+      builder.append((char) ('0' + (easyRandom.nextInt(9) + 1)));
+    }
+    return builder.toString();
+  }
 }
