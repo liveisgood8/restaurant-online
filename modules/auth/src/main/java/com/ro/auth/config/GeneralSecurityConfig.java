@@ -1,7 +1,5 @@
 package com.ro.auth.config;
 
-import com.ro.auth.config.modules.MenuModuleSecurity;
-import com.ro.auth.config.modules.OrdersModuleSecurity;
 import com.ro.auth.filter.JwtAuthenticationEntryPoint;
 import com.ro.auth.filter.JwtRequestFilter;
 import com.ro.auth.oauth2.*;
@@ -32,7 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class GeneralSecurityConfig extends WebSecurityConfigurerAdapter {
   private final JwtUserDetailsService jwtUserDetailsService;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtRequestFilter jwtRequestFilter;
@@ -40,15 +38,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
   private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
   private final PasswordEncoder passwordEncoder;
+  private final SecurityConfigAccumulator securityConfigAccumulator;
 
   @Autowired
-  public SecurityConfig(JwtUserDetailsService jwtUserDetailsService,
-                        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                        JwtRequestFilter jwtRequestFilter,
-                        CustomOAuth2UserService customOAuth2UserService,
-                        OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
-                        OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
-                        PasswordEncoder passwordEncoder) {
+  public GeneralSecurityConfig(JwtUserDetailsService jwtUserDetailsService,
+                               JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                               JwtRequestFilter jwtRequestFilter,
+                               CustomOAuth2UserService customOAuth2UserService,
+                               OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                               OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler,
+                               PasswordEncoder passwordEncoder,
+                               SecurityConfigAccumulator securityConfigAccumulator) {
     this.jwtUserDetailsService = jwtUserDetailsService;
     this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     this.jwtRequestFilter = jwtRequestFilter;
@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
     this.oAuth2AuthenticationFailureHandler = oAuth2AuthenticationFailureHandler;
     this.passwordEncoder = passwordEncoder;
+    this.securityConfigAccumulator = securityConfigAccumulator;
   }
 
   @Autowired
@@ -97,10 +98,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     "/**/*.css",
                     "/**/*.js")
                 .permitAll()
-              .antMatchers("/auth")
-                .permitAll()
-              .antMatchers("/auth/registration")
-                .permitAll()
               .and()
               .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -122,14 +119,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .successHandler(oAuth2AuthenticationSuccessHandler)
             .failureHandler(oAuth2AuthenticationFailureHandler);
 
-
-    // Configure modules security
-    MenuModuleSecurity.configure(httpSecurity);
-    OrdersModuleSecurity.configure(httpSecurity);
-
-    httpSecurity
-        .authorizeRequests()
-        .anyRequest().authenticated();
+    securityConfigAccumulator.apply(httpSecurity);
 
     httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
   }

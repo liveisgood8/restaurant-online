@@ -41,15 +41,6 @@ class OrdersRepositoryTest {
   @Autowired
   private OrderDataTestUtil orderDataTestUtil;
 
-//  @Autowired
-//  private AddressRepository addressRepository;
-//
-//  @Autowired
-//  private TelephoneNumberRepository telephoneNumberRepository;
-//
-//  @Autowired
-//  private PaymentMethodRepository paymentMethodRepository;
-
   @Test
   void findByIsApproved_whenApproved() {
     Order firstGivenOrder = createAndSaveOrder(true);
@@ -77,9 +68,10 @@ class OrdersRepositoryTest {
   @Test
   @Transactional(propagation = Propagation.NEVER)
   void findAllApprovedWithFullyFetchedParts() {
-    Order givenOrder = createAndSaveOrder(false);
+    Order givenOrder = createAndSaveOrder(true);
+    createAndSaveOrder(false);
 
-    List<Order> actualOrders = ordersRepository.findByIsApproved(false);
+    List<Order> actualOrders = ordersRepository.findAllApprovedWithFullyFetchedParts();
 
     assertEquals(1, actualOrders.size());
     assertEquals(givenOrder.getId(), actualOrders.get(0).getId());
@@ -99,50 +91,4 @@ class OrdersRepositoryTest {
   private Order createAndSaveOrder(boolean isApproved) {
     return orderDataTestUtil.createAndSaveOrder(isApproved);
   }
-
-//  @Transactional
-//  private Order createAndSaveOrder(boolean isApproved) {
-//    TelephoneNumber telephoneNumber = new TelephoneNumber();
-//    telephoneNumber.setCountryCode("7");
-//    telephoneNumber.setNationalNumber(CoreTestUtils.getRandomDigitsString(10));
-//
-//    telephoneNumber = telephoneNumberRepository.save(telephoneNumber);
-//
-//    Address address = CoreTestUtils.getRandomObject(Address.class);
-//    address.setId(null);
-//
-//    PaymentMethod paymentMethod = paymentMethodRepository.findByName(PaymentMethod.BY_CARD_ONLINE).orElseThrow();
-//
-//    address = addressRepository.save(address);
-//
-//    Order order = CoreTestUtils.getRandomObject(Order.class);
-//    order.setIsApproved(isApproved);
-//    order.setTelephoneNumber(telephoneNumber);
-//    order.setAddress(address);
-//    order.setPaymentMethod(paymentMethod);
-//
-//    order = ordersRepository.save(order);
-//    Hibernate.initialize(order.getAddress());
-//    Hibernate.initialize(order.getOrderParts());
-//    Hibernate.initialize(order.getPaymentMethod());
-//    order.getOrderParts().forEach(op -> Hibernate.initialize(op.getDish()));
-//
-//    return order;
-//  }
-//
-//  private OrderPart createAndSaveOrderPart() {
-//
-//  }
-//
-//  private OrderPart createAndSaveDish() {
-//    Category category = CoreTestUtils.getRandomObject(Category.class);
-//    category.setDishes(Collections.emptyList());
-//    category = categoryRepository.save(category);
-//
-//    Dish dish = CoreTestUtils.getRandomObject(Dish.class);
-//    dish.setCategory(category);
-//    dish.setPrice((short) 312);
-//
-//    return dishRepository.save(dish);
-//  }
 }

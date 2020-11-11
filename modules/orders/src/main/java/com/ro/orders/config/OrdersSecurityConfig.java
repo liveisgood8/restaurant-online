@@ -1,10 +1,14 @@
-package com.ro.auth.config.modules;
+package com.ro.orders.config;
 
+import com.ro.auth.config.ModuleSecurity;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-public class OrdersModuleSecurity {
-  public static void configure(HttpSecurity httpSecurity) throws Exception {
+@Configuration
+public class OrdersSecurityConfig implements ModuleSecurity {
+  @Override
+  public void configure(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, "/orders").permitAll()

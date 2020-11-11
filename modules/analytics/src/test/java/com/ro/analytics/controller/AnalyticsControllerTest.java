@@ -1,9 +1,11 @@
 package com.ro.analytics.controller;
 
+import com.ro.analytics.config.AnalyticsSecurityConfig;
 import com.ro.analytics.data.dto.mapper.DishOrderStatisticDtoMapper;
 import com.ro.analytics.data.dto.object.DishOrderStatisticDto;
 import com.ro.analytics.data.lib.DishOrderStatistic;
 import com.ro.analytics.service.OrderAnalyticsService;
+import com.ro.auth.config.UnitTestSecurityConfig;
 import com.ro.core.CoreTestUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -11,18 +13,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AnalyticsController.class)
-@WithMockUser(authorities = "ADMIN")
+@Import({
+    AnalyticsSecurityConfig.class,
+    UnitTestSecurityConfig.class
+})
 class AnalyticsControllerTest {
 
   @MockBean
@@ -50,7 +55,6 @@ class AnalyticsControllerTest {
   @Test
   @WithMockUser
   void getAnalyticsByOrders_whenNonAdmin() throws Exception {
-    // TODO Доделать авторизацию
     mockMvc.perform(get("/analytics/orders?topCount=1"))
         .andExpect(status().isForbidden());
   }

@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface OrdersRepository extends JpaRepository<Order, Long> {
   List<Order> findByIsApproved(boolean isApproved);
 
-  @Query("select o from Order o inner join fetch o.orderParts op inner join fetch op.dish")
+  @Query("select distinct o from Order o inner join fetch o.orderParts op inner join fetch op.dish " +
+      "where o.isApproved = true")
   List<Order> findAllApprovedWithFullyFetchedParts();
 
   @EntityGraph(attributePaths = { "orderParts" })

@@ -79,9 +79,14 @@ public class OrderDataTestUtil {
 
         OrderPart firstPart = CoreTestUtils.getRandomObject(OrderPart.class);
         firstPart.setDish(createAndSaveDish());
+        firstPart.setOrder(order);
 
         OrderPart secondPart = CoreTestUtils.getRandomObject(OrderPart.class);
         secondPart.setDish(createAndSaveDish());
+        secondPart.setOrder(order);
+
+        order.getOrderParts().add(firstPart);
+        order.getOrderParts().add(secondPart);
 
         order = ordersRepository.save(order);
         initializeOrderLazyProperties(order);
