@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/analytics-module.yml
+  - changeSet:
+      id: create-dish-orders-statistic-view
+      author: nexus
+      changes:
+        - createView:
+            viewName: dish_orders_statistic
+            selectQuery: 'select op.dish_id as dish_id, count(*) orders_count
+                          from order_parts op inner join orders o on op.order_id = o.id
+                          where o.is_approved = 1
+                          group by op.dish_id
+                          order by orders_count desc'
+  - changeSet:
+      id: create-dish-emotions-statistic-view
+      author: nexus
+      changes:
+        - createView:
+            viewName: dish_emotions_statistic
+            selectQuery: 'select dish_id, likes_count, dislikes_count, likes_count / dislikes_count relation
+                          from (
+                          	select d.id as dish_id,
+                          		(select count(*) from dish_emotions where dish_id = d.id and emotion_type = 1) as likes_count,
+                          		(select count(*) from dish_emotions where dish_id = d.id and emotion_type = 2) as dislikes_count
+                          	from dishes d
+                          ) as sub
+                          order by relation desc'

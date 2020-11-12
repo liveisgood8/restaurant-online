@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class CoreTestUtils {
@@ -28,9 +30,18 @@ public class CoreTestUtils {
     }
   }
 
+  public static <T> List<T> getRandomObjectsList(int size, Class<T> clazz) {
+    List<T> objectsList = new ArrayList<>();
+    for (int i = 0; i < size; i++) {
+      objectsList.add(getRandomObject(clazz));
+    }
+    return objectsList;
+  }
+
   public static <T> T getRandomObject(Class<T> clazz) {
     return easyRandom.nextObject(clazz);
   }
+
   public static String getRandomDigitsString(int length) {
     StringBuilder builder = new StringBuilder(10);
     for (int i = 0; i < length; i++) {

@@ -1,7 +1,5 @@
 package com.ro.orders.data.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.ro.core.data.AbstractModel;
 import com.ro.menu.model.Dish;
 import lombok.*;
@@ -11,6 +9,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
+@EqualsAndHashCode(of = {"id"}, callSuper = false)
 @Entity
 @Table(name = "order_parts")
 public class OrderPart extends AbstractModel {
@@ -54,9 +53,12 @@ public class OrderPart extends AbstractModel {
     }
   }
 
-  public void setDish(@NonNull Dish dish) {
+  public void setDish(Dish dish) {
     this.dish = dish;
-    this.sellingPrice = dish.getPrice();
+    if (dish != null) {
+      this.id.dishId = dish.getId();
+      this.sellingPrice = dish.getPrice();
+    }
   }
 
   public int getTotalPrice() {

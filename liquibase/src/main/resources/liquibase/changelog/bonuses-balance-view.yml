@@ -6,4 +6,4 @@ databaseChangeLog:
       changes:
         - createView:
             viewName: bonuses_balance
-            selectQuery: select user_id, sum(amount) as balance from bonuses_transactions group by user_id
+            selectQuery: select user_id, sum(amount) balance from bonuses_transactions group by user_id

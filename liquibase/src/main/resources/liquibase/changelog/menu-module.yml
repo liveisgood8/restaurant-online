@@ -88,14 +88,14 @@ databaseChangeLog:
       author: nexus (generated)
       changes:
         - createTable:
-            tableName: dish_likes
+            tableName: dish_emotions
             columns:
               - column:
                   autoIncrement: true
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: dish_likesPK
+                    primaryKeyName: dish_emotionsPK
                   name: id
                   type: BIGINT
               - column:
@@ -127,7 +127,7 @@ databaseChangeLog:
       changes:
         - addForeignKeyConstraint:
             baseColumnNames: dish_id
-            baseTableName: dish_likes
+            baseTableName: dish_emotions
             constraintName: FKfe3rcdrpen9684c4vte2tgqh9
             deferrable: false
             initiallyDeferred: false
@@ -153,7 +153,7 @@ databaseChangeLog:
       changes:
         - addForeignKeyConstraint:
             baseColumnNames: user_id
-            baseTableName: dish_likes
+            baseTableName: dish_emotions
             constraintName: FKt7e04tp0ymux6mwpyt6382oaq
             deferrable: false
             initiallyDeferred: false

@@ -12,9 +12,8 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = DishEmotion.class)
 @Entity
-@Table(name = "dish_likes")
+@Table(name = "dish_emotions")
 public class DishEmotion {
   public enum EmotionType {
     LIKE,

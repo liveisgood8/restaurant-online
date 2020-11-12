@@ -48,6 +48,7 @@ class OrderPartDtoMapperTest {
     dish.setPrice((short) 4234);
 
     OrderPartDto orderPartDto = CoreTestUtils.getRandomObject(OrderPartDto.class);
+    orderPartDto.getDish().setId(dish.getId());
     orderPartDto.setCount(42);
 
     Order order = CoreTestUtils.getRandomObject(Order.class);

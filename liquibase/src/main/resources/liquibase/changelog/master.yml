@@ -10,6 +10,9 @@ databaseChangeLog:
       file: orders-module.yml
       relativeToChangelogFile: true
   - include:
+      file: analytics-module.yml
+      relativeToChangelogFile: true
+  - include:
       file: payment-methods.yml
       relativeToChangelogFile: true
   - include:

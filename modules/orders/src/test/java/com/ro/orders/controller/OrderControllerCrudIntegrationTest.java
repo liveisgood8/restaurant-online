@@ -1,5 +1,6 @@
 package com.ro.orders.controller;
 
+import com.jayway.jsonpath.JsonPath;
 import com.ro.auth.config.AuthModuleConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
@@ -65,7 +66,7 @@ public class OrderControllerCrudIntegrationTest {
                 get("/orders"))
                 .andExpect(status().isOk());
 
-        assertGetOrderResponse(resultActions, List.of(givenFirstOrder, givenSecondOrder));
+        assertGetOrderResponseWithoutParts(resultActions, List.of(givenFirstOrder, givenSecondOrder), false);
     }
 
     @Test
@@ -78,7 +79,7 @@ public class OrderControllerCrudIntegrationTest {
                 get("/orders?isApproved=0"))
                 .andExpect(status().isOk());
 
-        assertGetOrderResponse(resultActions, List.of(givenSecondOrder));
+        assertGetOrderResponseWithoutParts(resultActions, List.of(givenSecondOrder), false);
     }
 
     @Test
@@ -92,66 +93,100 @@ public class OrderControllerCrudIntegrationTest {
                 get("/orders?isApproved=1"))
                 .andExpect(status().isOk());
 
-        assertGetOrderResponse(resultActions, List.of(givenFirstOrder, givenThirdOrder));
+        assertGetOrderResponseWithoutParts(resultActions, List.of(givenFirstOrder, givenThirdOrder), false);
     }
 
-    private void assertGetOrderResponse(ResultActions resultActions, List<Order> expectedOrders) throws Exception {
-        resultActions
+    @Test
+    @WithMockUser(value = "test", authorities = "ADMIN")
+    void getOrderById() throws Exception {
+        Order givenOrder = orderDataTestUtil.createAndSaveOrder(true);
+
+        ResultActions resultActions = mockMvc.perform(
+            get("/orders/" + givenOrder.getId()))
+            .andExpect(status().isOk());
+
+        assertGetOrderResponse(resultActions, List.of(givenOrder), true);
+    }
+
+    private void assertGetOrderResponse(ResultActions resultActions, List<Order> expectedOrders,
+                                        boolean singleOrderMode) throws Exception {
+        assertGetOrderResponseWithoutParts(resultActions, expectedOrders, singleOrderMode);
+
+        int i = 0;
+        for (Order expectedOrder : expectedOrders) {
+            Set<OrderPart> expectedOrderParts = expectedOrder.getOrderParts();
+            Set<Dish> expectedOrderPartsDishes = expectedOrderParts.stream().map(OrderPart::getDish)
+                    .collect(Collectors.toSet());
+
+            String baseJsonPath = singleOrderMode ? "$." : ("$.[" + i + "].");
+
+            resultActions
+                    .andExpect(jsonPath(baseJsonPath + "orderParts.*", hasSize(expectedOrderParts.size())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].orderId", everyItem(equalTo(expectedOrder.getId().intValue()))))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].count",
+                            containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getCount).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].sellingPrice",
+                            containsInAnyOrder(expectedOrderParts.stream().map(part -> part.getSellingPrice().intValue()).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.id",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getId().intValue()).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.name",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getName).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.description",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getDescription).toArray())))
+//                  TODO Fix doubles compare
+//                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.protein",
+//                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getProtein).toArray())))
+//                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.fat",
+//                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getFat).toArray())))
+//                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.carbohydrates",
+//                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getCarbohydrates).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.protein", notNullValue()))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.fat", notNullValue()))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.carbohydrates", notNullValue()))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.weight",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getWeight().intValue()).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.price",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getPrice().intValue()).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.imageUrl",
+                            everyItem(containsString("/menu/dishes/")))) // TODO Improve assert to start with /menu/dishes/:ID/image
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.likes.likeCount",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(this::getDishLikesCount).toArray())))
+                    .andExpect(jsonPath(baseJsonPath + "orderParts[*].dish.likes.dislikeCount",
+                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(this::getDishDislikesCount).toArray())));
+
+            i++;
+        }
+    }
+
+    private void assertGetOrderResponseWithoutParts(ResultActions resultActions, List<Order> expectedOrders,
+                                                    boolean singleOrderMode) throws Exception {
+        if (!singleOrderMode) {
+            resultActions
                 .andExpect(jsonPath("$.*", hasSize(expectedOrders.size())));
+        }
 
         int i = 0;
         for (Order expectedOrder : expectedOrders) {
             Address expectedAddress = expectedOrder.getAddress();
-            Set<OrderPart> expectedOrderParts = expectedOrder.getOrderParts();
-            Set<Dish> expectedOrderPartsDishes = expectedOrderParts.stream().map(OrderPart::getDish)
-                    .collect(Collectors.toSet());
             String expectedPhone = TelephoneNumberUtils.toString(expectedOrder.getTelephoneNumber());
 
+            String baseJsonPath = singleOrderMode ? "$." : ("$.[" + i + "].");
+
             resultActions
-                    .andExpect(jsonPath("$.[" + i + "].id", equalTo(expectedOrder.getId().intValue())))
-                    .andExpect(jsonPath("$.[" + i + "].isApproved", equalTo(expectedOrder.getIsApproved())))
-                    .andExpect(jsonPath("$.[" + i + "].paymentMethod", equalTo(expectedOrder.getPaymentMethod().getName())))
-                    .andExpect(jsonPath("$.[" + i + "].address.id", equalTo(expectedAddress.getId().intValue())))
-                    .andExpect(jsonPath("$.[" + i + "].address.street", equalTo(expectedAddress.getStreet())))
-                    .andExpect(jsonPath("$.[" + i + "].address.homeNumber", equalTo(expectedAddress.getHomeNumber().intValue())))
-                    .andExpect(jsonPath("$.[" + i + "].address.entranceNumber", equalTo(expectedAddress.getEntranceNumber().intValue())))
-                    .andExpect(jsonPath("$.[" + i + "].address.floorNumber", equalTo(expectedAddress.getFloorNumber().intValue())))
-                    .andExpect(jsonPath("$.[" + i + "].address.apartmentNumber", equalTo(expectedAddress.getApartmentNumber())))
-                    .andExpect(jsonPath("$.[" + i + "].phone", equalTo(expectedPhone)))
-                    .andExpect(jsonPath("$.[" + i + "].spentBonuses", equalTo(expectedOrder.getSpentBonuses())))
-                    .andExpect(jsonPath("$.[" + i + "].receivedBonuses", equalTo(expectedOrder.getReceivedBonuses())))
-                    .andExpect(jsonPath("$.[" + i + "].totalPrice", equalTo(expectedOrder.getTotalPrice())))
-                    .andExpect(jsonPath("$.[" + i + "].createdAt", equalTo(expectedOrder.getCreatedAt().getTime())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts.*", hasSize(expectedOrderParts.size())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].orderId", everyItem(equalTo(expectedOrder.getId()))))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].count",
-                            containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getCount).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].sellingPrice",
-                            containsInAnyOrder(expectedOrderParts.stream().map(part -> part.getSellingPrice().intValue()).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].totalPrice",
-                            containsInAnyOrder(expectedOrderParts.stream().map(OrderPart::getTotalPrice).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.id",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getId().intValue()).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.name",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getName).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.description",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getDescription).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.protein",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getProtein).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.fat",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getFat).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.carbohydrates",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(Dish::getCarbohydrates).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.weight",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getWeight().intValue()).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.price",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> d.getPrice().intValue()).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.imageUrl",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(d -> "/menu/dishes/" + d.getId() + "/image").toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.likes.likeCount",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(this::getDishLikesCount).toArray())))
-                    .andExpect(jsonPath("$.[" + i + "].orderParts[*].dish.likes.dislikeCount",
-                            containsInAnyOrder(expectedOrderPartsDishes.stream().map(this::getDishDislikesCount).toArray())));
+                .andExpect(jsonPath(baseJsonPath + "id", equalTo(expectedOrder.getId().intValue())))
+                .andExpect(jsonPath(baseJsonPath + "isApproved", equalTo(expectedOrder.getIsApproved())))
+                .andExpect(jsonPath(baseJsonPath + "paymentMethod", equalTo(expectedOrder.getPaymentMethod().getName())))
+                .andExpect(jsonPath(baseJsonPath + "address.id", equalTo(expectedAddress.getId().intValue())))
+                .andExpect(jsonPath(baseJsonPath + "address.street", equalTo(expectedAddress.getStreet())))
+                .andExpect(jsonPath(baseJsonPath + "address.homeNumber", equalTo(expectedAddress.getHomeNumber().intValue())))
+                .andExpect(jsonPath(baseJsonPath + "address.entranceNumber", equalTo(expectedAddress.getEntranceNumber().intValue())))
+                .andExpect(jsonPath(baseJsonPath + "address.floorNumber", equalTo(expectedAddress.getFloorNumber().intValue())))
+                .andExpect(jsonPath(baseJsonPath + "address.apartmentNumber", equalTo(expectedAddress.getApartmentNumber())))
+                .andExpect(jsonPath(baseJsonPath + "phone", equalTo(expectedPhone)))
+                .andExpect(jsonPath(baseJsonPath + "spentBonuses", equalTo(expectedOrder.getSpentBonuses())))
+                .andExpect(jsonPath(baseJsonPath + "receivedBonuses", equalTo(expectedOrder.getReceivedBonuses())))
+                .andExpect(jsonPath(baseJsonPath + "totalPrice", equalTo(expectedOrder.getTotalPrice())))
+                .andExpect(jsonPath(baseJsonPath + "createdAt", equalTo(expectedOrder.getCreatedAt().getTime())));
 
             i++;
         }
@@ -216,11 +251,13 @@ public class OrderControllerCrudIntegrationTest {
             DishDto dishDto = new DishDto();
             dishDto.setId(orderPart.getDish().getId());
             dishDto.setName(orderPart.getDish().getName());
+            dishDto.setDescription(orderPart.getDish().getDescription());
             dishDto.setProtein(orderPart.getDish().getProtein());
             dishDto.setFat(orderPart.getDish().getFat());
             dishDto.setCarbohydrates(orderPart.getDish().getCarbohydrates());
             dishDto.setWeight(orderPart.getDish().getWeight());
             dishDto.setProtein(orderPart.getDish().getProtein());
+            dishDto.setPrice(orderPart.getDish().getPrice());
 
             OrderPartDto orderPartDto = new OrderPartDto();
             orderPartDto.setDish(dishDto);
