@@ -114,6 +114,14 @@ databaseChangeLog:
                   name: user_id
                   type: BIGINT
   - changeSet:
+      id: 1605340765811-1
+      author: nexus (manually)
+      changes:
+        - addUniqueConstraint:
+            columnNames: dish_id, emotion_type, user_id
+            constraintName: unique-emotion-for-user
+            tableName: dish_emotions
+  - changeSet:
       id: 1603457296309-15
       author: nexus (generated)
       changes:

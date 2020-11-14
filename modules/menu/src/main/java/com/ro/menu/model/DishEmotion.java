@@ -13,7 +13,9 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "dish_emotions")
+@Table(name = "dish_emotions", indexes = {
+    @Index(name = "user_unique_emotion", columnList = "dish_id,emotion_type,user_id")
+})
 public class DishEmotion {
   public enum EmotionType {
     LIKE,

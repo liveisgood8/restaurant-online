@@ -5,7 +5,7 @@ import com.ro.menu.dto.mappers.ImageMapper;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
-import com.ro.menu.repository.DishLikesRepository;
+import com.ro.menu.repository.DishEmotionRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
@@ -27,12 +27,12 @@ import java.util.Optional;
 public class DishService {
   private final Path uploadImagesDir;
   private final DishRepository dishRepository;
-  private final DishLikesRepository dishEmotionsRepository;
+  private final DishEmotionRepository dishEmotionsRepository;
 
   @Autowired
   public DishService(@Value("${uploads.directory:uploads}") String uploadsDirectory,
                      DishRepository dishRepository,
-                     DishLikesRepository dishEmotionsRepository) throws IOException {
+                     DishEmotionRepository dishEmotionsRepository) throws IOException {
     uploadImagesDir = Paths.get(uploadsDirectory, "dish-images");
     this.dishRepository = dishRepository;
     this.dishEmotionsRepository = dishEmotionsRepository;

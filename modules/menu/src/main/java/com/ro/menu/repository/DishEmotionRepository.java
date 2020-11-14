@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DishLikesRepository extends JpaRepository<DishEmotion, Long> {
+public interface DishEmotionRepository extends JpaRepository<DishEmotion, Long> {
   List<DishEmotion> findByDishId(Long dishId);
   Optional<DishEmotion> findByEmotionTypeAndDishIdAndUserId(DishEmotion.EmotionType emotionType,
                                                             Long dishId, Long userId);
