@@ -35,7 +35,7 @@ class DishOrdersStatisticDtoMapperTest {
   @Test
   void toDto() {
     List<DishOrdersStatistic> givenStatistic = CoreTestUtils.getRandomObjectsList(1, DishOrdersStatistic.class);
-    MinimalDishDto givenMinimalDishDto = mockMinimalDishDtoMapper(givenStatistic);
+    MinimalDishDto givenMinimalDishDto = mockMinimalDishDtoMapper();
 
     DishOrdersStatisticDto actualDto = mapper.toDto(givenStatistic.get(0));
 
@@ -45,7 +45,7 @@ class DishOrdersStatisticDtoMapperTest {
   @Test
   void toDto_whenList() {
     List<DishOrdersStatistic> givenStatistic = CoreTestUtils.getRandomObjectsList(2, DishOrdersStatistic.class);
-    MinimalDishDto givenMinimalDishDto = mockMinimalDishDtoMapper(givenStatistic);
+    MinimalDishDto givenMinimalDishDto = mockMinimalDishDtoMapper();
 
     List<DishOrdersStatisticDto> actualDtos = mapper.toDto(givenStatistic);
 
@@ -55,7 +55,7 @@ class DishOrdersStatisticDtoMapperTest {
     }
   }
 
-  private MinimalDishDto mockMinimalDishDtoMapper(List<DishOrdersStatistic> givenStatistic) {
+  private MinimalDishDto mockMinimalDishDtoMapper() {
     MinimalDishDto minimalDishDto = CoreTestUtils.getRandomObject(MinimalDishDto.class);
 
     Mockito.when(minimalDishDtoMapper.toDto(Mockito.any(Dish.class)))
@@ -64,10 +64,13 @@ class DishOrdersStatisticDtoMapperTest {
     return minimalDishDto;
   }
 
-  private void assertDtoEqualWithStatistic(DishOrdersStatisticDto actual, MinimalDishDto expectedMinimalDishDto,
+  private void assertDtoEqualWithStatistic(DishOrdersStatisticDto actual,
+                                           MinimalDishDto expectedMinimalDishDto,
                                            DishOrdersStatistic expected) {
-    assertEquals(expectedMinimalDishDto, actual.getMinimalDish());
     assertEquals(expected.getOrdersCount(), actual.getOrdersCount());
+    assertEquals(expectedMinimalDishDto.getId(), actual.getMinimalDish().getId());
+    assertEquals(expectedMinimalDishDto.getName(), actual.getMinimalDish().getName());
+    assertEquals(expectedMinimalDishDto.getCategoryId(), actual.getMinimalDish().getCategoryId());
   }
 
 }

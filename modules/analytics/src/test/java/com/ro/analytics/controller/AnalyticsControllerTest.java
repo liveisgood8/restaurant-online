@@ -10,6 +10,7 @@ import com.ro.analytics.data.model.DishOrdersStatistic;
 import com.ro.analytics.service.AnalyticsService;
 import com.ro.auth.config.UnitTestSecurityConfig;
 import com.ro.core.CoreTestUtils;
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +52,9 @@ class AnalyticsControllerTest {
     mockMvc.perform(get("/analytics/dish-orders?topCount=1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(1)))
-        .andExpect(jsonPath("$.[0].minimalDish.id", is(givenDtos.get(0).getMinimalDish().getId())))
+        .andExpect(jsonPath("$.[0].minimalDish.id", is(givenDtos.get(0).getMinimalDish().getId()), Long.class))
         .andExpect(jsonPath("$.[0].minimalDish.name", equalTo(givenDtos.get(0).getMinimalDish().getName())))
+        .andExpect(jsonPath("$.[0].minimalDish.categoryId", equalTo(givenDtos.get(0).getMinimalDish().getCategoryId()), Long.class))
         .andExpect(jsonPath("$.[0].ordersCount", equalTo(givenDtos.get(0).getOrdersCount())));
   }
 
@@ -83,10 +85,13 @@ class AnalyticsControllerTest {
     mockMvc.perform(get("/analytics/dish-emotions?topCount=2"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.*", hasSize(2)))
-        .andExpect(jsonPath("$.[*].minimalDish.id", containsInAnyOrder(is(givenDtos.get(0).getMinimalDish().getId()),
-            is(givenDtos.get(1).getMinimalDish().getId()))))
+        .andExpect(jsonPath("$.[*].minimalDish.id", containsInAnyOrder(is(givenDtos.get(0).getMinimalDish().getId().intValue()),
+            is(givenDtos.get(1).getMinimalDish().getId().intValue()))))
         .andExpect(jsonPath("$.[*].minimalDish.name", containsInAnyOrder(is(givenDtos.get(0).getMinimalDish().getName()),
             is(givenDtos.get(1).getMinimalDish().getName()))))
+        .andExpect(jsonPath("$.[*].minimalDish.categoryId", containsInAnyOrder(
+            equalTo(givenDtos.get(0).getMinimalDish().getCategoryId().intValue()),
+            equalTo(givenDtos.get(1).getMinimalDish().getCategoryId().intValue()))))
         .andExpect(jsonPath("$.[*].likesCount", containsInAnyOrder(is(givenDtos.get(0).getLikesCount()),
             is(givenDtos.get(1).getLikesCount()))))
         .andExpect(jsonPath("$.[*].dislikesCount", containsInAnyOrder(is(givenDtos.get(0).getDislikesCount()),

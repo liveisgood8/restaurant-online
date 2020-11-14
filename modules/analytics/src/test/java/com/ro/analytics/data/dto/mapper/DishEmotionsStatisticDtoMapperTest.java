@@ -67,9 +67,11 @@ class DishEmotionsStatisticDtoMapperTest {
   private void assertDtoEqualWithStatistic(DishEmotionsStatisticDto actual,
                                            MinimalDishDto expectedMinimalDishDto,
                                            DishEmotionsStatistic expected) {
-    assertEquals(expectedMinimalDishDto, actual.getMinimalDish());
     assertEquals(expected.getLikesCount(), actual.getLikesCount());
     assertEquals(expected.getDislikesCount(), actual.getDislikesCount());
+    assertEquals(expectedMinimalDishDto.getId(), actual.getMinimalDish().getId());
+    assertEquals(expectedMinimalDishDto.getName(), actual.getMinimalDish().getName());
+    assertEquals(expectedMinimalDishDto.getCategoryId(), actual.getMinimalDish().getCategoryId());
   }
 
 }

@@ -16,6 +16,7 @@ public class CoreTestUtils {
   static {
     Random random = new Random();
     EasyRandomParameters parameters = new EasyRandomParameters()
+        .randomize(Long.class, () -> (long) (random.nextInt() & Integer.MAX_VALUE))
         .randomize(Integer.class, () -> random.nextInt() & Integer.MAX_VALUE)
         .randomize(Short.class, () -> (short) random.nextInt(1 << 15));
 
