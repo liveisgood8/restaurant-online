@@ -20,8 +20,8 @@ databaseChangeLog:
             selectQuery: 'select dish_id, likes_count, dislikes_count, likes_count / dislikes_count relation
                           from (
                           	select d.id as dish_id,
-                          		(select count(*) from dish_emotions where dish_id = d.id and emotion_type = 1) as likes_count,
-                          		(select count(*) from dish_emotions where dish_id = d.id and emotion_type = 2) as dislikes_count
+                          		(select count(*) from dish_emotions where dish_id = d.id and emotion_type = 0) as likes_count,
+                          		(select count(*) from dish_emotions where dish_id = d.id and emotion_type = 1) as dislikes_count
                           	from dishes d
                           ) as sub
                           order by relation desc'

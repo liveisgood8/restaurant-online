@@ -42,7 +42,7 @@ public class MakingOrdersService {
 
     order.setIsApproved(order.getPaymentMethod().getName().equals(PaymentMethod.BY_CARD_ONLINE));
 
-    if (user != null && orderDto.getSpentBonuses() != 0) {
+    if (user != null && orderDto.getSpentBonuses() != null && orderDto.getSpentBonuses() != 0) {
       BonusesTransaction outcomeTransaction = new BonusesTransaction();
       outcomeTransaction.setUser(user);
       outcomeTransaction.setAmount(-1 * orderDto.getSpentBonuses());
