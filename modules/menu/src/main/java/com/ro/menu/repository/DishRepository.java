@@ -17,6 +17,9 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
   List<Dish> findAll();
 
   @EntityGraph(attributePaths = {"emotions"})
+  List<Dish> findByNameContainingIgnoreCase(String contain);
+
+  @EntityGraph(attributePaths = {"emotions"})
   List<Dish> findByCategoryId(Long categoryId);
 
   @Query("select dish.imagePath from Dish dish where dish.id = ?1")

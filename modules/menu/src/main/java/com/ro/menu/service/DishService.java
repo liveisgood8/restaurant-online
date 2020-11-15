@@ -47,6 +47,10 @@ public class DishService {
     return dishRepository.findByCategoryId(categoryId);
   }
 
+  public List<Dish> getByNameContaining(String contain) {
+    return dishRepository.findByNameContainingIgnoreCase(contain);
+  }
+
   @Transactional
   public Dish create(Dish dish) {
     return dishRepository.save(dish);
