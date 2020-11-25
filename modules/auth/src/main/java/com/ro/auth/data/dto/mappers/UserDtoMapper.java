@@ -31,9 +31,7 @@ public abstract class UserDtoMapper {
   @Mapping(target = "telephoneNumber", source = "phone")
   @Mapping(target = "authorities", ignore = true)
   @Mapping(target = "bonuses", ignore = true)
-  @Mapping(target = "password",
-      qualifiedByName = "encodePassword",
-      nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+  @Mapping(target = "password", ignore = true)
   public abstract User toEntity(UserDto userDto);
 
   protected Set<String> toDtoAuthorities(Collection<? extends GrantedAuthority> authorities) {
@@ -43,10 +41,17 @@ public abstract class UserDtoMapper {
   }
 
   @Named("encodePassword")
-  protected String encodeDtoPassword(String password) {
+  protected String encodeDtoPassword(User user, String password) {
     if (password == null) {
-      return null;
+      return user.getPassword();
     }
     return passwordEncoder.encode(password);
+  }
+
+  @AfterMapping
+  public void afterMappingToEntity(UserDto dto, @MappingTarget User entity) {
+    if (dto.getPassword() != null) {
+      entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+    }
   }
 }

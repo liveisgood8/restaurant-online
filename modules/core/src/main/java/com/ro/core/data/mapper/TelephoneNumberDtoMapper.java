@@ -16,10 +16,18 @@ public abstract class TelephoneNumberDtoMapper {
     }
 
     public String toString(TelephoneNumber telephoneNumber) {
+        if (telephoneNumber == null) {
+            return null;
+        }
+        
         return TelephoneNumberUtils.toString(telephoneNumber);
     }
 
     public TelephoneNumber toEntity(String rawTelephoneNumber) {
+        if (rawTelephoneNumber == null) {
+            return null;
+        }
+
         TelephoneNumber telephoneNumber = TelephoneNumberUtils.fromString(rawTelephoneNumber);
         return telephoneNumberRepository.findByCountryCodeAndNationalNumber(telephoneNumber.getCountryCode(),
                 telephoneNumber.getNationalNumber())

@@ -1,11 +1,9 @@
 package com.ro.auth.controller.body;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 
-@AllArgsConstructor
-@Getter
+@Data
 public class AuthRequest {
-  private final String login;
-  private final String password;
+  private String login;
+  private String password;
 }
