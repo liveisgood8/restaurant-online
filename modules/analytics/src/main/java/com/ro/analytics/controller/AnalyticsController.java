@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/analytics")
+@RequestMapping("${api.basePath}/analytics")
 public class AnalyticsController {
   private final AnalyticsService orderAnalyticsService;
   private final DishOrdersStatisticDtoMapper dishOrdersStatisticDtoMapper;

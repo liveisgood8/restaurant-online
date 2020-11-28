@@ -1,6 +1,7 @@
 package com.ro.menu.controller;
 
 import com.ro.auth.config.UnitTestSecurityConfig;
+import com.ro.core.ApiConfig;
 import com.ro.core.CoreTestUtils;
 import com.ro.menu.config.MenuSecurityConfig;
 import com.ro.menu.dto.mappers.DishDtoMapper;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(DishController.class)
 @Import({
+    ApiConfig.class,
     MenuSecurityConfig.class,
     UnitTestSecurityConfig.class
 })

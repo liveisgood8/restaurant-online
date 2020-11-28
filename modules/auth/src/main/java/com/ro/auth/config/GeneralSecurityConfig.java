@@ -93,6 +93,7 @@ public class GeneralSecurityConfig extends WebSecurityConfigurerAdapter {
                     "/**/*.png",
                     "/**/*.gif",
                     "/**/*.svg",
+                    "/**/*.json",
                     "/**/*.jpg",
                     "/**/*.html",
                     "/**/*.css",

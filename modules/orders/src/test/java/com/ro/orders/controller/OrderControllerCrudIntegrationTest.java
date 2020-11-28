@@ -2,6 +2,7 @@ package com.ro.orders.controller;
 
 import com.jayway.jsonpath.JsonPath;
 import com.ro.auth.config.AuthModuleConfig;
+import com.ro.core.ApiConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
 import com.ro.core.data.model.Address;
@@ -40,10 +41,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {
-        OrdersModuleConfig.class,
-        MenuModuleConfig.class,
-        CoreModuleConfig.class,
-        AuthModuleConfig.class
+    ApiConfig.class,
+    OrdersModuleConfig.class,
+    MenuModuleConfig.class,
+    CoreModuleConfig.class,
+    AuthModuleConfig.class
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class OrderControllerCrudIntegrationTest {

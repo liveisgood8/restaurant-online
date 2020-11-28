@@ -9,6 +9,7 @@ import com.ro.analytics.data.model.DishEmotionsStatistic;
 import com.ro.analytics.data.model.DishOrdersStatistic;
 import com.ro.analytics.service.AnalyticsService;
 import com.ro.auth.config.UnitTestSecurityConfig;
+import com.ro.core.ApiConfig;
 import com.ro.core.CoreTestUtils;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AnalyticsController.class)
 @Import({
+    ApiConfig.class,
     AnalyticsSecurityConfig.class,
     UnitTestSecurityConfig.class
 })

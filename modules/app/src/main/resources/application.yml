@@ -1,7 +1,5 @@
 server:
   port: 10100
-  servlet:
-    context-path: /api/v1
 auth:
   tokenInfo:
     tokenSecret: 926D96C90030DD58429D2751AC1BDBBC
@@ -16,7 +14,12 @@ auth:
       - http://192.168.0.17:3000/oauth2/redirect
       - myandroidapp://oauth2/redirect
       - myiosapp://oauth2/redirect
+api:
+  basePath: /api/v1
 spring:
+  resources:
+    static-locations:
+      - file:${project.basedir}/../../ui/build/
   application:
     name: ro-app
   liquibase:

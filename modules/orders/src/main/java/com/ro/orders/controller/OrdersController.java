@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("${api.basePath}/orders")
 public class OrdersController {
   private final MakingOrdersService makingOrdersService;
   private final CrudOrdersService crudOrdersService;

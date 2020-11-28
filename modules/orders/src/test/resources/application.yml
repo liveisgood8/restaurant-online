@@ -16,11 +16,5 @@ spring:
   jackson:
     serialization:
       write_dates_as_timestamps: true
-
-log4j:
-  logger:
-    org:
-      hibernate:
-        transaction: DEBUG,R
-      springframework:
-        transaction: DEBUG,R
+api:
+  basePath: ''

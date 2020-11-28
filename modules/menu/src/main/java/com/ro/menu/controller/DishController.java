@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/menu/dishes")
+@RequestMapping("${api.basePath}/menu/dishes")
 public class DishController {
   private final DishService dishService;
   private final DishDtoMapper dishDtoMapper;

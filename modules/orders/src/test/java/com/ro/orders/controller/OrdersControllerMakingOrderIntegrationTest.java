@@ -2,6 +2,7 @@ package com.ro.orders.controller;
 
 import com.ro.auth.AuthTestUtils;
 import com.ro.auth.config.AuthModuleConfig;
+import com.ro.core.ApiConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
 import com.ro.core.utils.TelephoneNumberUtils;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -37,6 +39,7 @@ import static org.hamcrest.MatcherAssert.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {
+    ApiConfig.class,
     OrdersModuleConfig.class,
     MenuModuleConfig.class,
     CoreModuleConfig.class,

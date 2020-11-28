@@ -16,3 +16,5 @@ spring:
   jackson:
     serialization:
       write_dates_as_timestamps: true
+api:
+  basePath: ''
