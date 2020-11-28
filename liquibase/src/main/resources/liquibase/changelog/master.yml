@@ -27,3 +27,6 @@ databaseChangeLog:
   - include:
       file: bonuses-balance-view.yml
       relativeToChangelogFile: true
+  - include:
+      file: menu-module-add-archived-columns.yml
+      relativeToChangelogFile: true

@@ -26,6 +26,9 @@ public class Category {
   @Column(name = "name", nullable = false, length = 64)
   private String name;
 
+  @Column(name = "archived", nullable = false, columnDefinition = "smallint not null default 0")
+  private Boolean archived;
+
   @Column(name = "image_path")
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;

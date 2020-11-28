@@ -17,9 +17,6 @@ auth:
 api:
   basePath: /api/v1
 spring:
-  resources:
-    static-locations:
-      - file:${project.basedir}/../../ui/build/
   application:
     name: ro-app
   liquibase:

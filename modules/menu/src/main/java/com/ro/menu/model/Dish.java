@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 @EqualsAndHashCode(of = {"id", "name"})
@@ -45,6 +46,9 @@ public class Dish {
   @Column(name = "price", nullable = false)
   private Short price;
 
+  @Column(name = "archived", nullable = false, columnDefinition = "smallint not null default 0")
+  private Boolean archived;
+
   @Column(name = "image_path")
   @Basic(fetch = FetchType.LAZY)
   private String imagePath;
@@ -53,6 +57,6 @@ public class Dish {
   @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
-  @OneToMany(mappedBy = "dish")
-  private Set<DishEmotion> emotions = Collections.emptySet();
+  @OneToMany(mappedBy = "dish", cascade = CascadeType.REMOVE)
+  private Set<DishEmotion> emotions = new HashSet<>();
 }

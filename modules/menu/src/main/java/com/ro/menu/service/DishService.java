@@ -64,8 +64,9 @@ public class DishService {
     return dishRepository.save(dish);
   }
 
+  @Transactional
   public void delete(Long id) {
-    dishRepository.deleteById(id);
+    dishRepository.updateArchived(id, true);
   }
 
   public byte[] getImageBytes(Long dishId) throws IOException, EntityNotFoundException {
