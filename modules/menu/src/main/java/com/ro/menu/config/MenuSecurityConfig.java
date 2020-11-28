@@ -24,6 +24,7 @@ public class MenuSecurityConfig implements ModuleSecurity {
         .antMatchers(HttpMethod.GET, apiConfig.getBasePath() + "/menu/categories/**").permitAll()
         .antMatchers(apiConfig.getBasePath() + "/menu/dishes/*/likes/like").authenticated()
         .antMatchers(apiConfig.getBasePath() + "/menu/dishes/*/likes/dislike").authenticated()
+        .antMatchers(apiConfig.getBasePath() + "/menu/categories/**").hasAuthority("ADMIN")
         .antMatchers(apiConfig.getBasePath() + "/menu/dishes/**").hasAuthority("ADMIN");
   }
 }

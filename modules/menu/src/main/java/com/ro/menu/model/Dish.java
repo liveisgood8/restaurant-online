@@ -47,7 +47,7 @@ public class Dish {
   private Short price;
 
   @Column(name = "archived", nullable = false, columnDefinition = "smallint not null default 0")
-  private Boolean archived;
+  private Boolean archived = false;
 
   @Column(name = "image_path")
   @Basic(fetch = FetchType.LAZY)

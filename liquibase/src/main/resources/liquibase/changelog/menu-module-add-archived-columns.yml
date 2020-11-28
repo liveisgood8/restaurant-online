@@ -9,7 +9,10 @@ databaseChangeLog:
             columns:
               - column:
                   name: archived
-                  type: 'smallint not null default 0'
+                  type: smallint
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
   - changeSet:
       id: create-archived-column-categories-table
       author: nexus
@@ -19,4 +22,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: archived
-                  type: 'smallint not null default 0'
+                  type: smallint
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
