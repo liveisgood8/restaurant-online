@@ -62,6 +62,12 @@
 
 		<dependency>
 			<groupId>com.ro</groupId>
+			<artifactId>liquibase</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.ro</groupId>
 			<artifactId>auth</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
