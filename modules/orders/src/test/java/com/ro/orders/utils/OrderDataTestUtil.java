@@ -1,5 +1,6 @@
 package com.ro.orders.utils;
 
+import com.ro.auth.data.model.User;
 import com.ro.core.CoreTestUtils;
 import com.ro.core.data.model.Address;
 import com.ro.core.data.model.TelephoneNumber;
@@ -11,6 +12,7 @@ import com.ro.menu.repository.CategoryRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.orders.data.dto.objects.OrderDto;
 import com.ro.orders.data.dto.objects.OrderPartDto;
+import com.ro.orders.data.model.BonusesTransaction;
 import com.ro.orders.data.model.Order;
 import com.ro.orders.data.model.OrderPart;
 import com.ro.orders.data.model.PaymentMethod;
@@ -87,6 +89,39 @@ public class OrderDataTestUtil {
 
         order.getOrderParts().add(firstPart);
         order.getOrderParts().add(secondPart);
+
+        order = ordersRepository.save(order);
+        initializeOrderLazyProperties(order);
+
+        return order;
+    }
+
+    @Transactional
+    public Order createAndSaveUserOrder(boolean isApproved, User user, int receivedBonuses) {
+        Order order = CoreTestUtils.getRandomObject(Order.class);
+        order.setPaymentMethod(paymentMethodRepository.findByName(PaymentMethod.BY_CARD_ONLINE).orElseThrow());
+        order.setAddress(createAndSaveAddress());
+        order.setTelephoneNumber(createAndSaveTelephoneNumber());
+        order.setIsApproved(isApproved);
+        order.setUser(user);
+
+        OrderPart firstPart = CoreTestUtils.getRandomObject(OrderPart.class);
+        firstPart.setDish(createAndSaveDish());
+        firstPart.setOrder(order);
+
+        OrderPart secondPart = CoreTestUtils.getRandomObject(OrderPart.class);
+        secondPart.setDish(createAndSaveDish());
+        secondPart.setOrder(order);
+
+        order.getOrderParts().add(firstPart);
+        order.getOrderParts().add(secondPart);
+
+        BonusesTransaction incomeTransaction = new BonusesTransaction();
+        incomeTransaction.setAmount(receivedBonuses);
+        incomeTransaction.setOrder(order);
+        incomeTransaction.setUser(user);
+
+        order.getBonusesTransactions().add(incomeTransaction);
 
         order = ordersRepository.save(order);
         initializeOrderLazyProperties(order);

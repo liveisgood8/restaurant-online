@@ -14,7 +14,7 @@ public class UserDto implements Identity {
   private String email;
   private String name;
   private String password;
-  private Integer bonuses;
+  private Integer bonusesBalance;
   private String phone;
   private Set<String> authorities = Collections.emptySet();
 }

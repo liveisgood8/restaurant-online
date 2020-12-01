@@ -19,17 +19,19 @@ public class MakingOrdersService {
   private final OrdersRepository ordersRepository;
   private final OrderDtoMapper orderDtoMapper;
   private final OrderContactsService orderContactsService;
+  private final BonusesTransactionService bonusesTransactionService;
   private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
   public MakingOrdersService(OrdersRepository ordersRepository,
                              OrderDtoMapper orderDtoMapper,
                              OrderContactsService orderContactsService,
+                             BonusesTransactionService bonusesTransactionService,
                              ApplicationEventMulticaster eventMulticaster) {
     this.ordersRepository = ordersRepository;
-
     this.orderDtoMapper = orderDtoMapper;
     this.orderContactsService = orderContactsService;
+    this.bonusesTransactionService = bonusesTransactionService;
     this.eventMulticaster = eventMulticaster;
   }
 
@@ -42,25 +44,7 @@ public class MakingOrdersService {
 
     order.setIsApproved(order.getPaymentMethod().getName().equals(PaymentMethod.BY_CARD_ONLINE));
 
-    if (user != null && orderDto.getSpentBonuses() != null && orderDto.getSpentBonuses() != 0) {
-      BonusesTransaction outcomeTransaction = new BonusesTransaction();
-      outcomeTransaction.setUser(user);
-      outcomeTransaction.setAmount(-1 * orderDto.getSpentBonuses());
-      outcomeTransaction.setOrder(order);
-      order.getBonusesTransactions().add(outcomeTransaction);
-    }
-
-    int bonuses = 0;
-    if (user != null) {
-      bonuses = calculateBonuses(order);
-      if (bonuses > 0) {
-        BonusesTransaction incomeTransaction = new BonusesTransaction();
-        incomeTransaction.setUser(user);
-        incomeTransaction.setAmount(bonuses);
-        incomeTransaction.setOrder(order);
-        order.getBonusesTransactions().add(incomeTransaction);
-      }
-    }
+    createBonusesTransactions(order, orderDto.getSpentBonuses());
 
     order = ordersRepository.save(order);
 
@@ -68,6 +52,24 @@ public class MakingOrdersService {
     eventMulticaster.multicastEvent(orderEvent);
 
     return ordersRepository.save(order);
+  }
+
+  private void createBonusesTransactions(Order order, Integer spentBonuses) {
+    User user = order.getUser();
+    if (user == null) {
+      return;
+    }
+
+    if (spentBonuses != null && spentBonuses > 0) {
+      BonusesTransaction outcomeTransaction = bonusesTransactionService.addOutcome(order, user, spentBonuses);
+      order.getBonusesTransactions().add(outcomeTransaction);
+    }
+
+    int receivedBonuses = calculateBonuses(order);
+    if (receivedBonuses > 0) {
+      BonusesTransaction incomeTransaction = bonusesTransactionService.addIncome(order, user, receivedBonuses);
+      order.getBonusesTransactions().add(incomeTransaction);
+    }
   }
 
   private int calculateBonuses(Order order) {

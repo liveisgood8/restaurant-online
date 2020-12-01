@@ -1,7 +1,9 @@
 package com.ro.orders.controller;
 
+import com.jayway.jsonpath.JsonPath;
 import com.ro.auth.AuthTestUtils;
 import com.ro.auth.config.AuthModuleConfig;
+import com.ro.auth.data.model.User;
 import com.ro.core.ApiConfig;
 import com.ro.core.CoreModuleConfig;
 import com.ro.core.CoreTestUtils;
@@ -17,6 +19,7 @@ import com.ro.orders.data.model.PaymentMethod;
 import com.ro.orders.utils.OrderDataTestUtil;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -77,7 +80,7 @@ class OrdersControllerMakingOrderIntegrationTest {
         .andExpect(jsonPath("$.receivedBonuses", is(0)));
 
     assertMakeOrderAnswer(givenOrder, false, result);
-    assertOrderInDatabase(givenOrder, false, false);
+    assertOrderInDatabase(givenOrder, 1, false, false);
   }
 
   @Test
@@ -92,13 +95,45 @@ class OrdersControllerMakingOrderIntegrationTest {
         .andExpect(jsonPath("$.receivedBonuses", is(0)));
 
     assertMakeOrderAnswer(givenOrder, true, result);
-    assertOrderInDatabase(givenOrder, true,false);
+    assertOrderInDatabase(givenOrder, 1, true,false);
+  }
+
+  @Test
+  public void makeOrder_whenAuthorizedAndSpendingBonuses() throws Exception {
+    OrderDto givenOrder = createOrderDtoForMakeOrder(PaymentMethod.BY_CARD_ONLINE);
+    givenOrder.setSpentBonuses(78);
+    givenOrder.setReceivedBonuses(484); // Must be ignored
+
+    User authUser = createUserWithBonuses(getExpectedReceivedBonuses(givenOrder));
+
+    ResultActions result = mockMvc.perform(
+        post("/orders")
+            .with(user(authUser))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(CoreTestUtils.asJson(givenOrder)))
+        .andExpect(jsonPath("$.spentBonuses", is(givenOrder.getSpentBonuses())))
+        .andExpect(jsonPath("$.receivedBonuses", is(getExpectedReceivedBonuses(givenOrder))));
+
+
+    assertMakeOrderAnswer(givenOrder, true, result);
+
+    int id = JsonPath.read(result.andReturn().getResponse().getContentAsString(), "$.id");
+    assertOrderInDatabase(givenOrder, id, true,true);
+  }
+
+  private User createUserWithBonuses(int amount) {
+    User user = authTestUtils.createAndSaveUserInDataSource();
+    orderDataTestUtil.createAndSaveUserOrder(true, user, amount);
+
+    // Updated user with bonuses
+    user = authTestUtils.getInitializedUser(user.getEmail());
+    return user;
   }
 
   @Test
   public void makeOrder_whenAuthorized() throws Exception {
     OrderDto givenOrder = createOrderDtoForMakeOrder(PaymentMethod.BY_CARD_ONLINE);
-    givenOrder.setSpentBonuses(59);
+    givenOrder.setSpentBonuses(0);
     givenOrder.setReceivedBonuses(484); // Must be ignored
 
     ResultActions result = mockMvc.perform(
@@ -110,7 +145,7 @@ class OrdersControllerMakingOrderIntegrationTest {
         .andExpect(jsonPath("$.receivedBonuses", is(getExpectedReceivedBonuses(givenOrder))));
 
     assertMakeOrderAnswer(givenOrder, true, result);
-    assertOrderInDatabase(givenOrder, true,true);
+    assertOrderInDatabase(givenOrder, 1,true,true);
   }
 
   private OrderDto createOrderDtoForMakeOrder(String paymentMethodName) {
@@ -125,7 +160,7 @@ class OrdersControllerMakingOrderIntegrationTest {
                                      ResultActions resultActions) throws Exception {
       resultActions
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.id", is(1)))
+        .andExpect(jsonPath("$.id", notNullValue()))
         .andExpect(jsonPath("$.isApproved", is(expectedApprovedState)))
         .andExpect(jsonPath("$.paymentMethod", is(givenOrder.getPaymentMethod())))
         .andExpect(jsonPath("$.phone", is(givenOrder.getPhone())))
@@ -142,9 +177,10 @@ class OrdersControllerMakingOrderIntegrationTest {
   }
 
   private void assertOrderInDatabase(OrderDto givenOrder,
+                                     long id,
                                      boolean expectedApprovedState,
                                      boolean shouldBonusesExist) {
-    Order order = orderDataTestUtil.getFullyInitialized(1L);
+    Order order = orderDataTestUtil.getFullyInitialized(id);
 
     assertEquals(givenOrder.getPaymentMethod(), order.getPaymentMethod().getName());
     assertEquals(expectedApprovedState, order.getIsApproved());
@@ -154,8 +190,8 @@ class OrdersControllerMakingOrderIntegrationTest {
     } else {
       int expectedReceivedBonuses = getExpectedReceivedBonuses(givenOrder);
 
-      assertEquals(expectedReceivedBonuses, order.getReceivedBonuses());
-      assertEquals(givenOrder.getSpentBonuses(), order.getSpentBonuses());
+      assertEquals(expectedReceivedBonuses, order.getReceivedBonuses(), "received bonuses is not equal");
+      assertEquals(givenOrder.getSpentBonuses(), order.getSpentBonuses(), "spent bonuses is not equal");
     }
 
     // Phone assertation

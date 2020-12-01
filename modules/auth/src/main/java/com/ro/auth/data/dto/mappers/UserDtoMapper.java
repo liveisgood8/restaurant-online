@@ -30,7 +30,6 @@ public abstract class UserDtoMapper {
 
   @Mapping(target = "telephoneNumber", source = "phone")
   @Mapping(target = "authorities", ignore = true)
-  @Mapping(target = "bonuses", ignore = true)
   @Mapping(target = "password", ignore = true)
   public abstract User toEntity(UserDto userDto);
 

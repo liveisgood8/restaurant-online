@@ -39,7 +39,6 @@ public class OAuth2Service {
         User user = new User();
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setName(oAuth2UserInfo.getName());
-        user.setBonuses(0);
         user.setAuthProvider(provider);
         user.setIsCredentialsExpired(true);
 

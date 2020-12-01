@@ -2,6 +2,7 @@ package com.ro.auth.data.model;
 
 import com.ro.core.data.AbstractModel;
 import com.ro.core.data.model.TelephoneNumber;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,9 +32,6 @@ public class User extends AbstractModel implements OAuth2User, UserDetails {
   @Column(name = "name", length = 32)
   private String name;
 
-  @Column(name = "bonuses", columnDefinition = "integer default 0", nullable = false)
-  private Integer bonuses;
-
   @Column(name = "is_credentials_expired", columnDefinition = "boolean default false", nullable = false)
   private Boolean isCredentialsExpired = false;
 
@@ -47,6 +45,11 @@ public class User extends AbstractModel implements OAuth2User, UserDetails {
   @OneToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "auth_provider_id", nullable = false)
   private AuthProvider authProvider;
+
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  @OneToOne(mappedBy = "user")
+  private UserBonusesBalance bonusesBalance;
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private Set<UserAuthority> authorities = Collections.emptySet();
@@ -87,5 +90,9 @@ public class User extends AbstractModel implements OAuth2User, UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  public int getBonusesBalance() {
+    return bonusesBalance == null ? 0 : bonusesBalance.getAmount();
   }
 }

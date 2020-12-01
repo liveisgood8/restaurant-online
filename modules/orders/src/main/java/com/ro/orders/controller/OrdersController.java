@@ -3,10 +3,14 @@ package com.ro.orders.controller;
 import com.ro.auth.data.model.User;
 import com.ro.orders.data.dto.mapper.OrderDtoMapper;
 import com.ro.orders.data.dto.objects.OrderDto;
+import com.ro.orders.data.model.BonusesTransaction;
 import com.ro.orders.data.model.Order;
+import com.ro.orders.exception.BonusesTransactionException;
 import com.ro.orders.service.CrudOrdersService;
 import com.ro.orders.service.MakingOrdersService;
+import com.ro.orders.validation.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,5 +62,11 @@ public class OrdersController {
 
     Order order = makingOrdersService.save(orderDto, user);
     return orderDtoMapper.toDto(order);
+  }
+  
+  @ExceptionHandler(BonusesTransactionException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ApiError handleBonusesTransactionException(BonusesTransactionException ex) {
+    return new ApiError(ex.getMessage());
   }
 }

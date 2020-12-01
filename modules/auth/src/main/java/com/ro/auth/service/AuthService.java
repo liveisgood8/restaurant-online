@@ -62,7 +62,6 @@ public class AuthService {
     AuthProvider authProvider = authProviderRepository.findByName(AuthProvider.NATIVE)
         .orElseThrow(() -> new OAuth2ProviderNotExistException(AuthProvider.NATIVE));
 
-    user.setBonuses(0);
     user.setAuthProvider(authProvider);
     return userRepository.save(user);
   }
