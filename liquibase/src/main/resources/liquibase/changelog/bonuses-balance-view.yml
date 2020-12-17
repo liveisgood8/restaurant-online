@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/bonuses-balance-view.yml
+  - changeSet:
+      id: create-bonuses-balance-view
+      author: nexus
+      changes:
+        - createView:
+            viewName: bonuses_balance
+            selectQuery: select user_id, sum(amount) balance from bonuses_transactions group by user_id

@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/bonuses-balance-view.yml
+  - changeSet:
+      id: create-archived-column-dishes-table
+      author: nexus
+      changes:
+        - addColumn:
+            tableName: dishes
+            columns:
+              - column:
+                  name: archived
+                  type: smallint
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: create-archived-column-categories-table
+      author: nexus
+      changes:
+        - addColumn:
+            tableName: categories
+            columns:
+              - column:
+                  name: archived
+                  type: smallint
+                  defaultValue: 0
+                  constraints:
+                    nullable: false

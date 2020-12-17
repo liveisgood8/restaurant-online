@@ -3,6 +3,8 @@ package com.ro.menu.dto.mappers;
 import com.sun.istack.Nullable;
 import org.apache.commons.io.FilenameUtils;
 
+import java.util.Base64;
+
 public class ImageMapper {
   public enum ImageSource {
     DISH,
@@ -13,8 +15,8 @@ public class ImageMapper {
     if (imagePath == null) {
       return null;
     }
-    String fileNamePart = FilenameUtils.getBaseName(imagePath).substring(0, 15);
+    String fileNameBase64 = Base64.getEncoder().encodeToString(FilenameUtils.getBaseName(imagePath).getBytes());
     String partUrl = imageSource == ImageSource.DISH ? "dishes" : "categories";
-    return String.format("/menu/%s/%s/image?%s", partUrl, id, fileNamePart);
+    return String.format("/menu/%s/%s/image?%s", partUrl, id, fileNameBase64);
   }
 }

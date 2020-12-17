@@ -1,21 +1,21 @@
 package com.ro.menu.service;
 
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.User;
 import com.ro.menu.dto.mappers.ImageMapper;
 import com.ro.menu.exceptions.EmotionAlreadyExistException;
 import com.ro.menu.model.Dish;
 import com.ro.menu.model.DishEmotion;
-import com.ro.menu.repository.DishLikesRepository;
+import com.ro.menu.repository.DishEmotionRepository;
 import com.ro.menu.repository.DishRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,12 +27,12 @@ import java.util.Optional;
 public class DishService {
   private final Path uploadImagesDir;
   private final DishRepository dishRepository;
-  private final DishLikesRepository dishEmotionsRepository;
+  private final DishEmotionRepository dishEmotionsRepository;
 
   @Autowired
   public DishService(@Value("${uploads.directory:uploads}") String uploadsDirectory,
                      DishRepository dishRepository,
-                     DishLikesRepository dishEmotionsRepository) throws IOException {
+                     DishEmotionRepository dishEmotionsRepository) throws IOException {
     uploadImagesDir = Paths.get(uploadsDirectory, "dish-images");
     this.dishRepository = dishRepository;
     this.dishEmotionsRepository = dishEmotionsRepository;
@@ -45,6 +45,10 @@ public class DishService {
 
   public List<Dish> getByCategoryId(Long categoryId) {
     return dishRepository.findByCategoryId(categoryId);
+  }
+
+  public List<Dish> getByNameContaining(String contain) {
+    return dishRepository.findByNameContainingIgnoreCase(contain);
   }
 
   @Transactional
@@ -60,8 +64,9 @@ public class DishService {
     return dishRepository.save(dish);
   }
 
+  @Transactional
   public void delete(Long id) {
-    dishRepository.deleteById(id);
+    dishRepository.updateArchived(id, true);
   }
 
   public byte[] getImageBytes(Long dishId) throws IOException, EntityNotFoundException {

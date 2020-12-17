@@ -1,5 +1,7 @@
 package com.ro.app;
 
+import com.ro.core.exceptions.RoIllegalArgumentException;
+import com.ro.core.exceptions.RoIllegalStateException;
 import com.ro.menu.validation.ApiError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +57,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     String message = String.join("\n", errors);
     return new ResponseEntity<>(new ApiError(message), headers, status);
+  }
+
+  @ExceptionHandler(value = { RoIllegalStateException.class, RoIllegalArgumentException.class })
+  protected ResponseEntity<Object> handleIllegal(RuntimeException ex, WebRequest request) {
+    return new ResponseEntity<>(new ApiError(ex.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
   @Override

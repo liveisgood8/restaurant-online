@@ -1,7 +1,7 @@
 package com.ro.orders.events.listeners;
 
 import com.ro.orders.events.OrderEvent;
-import com.ro.orders.model.Order;
+import com.ro.orders.data.model.Order;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package com.ro.auth.oauth2.user.info;
 
-import com.ro.auth.model.AuthProvider;
+import com.ro.auth.data.model.AuthProvider;
 import com.ro.auth.oauth2.exception.OAuth2AuthenticationProcessingException;
 
 import java.util.Map;

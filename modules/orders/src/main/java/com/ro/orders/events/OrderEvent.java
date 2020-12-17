@@ -1,6 +1,6 @@
 package com.ro.orders.events;
 
-import com.ro.orders.model.Order;
+import com.ro.orders.data.model.Order;
 import org.springframework.context.ApplicationEvent;
 
 public class OrderEvent extends ApplicationEvent {

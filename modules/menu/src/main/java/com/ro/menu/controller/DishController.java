@@ -1,6 +1,6 @@
 package com.ro.menu.controller;
 
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.User;
 import com.ro.menu.controller.payload.UploadImageResponse;
 import com.ro.menu.dto.mappers.DishDtoMapper;
 import com.ro.menu.dto.objects.DishDto;
@@ -21,23 +21,38 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.groups.Default;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/menu/dishes")
+@RequestMapping("${api.basePath}/menu/dishes")
 public class DishController {
   private final DishService dishService;
+  private final DishDtoMapper dishDtoMapper;
 
   @Autowired
-  public DishController(DishService dishService) {
+  public DishController(DishService dishService,
+                        DishDtoMapper dishDtoMapper) {
     this.dishService = dishService;
+    this.dishDtoMapper = dishDtoMapper;
   }
 
   @GetMapping
   public List<DishDto> getAll(@RequestParam Long categoryId) {
     List<Dish> dishes = categoryId == null ? dishService.getAll() : dishService.getByCategoryId(categoryId);
-    return DishDtoMapper.INSTANCE.toDto(dishes);
+    return dishDtoMapper.toDto(dishes);
   }
+
+  @GetMapping("/search")
+  public List<DishDto> search(@RequestParam(required = false) String name) {
+    if (name == null) {
+      return Collections.emptyList();
+    }
+
+    List<Dish> dishes = dishService.getByNameContaining(name);
+    return dishDtoMapper.toDto(dishes);
+  }
+
 
   @GetMapping(value = "{id}/image", produces = MediaType.IMAGE_PNG_VALUE)
   public ResponseEntity<byte[]> getImage(@PathVariable Long id) throws IOException {
@@ -63,7 +78,7 @@ public class DishController {
   @ResponseStatus(HttpStatus.CREATED)
   public DishDto create(@Validated({Default.class, InsertGroup.class}) @RequestBody Dish dish) {
     Dish createdDish = dishService.create(dish);
-    return DishDtoMapper.INSTANCE.toDto(createdDish);
+    return dishDtoMapper.toDto(createdDish);
   }
 
   @PostMapping("{id}/likes/like")
@@ -81,7 +96,7 @@ public class DishController {
   @PatchMapping("{id}")
   public DishDto update(@PathVariable Long id, @RequestBody Dish dish) throws Exception {
     Dish updatedDish = dishService.update(id, dish);
-    return DishDtoMapper.INSTANCE.toDto(updatedDish);
+    return dishDtoMapper.toDto(updatedDish);
   }
 
   @DeleteMapping("{id}")

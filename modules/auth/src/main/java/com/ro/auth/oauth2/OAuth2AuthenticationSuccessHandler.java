@@ -2,7 +2,7 @@ package com.ro.auth.oauth2;
 
 import com.ro.auth.config.AuthProperties;
 import com.ro.auth.exception.BadRedirectException;
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.User;
 import com.ro.auth.utils.CookieUtils;
 import com.ro.auth.utils.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;

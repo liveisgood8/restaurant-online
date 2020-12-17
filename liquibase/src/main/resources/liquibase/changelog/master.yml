@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/master.yml
+  - include:
+      file: auth-module.yml
+      relativeToChangelogFile: true
+  - include:
+      file: menu-module.yml
+      relativeToChangelogFile: true
+  - include:
+      file: orders-module.yml
+      relativeToChangelogFile: true
+  - include:
+      file: analytics-module.yml
+      relativeToChangelogFile: true
+  - include:
+      file: payment-methods.yml
+      relativeToChangelogFile: true
+  - include:
+      file: authorities.yml
+      relativeToChangelogFile: true
+  - include:
+      file: auth-providers.yml
+      relativeToChangelogFile: true
+  - include:
+      file: admin-user.yml
+      relativeToChangelogFile: true
+  - include:
+      file: bonuses-balance-view.yml
+      relativeToChangelogFile: true
+  - include:
+      file: menu-module-add-archived-columns.yml
+      relativeToChangelogFile: true

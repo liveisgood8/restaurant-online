@@ -13,3 +13,5 @@ spring:
       - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: none

@@ -1,0 +1,271 @@
+databaseChangeLog:
+  - logicalFilePath: liquibase/changelog/orders-module.yml
+  - changeSet:
+      id: 1603457296309-1
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: addresses
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: addressesPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: apartment_number
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: entrance_number
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: floor_number
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: home_number
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: street
+                  type: VARCHAR(64)
+  - changeSet:
+      id: 1603457296309-4
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: bonuses_transactions
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: bonuses_transactionsPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: amount
+                  type: INT
+              - column:
+                  name: created_at
+                  type: datetime
+              - column:
+                  constraints:
+                    nullable: false
+                  name: order_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+  - changeSet:
+      id: 1603457296309-9
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: ordersPK
+                  name: id
+                  type: BIGINT
+              - column:
+                  name: created_at
+                  type: datetime
+              - column:
+                  constraints:
+                    nullable: false
+                  name: is_approved
+                  type: BIT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: address_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: payment_method_id
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: telephone_number_id
+                  type: BIGINT
+              - column:
+                  name: user_id
+                  type: BIGINT
+  - changeSet:
+      id: 1603457296309-8
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: order_parts
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: count
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: selling_price
+                  type: SMALLINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: order_partsPK
+                  name: dish_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: order_partsPK
+                  name: order_id
+                  type: BIGINT
+  - changeSet:
+      id: 1603457296309-10
+      author: nexus (generated)
+      changes:
+        - createTable:
+            tableName: payment_methods
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: payment_methodsPK
+                  name: id
+                  type: TINYINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(64)
+  - changeSet:
+      id: 1603457296309-17
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: orders
+            constraintName: FK32ql8ubntj5uh44ph9659tiih
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1603457296309-18
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: bonuses_transactions
+            constraintName: FK4v9y770tscjuiwjwv5l9ljih
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: orders
+            validate: true
+  - changeSet:
+      id: 1603457296309-19
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: bonuses_transactions
+            constraintName: FK5vbdhyu0if1a8q5aqpfo9quar
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: users
+            validate: true
+  - changeSet:
+      id: 1603457296309-20
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: telephone_number_id
+            baseTableName: orders
+            constraintName: FK809u7115rn4ir14ag5jxk5c51
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: telephone_numbers
+            validate: true
+  - changeSet:
+      id: 1603457296309-21
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: payment_method_id
+            baseTableName: orders
+            constraintName: FKa03ljb6t6oa6mqtoifuwkb0kw
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: payment_methods
+            validate: true
+  - changeSet:
+      id: 1603457296309-25
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: address_id
+            baseTableName: orders
+            constraintName: FKhlglkvf5i60dv6dn397ethgpt
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: addresses
+            validate: true
+  - changeSet:
+      id: 1603457296309-29
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: order_id
+            baseTableName: order_parts
+            constraintName: FKq8djk3hm20rfxcmrbd63irspq
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: orders
+            validate: true
+  - changeSet:
+      id: 1603457296309-30
+      author: nexus (generated)
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: dish_id
+            baseTableName: order_parts
+            constraintName: FKss2qc2uq5fduhvhsvq4uhvm9y
+            deferrable: false
+            initiallyDeferred: false
+            referencedColumnNames: id
+            referencedTableName: dishes
+            validate: true

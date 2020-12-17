@@ -1,23 +1,22 @@
 package com.ro.auth.service;
 
-import com.ro.auth.dto.mappers.UserDtoMapper;
-import com.ro.auth.dto.objects.UserDto;
+import com.ro.auth.data.lib.AuthenticateData;
 import com.ro.auth.exception.UserAlreadyExistException;
-import com.ro.auth.model.AuthProvider;
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.AuthProvider;
+import com.ro.auth.data.model.User;
 import com.ro.auth.oauth2.exception.OAuth2ProviderNotExistException;
-import com.ro.auth.repository.AuthProviderRepository;
-import com.ro.auth.repository.UserRepository;
+import com.ro.auth.data.repository.AuthProviderRepository;
+import com.ro.auth.data.repository.UserRepository;
+import com.ro.auth.utils.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 
 @Service
 public class AuthService {
@@ -25,32 +24,37 @@ public class AuthService {
   private final AuthenticationManager authenticationManager;
   private final UserRepository userRepository;
   private final AuthProviderRepository authProviderRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final JwtUserDetailsService jwtUserDetailsService;
+  private final JwtTokenUtil jwtTokenUtil;
 
   @Autowired
   public AuthService(AuthenticationManager authenticationManager,
                      UserRepository userRepository,
                      AuthProviderRepository authProviderRepository,
-                     PasswordEncoder passwordEncoder) {
+                     JwtUserDetailsService jwtUserDetailsService,
+                     JwtTokenUtil jwtTokenUtil) {
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
     this.authProviderRepository = authProviderRepository;
-    this.passwordEncoder = passwordEncoder;
+    this.jwtUserDetailsService = jwtUserDetailsService;
+    this.jwtTokenUtil = jwtTokenUtil;
   }
 
-  public void authenticateUser(String username, String password) {
+  public AuthenticateData authenticateUser(String username, String password) {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+
+    User user = (User) jwtUserDetailsService.loadUserByUsername(username);
+    String accessToken = jwtTokenUtil.generateToken(user);
+
+    return new AuthenticateData(user, accessToken);
   }
 
   @Transactional
-  public User updateInfo(User user, UserDto userDto) {
-    UserDtoMapper.INSTANCE.mergeWithDto(user, userDto);
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
+  public User update(User user) {
     return userRepository.save(user);
   }
 
-  public User register(UserDto userDto) {
-    User user = UserDtoMapper.INSTANCE.toEntity(userDto);
+  public User register(User user) {
     if (isUserExist(user)) {
       throw new UserAlreadyExistException();
     }
@@ -58,8 +62,6 @@ public class AuthService {
     AuthProvider authProvider = authProviderRepository.findByName(AuthProvider.NATIVE)
         .orElseThrow(() -> new OAuth2ProviderNotExistException(AuthProvider.NATIVE));
 
-    user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    user.setBonuses(0);
     user.setAuthProvider(authProvider);
     return userRepository.save(user);
   }

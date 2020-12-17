@@ -5,23 +5,19 @@ import com.ro.menu.model.Category;
 import com.ro.menu.repository.CategoryRepository;
 import com.ro.core.utils.NullAwareBeanUtilsBean;
 import com.ro.menu.utils.FileUploadUtils;
-import com.sun.istack.Nullable;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -78,7 +74,8 @@ public class CategoryService {
     categoryRepository.save(category);
   }
 
+  @Transactional
   public void delete(Long id) {
-    categoryRepository.deleteById(id);
+    categoryRepository.updateArchived(id, true);
   }
 }

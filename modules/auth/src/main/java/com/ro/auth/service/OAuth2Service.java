@@ -1,18 +1,17 @@
 package com.ro.auth.service;
 
 import com.ro.auth.exception.UserAlreadyExistException;
-import com.ro.auth.model.AuthProvider;
-import com.ro.auth.model.User;
-import com.ro.auth.oauth2.exception.OAuth2AuthenticationProcessingException;
+import com.ro.auth.data.model.AuthProvider;
+import com.ro.auth.data.model.User;
 import com.ro.auth.oauth2.exception.OAuth2ProviderNotExistException;
 import com.ro.auth.oauth2.user.info.OAuth2UserInfo;
-import com.ro.auth.repository.AuthProviderRepository;
-import com.ro.auth.repository.UserRepository;
+import com.ro.auth.data.repository.AuthProviderRepository;
+import com.ro.auth.data.repository.UserRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -40,7 +39,6 @@ public class OAuth2Service {
         User user = new User();
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setName(oAuth2UserInfo.getName());
-        user.setBonuses(0);
         user.setAuthProvider(provider);
         user.setIsCredentialsExpired(true);
 

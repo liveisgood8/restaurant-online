@@ -1,0 +1,3 @@
+[submodule "restaurant-online-ui"]
+	path = ui
+	url = https://github.com/liveisgood8/restaurant-online-ui.git

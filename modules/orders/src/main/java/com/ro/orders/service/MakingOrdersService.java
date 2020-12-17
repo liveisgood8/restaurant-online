@@ -1,135 +1,75 @@
 package com.ro.orders.service;
 
-import com.ro.auth.model.User;
-import com.ro.core.model.Address;
-import com.ro.core.repository.AddressRepository;
-import com.ro.core.repository.TelephoneNumberRepository;
-import com.ro.menu.model.Dish;
-import com.ro.menu.repository.DishRepository;
-import com.ro.orders.dto.mapper.MakeOrderDtoMapper;
-import com.ro.orders.dto.objects.MakeOrderDto;
+import com.ro.auth.data.model.User;
+import com.ro.orders.data.dto.mapper.OrderDtoMapper;
+import com.ro.orders.data.dto.objects.OrderDto;
 import com.ro.orders.events.OrderEvent;
-import com.ro.orders.exception.PaymentMethodNotExistException;
-import com.ro.orders.lib.OrderInfo;
-import com.ro.orders.model.BonusesTransaction;
-import com.ro.orders.model.Order;
-import com.ro.orders.model.OrderPart;
-import com.ro.orders.model.PaymentMethod;
-import com.ro.orders.repository.OrdersInfoRepository;
-import com.ro.orders.repository.OrdersRepository;
-import com.ro.orders.repository.PaymentMethodRepository;
+import com.ro.orders.data.model.BonusesTransaction;
+import com.ro.orders.data.model.Order;
+import com.ro.orders.data.model.PaymentMethod;
+import com.ro.orders.data.repository.OrdersRepository;
 import com.sun.istack.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ApplicationEventMulticaster;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
-
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MakingOrdersService {
   private final OrdersRepository ordersRepository;
-  private final OrdersInfoRepository ordersInfoRepository;
-  private final TelephoneNumberRepository telephoneNumberRepository;
-  private final DishRepository dishRepository;
-  private final PaymentMethodRepository paymentMethodRepository;
+  private final OrderDtoMapper orderDtoMapper;
+  private final OrderContactsService orderContactsService;
   private final BonusesTransactionService bonusesTransactionService;
-  private final AddressRepository addressRepository;
   private final ApplicationEventMulticaster eventMulticaster;
 
   @Autowired
   public MakingOrdersService(OrdersRepository ordersRepository,
-                             OrdersInfoRepository ordersInfoRepository,
-                             TelephoneNumberRepository telephoneNumberRepository,
-                             DishRepository dishRepository,
-                             PaymentMethodRepository paymentMethodRepository,
+                             OrderDtoMapper orderDtoMapper,
+                             OrderContactsService orderContactsService,
                              BonusesTransactionService bonusesTransactionService,
-                             AddressRepository addressRepository,
                              ApplicationEventMulticaster eventMulticaster) {
     this.ordersRepository = ordersRepository;
-    this.ordersInfoRepository = ordersInfoRepository;
-    this.telephoneNumberRepository = telephoneNumberRepository;
-    this.dishRepository = dishRepository;
-    this.paymentMethodRepository = paymentMethodRepository;
+    this.orderDtoMapper = orderDtoMapper;
+    this.orderContactsService = orderContactsService;
     this.bonusesTransactionService = bonusesTransactionService;
-    this.addressRepository = addressRepository;
     this.eventMulticaster = eventMulticaster;
   }
 
   @Transactional
-  public void approveOrder(Long id) {
-    ordersRepository.setIsApprovedById(true, id);
-  }
-
-  @Transactional
-  public OrderInfo makeOrder(MakeOrderDto makeOrderDto, @Nullable User user) {
-    Order order = MakeOrderDtoMapper.INSTANCE.toOrderEntity(makeOrderDto);
+  public Order save(OrderDto orderDto, @Nullable User user) {
+    Order order = orderDtoMapper.toEntity(orderDto);
     order.setUser(user);
+
+    orderContactsService.saveOrderContacts(order);
+
     order.setIsApproved(order.getPaymentMethod().getName().equals(PaymentMethod.BY_CARD_ONLINE));
 
-    prepareOrderForSave(order);
-    Order finalOrder = ordersRepository.save(order);
+    createBonusesTransactions(order, orderDto.getSpentBonuses());
 
-    prepareOrderPartsForSave(finalOrder);
-    List<OrderPart> savedOrderParts = ordersInfoRepository.saveAll(finalOrder.getOrderParts());
-    finalOrder.setOrderParts(new HashSet<>(savedOrderParts));
+    order = ordersRepository.save(order);
 
-    if (user != null && makeOrderDto.getSpentBonuses() != null && makeOrderDto.getSpentBonuses() != 0) {
-      BonusesTransaction outcomeTransaction = bonusesTransactionService.addOutcome(order,
-          user,
-          makeOrderDto.getSpentBonuses());
-      finalOrder.getBonusesTransactions().add(outcomeTransaction);
-    }
-
-    int bonuses = 0;
-    if (user != null) {
-      bonuses = calculateBonuses(finalOrder);
-      if (bonuses > 0) {
-        BonusesTransaction incomeTransaction = bonusesTransactionService.addIncome(order,
-                user,
-                bonuses);
-        finalOrder.getBonusesTransactions().add(incomeTransaction);
-      }
-    }
-
-    OrderEvent orderEvent = new OrderEvent(finalOrder, this);
+    OrderEvent orderEvent = new OrderEvent(order, this);
     eventMulticaster.multicastEvent(orderEvent);
 
-    return new OrderInfo(finalOrder, bonuses);
+    return ordersRepository.save(order);
   }
 
-  private void prepareOrderForSave(Order order) {
-    PaymentMethod paymentMethod = paymentMethodRepository.findByName(order.getPaymentMethod().getName())
-        .orElseThrow(() -> new PaymentMethodNotExistException(order.getPaymentMethod().getName()));
+  private void createBonusesTransactions(Order order, Integer spentBonuses) {
+    User user = order.getUser();
+    if (user == null) {
+      return;
+    }
 
-    order.setPaymentMethod(paymentMethod);
-    order.setAddress(handleOrderAddress(order.getAddress()));
-    order.setTelephoneNumber(telephoneNumberRepository.save(order.getTelephoneNumber())); // TODO Check phone existence
-  }
+    if (spentBonuses != null && spentBonuses > 0) {
+      BonusesTransaction outcomeTransaction = bonusesTransactionService.addOutcome(order, user, spentBonuses);
+      order.getBonusesTransactions().add(outcomeTransaction);
+    }
 
-  private void prepareOrderPartsForSave(Order finalOrder) {
-    finalOrder.getOrderParts().forEach(o -> {
-      Dish dish = dishRepository.findById(o.getDish().getId())
-          .orElseThrow(() -> new EntityNotFoundException("Dish with id: " + o.getDish().getId() + " not founded"));
-
-      o.getId().setOrderId(finalOrder.getId());
-      o.setOrder(finalOrder);
-      o.setDish(dish);
-    });
-  }
-
-  private Address handleOrderAddress(Address address) {
-    ExampleMatcher addressMatcher = ExampleMatcher.matchingAll()
-        .withIgnorePaths("id")
-        .withIgnoreCase();
-
-    Optional<Address> foundedAddress = addressRepository.findOne(Example.of(address, addressMatcher));
-    return foundedAddress.orElseGet(() -> addressRepository.save(address));
+    int receivedBonuses = calculateBonuses(order);
+    if (receivedBonuses > 0) {
+      BonusesTransaction incomeTransaction = bonusesTransactionService.addIncome(order, user, receivedBonuses);
+      order.getBonusesTransactions().add(incomeTransaction);
+    }
   }
 
   private int calculateBonuses(Order order) {

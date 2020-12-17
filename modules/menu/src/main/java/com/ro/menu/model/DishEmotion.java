@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.ro.auth.model.User;
+import com.ro.auth.data.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,9 +12,10 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id", scope = DishEmotion.class)
 @Entity
-@Table(name = "dish_likes")
+@Table(name = "dish_emotions", indexes = {
+    @Index(name = "user_unique_emotion", columnList = "dish_id,emotion_type,user_id")
+})
 public class DishEmotion {
   public enum EmotionType {
     LIKE,
